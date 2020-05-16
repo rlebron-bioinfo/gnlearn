@@ -1,18 +1,3 @@
-#' A Test Function
-#'
-#' This function allows you to test your package.
-#' @param message Say something.
-#' @keywords test message
-#' @export
-#' @examples
-#' test.function()
-#' test.function('The way to get started is to quit talking and begin doing.')
-#' test.function(message='Your time is limited, so don't waste it living someone else's life.')
-
-test.function <- function(message='hello world!') {
-    print(message)
-}
-
 #' Graph Format Conversion
 #'
 #' This function allows you to convert graph between different formats: adjacency matrix, list of edges, igraph and bn (bnlearn).
@@ -46,6 +31,15 @@ convert_format <- function(x, to, from=NULL) {
     return(obj)
 }
 
+#' Graph Format Detection
+#'
+#' This function allows you to detect graph format.
+#' @param x Graph object.
+#' @keywords graph format
+#' @export
+#' @examples
+#' detect_format(obj)
+
 detect_format <- function(x) {
     fmt <- class(x)[1]
     fmt <- switch(fmt,
@@ -64,6 +58,15 @@ adjacency_or_edges <- function(x) {
         return('edges')
     }
 }
+
+#' Convert Graph To Edge List
+#'
+#' This function allows you to convert your graph to edge list format.
+#' @param x Graph object.
+#' @param from Input format (optional).
+#' @export
+#' @examples
+#' mtx <- as_edges(obj)
 
 as_edges <- function(x, from=NULL) {
     if (is.null(from)) {
@@ -89,6 +92,15 @@ as_edges <- function(x, from=NULL) {
     return(mtx)
 }
 
+#' Convert Graph To Adjacency Matrix
+#'
+#' This function allows you to convert your graph to adjacency matrix format.
+#' @param x Graph object.
+#' @param from Input format (optional).
+#' @export
+#' @examples
+#' mtx <- as_adjacency(obj)
+
 as_adjacency <- function(x, from=NULL) {
     if (is.null(from)) {
         from=detect_format(x)
@@ -98,20 +110,6 @@ as_adjacency <- function(x, from=NULL) {
             mtx <- as.matrix(x)
         },
         edges = {
-            #nodes <- union(x[[1]], x[[2]])
-            #nodes <- nodes[!duplicated(nodes)]
-            #j <- dim(x)[1]
-            #n <- length(nodes)
-            #df <- as.data.frame(matrix(0, n, n))
-            #colnames(df) <- as.character(nodes)
-            #rownames(df) <- as.character(nodes)
-            #for (i in 1:j) {
-            #    row <- x[i,]
-            #    f <- as.character(row[[1]])
-            #    t <- as.character(row[[2]])
-            #    df[f, t] = 1
-            #}
-            #mtx <- as.matrix(df)
             g <- igraph::graph_from_edgelist(as.matrix(x), directed=TRUE)
             mtx <- as.matrix(igraph::as_adjacency_matrix(g, type='both'))
         },
@@ -126,6 +124,15 @@ as_adjacency <- function(x, from=NULL) {
     )
     return(mtx)
 }
+
+#' Convert Graph To igraph Format
+#'
+#' This function allows you to convert your graph to igraph format.
+#' @param x Graph object.
+#' @param from Input format (optional).
+#' @export
+#' @examples
+#' g <- as_igraph(obj)
 
 as_igraph <- function(x, from=NULL) {
     if (is.null(from)) {
@@ -148,6 +155,15 @@ as_igraph <- function(x, from=NULL) {
     )
     return(g)
 }
+
+#' Convert Graph To bn Format
+#'
+#' This function allows you to convert your graph to bn format (bnlearn).
+#' @param x Graph object.
+#' @param from Input format (optional).
+#' @export
+#' @examples
+#' g <- as_bn(obj)
 
 as_bn <- function(x, from=NULL) {
     if (is.null(from)) {
