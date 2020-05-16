@@ -1,7 +1,7 @@
 Package: gnlearn
 Title: Genetic Network Learning
 Version: 0.0.0
-Authors@R: 
+Authors@R:
     person(given = "Ricardo",
            family = "Lebrón",
            role = c("aut", "cre"),
@@ -14,13 +14,13 @@ Authors@R:
            comment = c(Google.Scholar = "ALjiTg0AAAAJ"))
 Description: Genetic Network Learning.
 Imports:
-    igraph
-    threejs
+    igraph,
+    threejs,
     bnlearn
 Suggests:
-    graph
-    Rgraphviz
-    RBGL
+    graph,
+    Rgraphviz,
+    RBGL,
     gRain
 License: GPL-3
 Encoding: UTF-8
