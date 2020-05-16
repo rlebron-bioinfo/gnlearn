@@ -16,7 +16,8 @@ Description: Genetic Network Learning.
 Imports:
     igraph,
     threejs,
-    bnlearn
+    bnlearn,
+    jsonlite
 Suggests:
     graph,
     Rgraphviz,
