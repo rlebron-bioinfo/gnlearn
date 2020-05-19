@@ -3,7 +3,7 @@
 #' This function allows you to import a local dataset.
 #' @param path Path to local dataset.
 #' @param log Whether or not to apply log(x+1) (optional). Default: FALSE
-#' @param sep Separator / delimiter character (optional). Default: '\t'
+#' @param sep Separator / delimiter character (optional). Default: TAB
 #' @param header Whether or not the file has a header (optional). Default: TRUE
 #' @param index Whether or not the file has an index column (optional). Default: FALSE
 #' @param transpose Whether or not to transpose the data matrix (optional). IMPORTANT NOTE: gnlearn works with cell x gene matrices. Default: FALSE
