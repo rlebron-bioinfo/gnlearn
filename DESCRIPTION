@@ -17,8 +17,7 @@ Imports:
     igraph,
     threejs,
     bnlearn,
-    jsonlite,
-    svDialogs
+    jsonlite
 Suggests:
     graph,
     Rgraphviz,
