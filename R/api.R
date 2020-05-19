@@ -1,6 +1,6 @@
 HOST = 'https://gnlearn-api.herokuapp.com'
 
-#' List Genesets Available Via RESTful API 
+#' List Genesets Available Via RESTful API
 #'
 #' This function allows you to list genesets available via RESTful API.
 #' @param sp.scientific Species (Scientific Name) (regex) (optional).
@@ -31,7 +31,7 @@ list_genesets <- function(sp.scientific=NULL, sp.common=NULL, dataset=NULL, host
     return(df)
 }
 
-#' List Datasets Available Via RESTful API 
+#' List Datasets Available Via RESTful API
 #'
 #' This function allows you to list datasets available via RESTful API.
 #' @param sp.scientific Species (Scientific Name) (regex) (optional).
@@ -79,7 +79,7 @@ list_datasets <- function(sp.scientific=NULL, sp.common=NULL, bio.layer=NULL, se
     return(df)
 }
 
-#' Download A Geneset Via RESTful API 
+#' Download A Geneset Via RESTful API
 #'
 #' This function allows you to download a geneset available via RESTful API.
 #' @param code Download Code (indicated by list_genesets() output).
@@ -102,10 +102,11 @@ download_geneset <- function(code, host=HOST) {
     }
 }
 
-#' Download A Dataset Via RESTful API 
+#' Download A Dataset Via RESTful API
 #'
 #' This function allows you to download a dataset available via RESTful API.
 #' @param code Download Code (indicated by list_datasets() output).
+#' @param log Whether or not to apply log(x+1) (optional). Default: FALSE
 #' @keywords datasets api
 #' @export
 #' @examples

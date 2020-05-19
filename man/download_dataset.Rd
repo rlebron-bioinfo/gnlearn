@@ -8,6 +8,8 @@ download_dataset(code, log = FALSE, host = HOST)
 }
 \arguments{
 \item{code}{Download Code (indicated by list_datasets() output).}
+
+\item{log}{Whether or not to apply log(x+1) (optional). Default: FALSE}
 }
 \description{
 This function allows you to download a dataset available via RESTful API.
