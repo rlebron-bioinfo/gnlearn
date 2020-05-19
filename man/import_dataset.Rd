@@ -18,7 +18,7 @@ import_dataset(
 
 \item{log}{Whether or not to apply log(x+1) (optional). Default: FALSE}
 
-\item{sep}{Separator / delimiter character (optional). Default: '\t'}
+\item{sep}{Separator / delimiter character (optional). Default: TAB}
 
 \item{header}{Whether or not the file has a header (optional). Default: TRUE}
 
