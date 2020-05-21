@@ -16,13 +16,19 @@ Description: Genetic Network Learning.
 Imports:
     igraph,
     threejs,
+    glasso,
     bnlearn,
     jsonlite
+Remotes:
+    gherardovarando/gclm
 Suggests:
     graph,
     Rgraphviz,
     RBGL,
-    gRain
+    gRain,
+    glmnet,
+    MASS,
+    ggplot2
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
