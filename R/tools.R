@@ -210,3 +210,122 @@ as_bn <- function(x, from=NULL) {
     )
     return(g)
 }
+
+#' Graph Plotting
+#'
+#' This function allows you to plot a graph, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
+#' @param x Graph object.
+#' @param from Input format (optional).
+#' @param layout igraph plot layout (optional). It will be ignored if interactive=TRUE.
+#' @param from Interactive plot (optional). Default: FALSE
+#' @keywords graph plot
+#' @export
+#' @examples
+#' plot_graph(obj, interactive=FALSE)
+#' plot_graph(obj, interactive=TRUE)
+
+plot_graph <- function(x, from=NULL, layout=NULL, interactive=FALSE) {
+    if (is.null(from)) {
+        from=detect_format(x)
+    }
+    g <- as_igraph(x, from=from)
+    if (is.null(layout)) {
+        layout=igraph::layout_nicely(g)
+    }
+    if (interactive) {
+        threejs::graphjs(g)
+    } else {
+        igraph::plot.igraph(g, layout=layout)
+    }
+}
+
+#' Adjacency Matrix Plotting
+#'
+#' This function allows you to plot a graph as an adjacency matrix, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
+#' @param x Graph object.
+#' @param from Input format (optional).
+#' @param col Heatmap color palette (optional).
+#' @keywords adjacency heatmap plot
+#' @export
+#' @examples
+#' heatmap_adjacency(obj)
+
+heatmap_adjacency <- function(x, from=NULL, col=NULL) {
+    if (is.null(from)) {
+        from=detect_format(x)
+    }
+    mtx <- as_adjacency(x, from=from)
+    if (is.null(col)) {
+        col=colorRampPalette(c('white', 'dark blue'))(100)
+    }
+    stats::heatmap(mtx, col=col)
+}
+
+#' Graph Comparison
+#'
+#' This function allows you to compare two graphs, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
+#' @param learned Learned graph or graph 1.
+#' @param true Ground truth graph or graph 2 (reference).
+#' @param arcs Whether or not to list the arcs (optional). Default: FALSE.
+#' @keywords graph comparison
+#' @export
+#' @examples
+#' comparison <- compare_graphs(obj1, obj2)
+
+compare_graphs <- function(learned, true, arcs=FALSE) {
+    learned <- as_igraph(learned)
+    true <- as_igraph(true)
+    learned <- igraph::simplify(learned, remove.multiple=TRUE, remove.loops=TRUE)
+    true <- igraph::simplify(true, remove.multiple=TRUE, remove.loops=TRUE)
+    v1 <- names(igraph::V(learned))
+    v2 <- names(igraph::V(true))
+    r1 <- v1[!(v1 %in% v2)]
+    r2 <- v2[!(v2 %in% v1)]
+    learned <- igraph::delete_vertices(learned, r1)
+    true <- igraph::delete_vertices(true, r2)
+    u <- igraph::union(learned, true)
+    tp <- igraph::intersection(learned, true)
+    fp <- igraph::difference(u, true)
+    fn <- igraph::difference(u, learned)
+    p <- precision(igraph::ecount(tp), igraph::ecount(fp))
+    r <- recall(igraph::ecount(tp), igraph::ecount(fn))
+    f1 <- f1_score(igraph::ecount(tp), igraph::ecount(fp), igraph::ecount(fn))
+    #bn_learned <- as_bn(learned)
+    #bn_true <- as_bn(true)
+    #shd <- bnlearn::shd(bn_learned, bn_true)
+    #hamming <- bnlearn::hamming(bn_learned, bn_true)
+    if (arcs) {
+        tp <- igraph::as_edgelist(tp)
+        fp <- igraph::as_edgelist(fp)
+        fn <- igraph::as_edgelist(fn)
+    } else {
+        tp <- igraph::ecount(tp)
+        fp <- igraph::ecount(fp)
+        fn <- igraph::ecount(fn)
+    }
+    return(list(
+        tp = tp,
+        fp = fp,
+        fn = fn,
+        precision = p,
+        recall = r,
+        f1_score = f1 #,
+        #shd = shd,
+        #hamming = hamming
+    ))
+
+}
+
+precision <- function(tp, fp) {
+    return(tp/(tp+fp))
+}
+
+recall <- function(tp, fn) {
+    return(tp/(tp+fn))
+}
+
+f1_score <- function(tp, fp, fn) {
+    p <- precision(tp, fp)
+    r <- recall(tp, fn)
+    return((2*p*r)/(p+r))
+}
