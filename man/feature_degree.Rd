@@ -21,6 +21,14 @@ feature_degree(
 \item{genes}{Geneset with features.}
 
 \item{features}{Features you want to analyze. Default: all boolean features.}
+
+\item{in.degree}{Whether or not to analyze in-degree (optional). Default: TRUE.}
+
+\item{out.degree}{Whether or not to analyze out-degree (optional). Default: TRUE.}
+
+\item{loops}{Whether or not to consider loops (optional). Default: FALSE.}
+
+\item{normalized}{Whether or not to normalize degrees (optional). Default: FALSE.}
 }
 \description{
 This function allows you to calculate the in-degree and out-degree of genes that have a certain feature (e.g. transcription factors or tumor suppressor genes).
