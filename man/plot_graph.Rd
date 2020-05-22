@@ -9,9 +9,11 @@ plot_graph(x, from = NULL, layout = NULL, interactive = FALSE)
 \arguments{
 \item{x}{Graph object.}
 
-\item{from}{Interactive plot (optional). Default: FALSE}
+\item{from}{Input format (optional).}
 
 \item{layout}{igraph plot layout (optional). It will be ignored if interactive=TRUE.}
+
+\item{interactive}{Interactive plot (optional). Default: FALSE}
 }
 \description{
 This function allows you to plot a graph, regardless of the format (adjacency matrix, list of edges, igraph, or bn).

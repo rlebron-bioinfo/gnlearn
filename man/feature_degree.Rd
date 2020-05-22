@@ -22,6 +22,8 @@ feature_degree(
 
 \item{features}{Features you want to analyze. Default: all boolean features.}
 
+\item{vertices}{Vertices you want to analyze. Default: all vertices.}
+
 \item{in.degree}{Whether or not to analyze in-degree (optional). Default: TRUE.}
 
 \item{out.degree}{Whether or not to analyze out-degree (optional). Default: TRUE.}
@@ -39,12 +41,7 @@ mtx <- feature_degree(x, genes, features=c('tf', 'target', 'tumor.suppressor'))
 mtx <- feature_degree(x, genes, features='tumor.suppressor', in.degree=TRUE, out.degree=FALSE)
 mtx <- feature_degree(x, genes, features='essential', vertices=c('ADRB1', 'HSF2'), normalized=TRUE)
 }
-\keyword{Default:}
-\keyword{Vertices}
-\keyword{all}
-\keyword{analyze.}
-\keyword{to}
-\keyword{vertices}
-\keyword{vertices.}
-\keyword{want}
-\keyword{you}
+\keyword{degree}
+\keyword{feature}
+\keyword{graph}
+\keyword{vertex}
