@@ -217,7 +217,7 @@ as_bn <- function(x, from=NULL) {
 #' @param x Graph object.
 #' @param from Input format (optional).
 #' @param layout igraph plot layout (optional). It will be ignored if interactive=TRUE.
-#' @param from Interactive plot (optional). Default: FALSE
+#' @param interactive Interactive plot (optional). Default: FALSE
 #' @keywords graph plot
 #' @export
 #' @examples
@@ -229,6 +229,42 @@ plot_graph <- function(x, from=NULL, layout=NULL, interactive=FALSE) {
         from=detect_format(x)
     }
     g <- as_igraph(x, from=from)
+    if (is.null(layout)) {
+        layout=igraph::layout_nicely(g)
+    }
+    if (interactive) {
+        threejs::graphjs(g)
+    } else {
+        igraph::plot.igraph(g, layout=layout)
+    }
+}
+
+#' Feature Graph Plotting
+#'
+#' This function allows you to plot the graph of a feature (e.g. transcription factors or tumor suppressors).
+#' @param x Graph object.
+#' @param genes Geneset with features.
+#' @param features Feature whose graph you want to plot.
+#' @param from Input format (optional).
+#' @param feature.color Color of the nodes with the feature (optional).
+#' @param other.color Color of the other nodes (optional).
+#' @param layout igraph plot layout (optional). It will be ignored if interactive=TRUE.
+#' @param interactive Interactive plot (optional). Default: FALSE
+#' @keywords graph feature plot
+#' @export
+#' @examples
+#' plot_graph(obj, genes, 'tf', interactive=FALSE)
+#' plot_graph(obj, genes, 'tumor.suppressor', interactive=TRUE)
+
+plot_feature_graph <- function(x, genes, feature, from=NULL, feature.color='red', other.color='green', layout=NULL, interactive=FALSE) {
+    if (is.null(from)) {
+        from=detect_format(x)
+    }
+    x <- as_edges(x, from=from)
+    f_genes <- genes[genes[feature]==TRUE,]$name
+    x <- x[x[,1] %in% f_genes | x[,2] %in% f_genes, ]
+    g <- as_igraph(x, from='edges')
+    V(g)$color <- ifelse(names(igraph::V(g)) %in% f_genes, 'red', 'green')
     if (is.null(layout)) {
         layout=igraph::layout_nicely(g)
     }
@@ -336,11 +372,13 @@ f1_score <- function(tp, fp, fn) {
 #' @param x Graph object.
 #' @param genes Geneset with features.
 #' @param features Features you want to analyze. Default: all boolean features.
+#' @param vertices Vertices you want to analyze. Default: all vertices.
 #' @param in.degree Whether or not to analyze in-degree (optional). Default: TRUE.
 #' @param out.degree Whether or not to analyze out-degree (optional). Default: TRUE.
 #' @param loops Whether or not to consider loops (optional). Default: FALSE.
 #' @param normalized Whether or not to normalize degrees (optional). Default: FALSE.
-#' @keywords vertices Vertices you want to analyze. Default: all vertices.
+#' @keywords graph feature vertex degree
+#' @export
 #' @examples
 #' mtx <- feature_degree(x, genes)
 #' mtx <- feature_degree(x, genes, features=c('tf', 'target', 'tumor.suppressor'))
