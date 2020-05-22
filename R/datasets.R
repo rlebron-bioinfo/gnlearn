@@ -172,3 +172,44 @@ import_dataset <- function(path, log=FALSE, sep='\t', header=TRUE, index=FALSE, 
     }
     return(df)
 }
+
+#' Select (automatically) the most appropriate gene columns of your dataset.
+#'
+#' This function allows you to (automatically) select the most appropriate gene columns of your dataset.
+#' @param df Dataset.
+#' @param genes Geneset with features (optional).
+#' @param selected.genes User-selected genes (optional).
+#' @param features Features you want to select (optional).
+#' @param max.genes Maximum number of selected genes (optional).
+#' @param min.non.zeros Minimum number of non-zero values per gene (optional).
+#' @param glasso Using the GLASSO algorithm to exclude unconnected genes (optional).
+#' @param rho Non-negative regularization parameter for GLASSO.
+#' @keywords genes select
+#' @export
+#' @examples
+#' df <- select_genes(df, max.genes=100, min.non.zeros=2)
+#' df <- select_genes(df, genes=genes, features=c('tumor.suppressor', 'breast.cancer'), glasso=TRUE, rho=0.5)
+
+select_genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max.genes=100, min.non.zeros=2, glasso=TRUE, rho=0.5) {
+    if (is.null(selected.genes)) {
+        selected.genes <- colnames(df)
+    }
+    selected.genes <- selected.genes[colSums(df!=0) >= min.non.zeros]
+    if (!is.null(genes) & !is.null(features)) {
+        f_genes <- c()
+        for (f in features) {
+            tmp <- intersect(selected.genes, genes[genes[f]==TRUE,]$name)
+            f_genes <- union(f_genes, tmp)
+        }
+        selected.genes <- f_genes
+    }
+    df <- subset(df, select=selected.genes)
+    if (glasso & !is.null(rho)) {
+        g <- run.glasso(df, rho, unconnected.nodes=FALSE)
+        selected.genes <- names(igraph::V(g))
+    }
+    if (length(selected.genes) > max.genes) {
+        df <- df[,1:max.genes]
+    }
+    return(df)
+}
