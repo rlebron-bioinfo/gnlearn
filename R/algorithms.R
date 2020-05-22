@@ -66,6 +66,8 @@ run.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.
     library(foreach)
     library(doParallel)
 
+    df <- df[apply(df, 1, function(x) !all(x==0)),]
+    df <- df[,apply(df, 2, function(x) !all(x==0))]
     df <- as.matrix(df)
     n.genes <- ncol(df)
     if (is.null(m)) {
