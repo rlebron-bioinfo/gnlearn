@@ -329,3 +329,134 @@ f1_score <- function(tp, fp, fn) {
     r <- recall(tp, fn)
     return((2*p*r)/(p+r))
 }
+
+#' Feature Degree
+#'
+#' This function allows you to calculate the in-degree and out-degree of genes that have a certain feature (e.g. transcription factors or tumor suppressor genes).
+#' @param x Graph object.
+#' @param genes Geneset with features.
+#' @param features Features you want to analyze. Default: all boolean features.
+#' @keywords vertices Vertices you want to analyze. Default: all vertices.
+#' @export in.degree Whether or not to analyze in-degree (optional). Default: TRUE.
+#' @export out.degree Whether or not to analyze out-degree (optional). Default: TRUE.
+#' @export loops Whether or not to consider loops (optional). Default: FALSE.
+#' @export normalized Whether or not to normalize degrees (optional). Default: FALSE.
+#' @examples
+#' mtx <- feature_degree(x, genes)
+#' mtx <- feature_degree(x, genes, features=c('tf', 'target', 'tumor.suppressor'))
+#' mtx <- feature_degree(x, genes, features='tumor.suppressor', in.degree=TRUE, out.degree=FALSE)
+#' mtx <- feature_degree(x, genes, features='essential', vertices=c('ADRB1', 'HSF2'), normalized=TRUE)
+
+feature_degree <- function(x, genes, features=NULL, vertices=NULL, in.degree=TRUE, out.degree=TRUE, loops=FALSE, normalized=FALSE) {
+    x <- as_adjacency(x)
+    if (!loops) {
+        diag(x) <- 0
+    }
+    k <- sum(c(in.degree, out.degree))
+    if (k==0) {
+        in.degree <- TRUE
+        out.degree <- TRUE
+        k = 2
+    }
+    if (!is.null(features)) {
+        features <- features[as.logical(lapply(features, valid_feature, genes=genes))]
+        n.features <- length(features)
+        if (n.features==0) {
+            features <- colnames(genes)
+            features <- features[as.logical(lapply(features, valid_feature, genes=genes))]
+            n.features <- length(features)
+        }
+    } else {
+        features <- colnames(genes)
+        features <- features[as.logical(lapply(features, valid_feature, genes=genes))]
+        n.features <- length(features)
+    }
+    if (!is.null(vertices)) {
+        vertices <- vertices[as.logical(lapply(vertices, valid_vertex, x=x))]
+        n.vertices <- length(vertices)
+        if (n.vertices==0) {
+            vertices <- colnames(x)
+            n.vertices <- length(vertices)
+        }
+    } else {
+        vertices <- colnames(x)
+        n.vertices <- length(vertices)
+    }
+    mtx = matrix(NA, n.vertices, k+n.features*k)
+    rownames(mtx) <- vertices
+    colnames(mtx) <- feature_colnames(features, in.degree, out.degree)
+    for (v in vertices) {
+        if (in.degree) {
+            mtx[v, 'in.degree'] <- igraph::degree(as_igraph(x), v, mode='in', normalized=normalized)
+        }
+        if (out.degree) {
+            mtx[v, 'out.degree'] <- igraph::degree(as_igraph(x), v, mode='out', normalized=normalized)
+        }
+        for (f in features) {
+            f_genes <- intersect(colnames(x), genes[genes[f]==TRUE,]$name)
+            if (!v %in% f_genes) {
+                f_genes <- c(v, f_genes)
+                j = 2
+            } else {
+                j = 1
+            }
+            f_x <- subset(x, select=f_genes)
+            f_x <- f_x[f_genes, ]
+            if (!is.null(dim(f_x))) {
+                if (loops) {
+                    s <- f_x[v, v]
+                } else {
+                    s <- 0
+                }
+                diag(f_x) <- 0
+                f_x[v, v] <- s
+                if (in.degree) {
+                    f_col <- paste(f, 'in.degree', sep='|')
+                    mtx[v, f_col] <- igraph::degree(as_igraph(f_x, from='adjacency'), v, mode='in')
+                    if (normalized) {
+                        mtx[v, f_col] <- mtx[v, f_col]/(length(f_genes)-j)
+                    }
+                }
+                if (out.degree) {
+                    f_col <- paste(f, 'out.degree', sep='|')
+                    mtx[v, f_col] <- igraph::degree(as_igraph(f_x, from='adjacency'), v, mode='out')
+                    if (normalized) {
+                        mtx[v, f_col] <- mtx[v, f_col]/(length(f_genes)-j)
+                    }
+                }
+            }
+        }
+    }
+    return(mtx)
+}
+
+valid_feature <- function(genes, feature) {
+    col.classes <- lapply(genes, class)
+    if (feature %in% colnames(genes)) {
+        if (col.classes[feature]=='logical') {
+            return(TRUE)
+        } else {
+            return(FALSE)
+        }
+    } else{
+        return(FALSE)
+    }
+}
+
+valid_vertex <- function(x, vertex) {
+    x <- as_adjacency(x)
+    return(vertex %in% colnames(x))
+}
+
+feature_colnames <- function(features, in.degree, out.degree) {
+    cols <- c('in.degree', 'out.degree')[c(in.degree, out.degree)]
+    for (feature in features) {
+        if (in.degree) {
+            cols <- c(cols, paste(feature, 'in.degree', sep='|'))
+        }
+        if (out.degree) {
+            cols <- c(cols, paste(feature, 'out.degree', sep='|'))
+        }
+    }
+    return(cols)
+}
