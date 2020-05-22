@@ -39,8 +39,8 @@ run.glasso <- function(df, rho=0.5, to='igraph', upper=FALSE, lower=TRUE, loops=
         A <- ifelse(A!=0, non.zero.coeff, 0)
     }
     if (!unconnected.nodes) {
-        A <- A[apply(A, 1, function(x) !all(x==0)),]
-        A <- A[,apply(A, 2, function(x) !all(x==0))]
+        j <- apply(A, 1, function(x) !all(x==0)) | apply(A, 2, function(x) !all(x==0))
+        A <- A[j,j]
     }
     g <- convert_format(A, to=to)
     return(g)
