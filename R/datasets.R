@@ -106,13 +106,13 @@ download_geneset <- function(code, host=HOST) {
 #'
 #' This function allows you to download a dataset available via RESTful API.
 #' @param code Download Code (indicated by list_datasets() output).
-#' @param log Whether or not to apply log(x+1) (optional). Default: FALSE
+#' @param log Whether or not to apply log(x+1) (optional). Default: TRUE
 #' @keywords datasets api
 #' @export
 #' @examples
 #' df <- download_dataset(1)
 
-download_dataset <- function(code, log=FALSE, host=HOST) {
+download_dataset <- function(code, log=TRUE, host=HOST) {
     uri <- file.path(host, 'datasets', code)
     df <- jsonlite::fromJSON(uri)
     url <- df$raw.dataset

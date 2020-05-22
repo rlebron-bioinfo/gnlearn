@@ -4,12 +4,12 @@
 \alias{download_dataset}
 \title{Download A Dataset Via RESTful API}
 \usage{
-download_dataset(code, log = FALSE, host = HOST)
+download_dataset(code, log = TRUE, host = HOST)
 }
 \arguments{
 \item{code}{Download Code (indicated by list_datasets() output).}
 
-\item{log}{Whether or not to apply log(x+1) (optional). Default: FALSE}
+\item{log}{Whether or not to apply log(x+1) (optional). Default: TRUE}
 }
 \description{
 This function allows you to download a dataset available via RESTful API.

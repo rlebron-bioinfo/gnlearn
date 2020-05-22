@@ -28,7 +28,8 @@ Suggests:
     gRain,
     glmnet,
     MASS,
-    ggplot2
+    ggplot2,
+    network
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

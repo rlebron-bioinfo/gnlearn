@@ -366,6 +366,20 @@ f1_score <- function(tp, fp, fn) {
     return((2*p*r)/(p+r))
 }
 
+common_edges <- function(learned, true) {
+    learned <- as_igraph(learned)
+    true <- as_igraph(true)
+    learned <- igraph::simplify(learned, remove.multiple=TRUE, remove.loops=TRUE)
+    true <- igraph::simplify(true, remove.multiple=TRUE, remove.loops=TRUE)
+    v1 <- names(igraph::V(learned))
+    v2 <- names(igraph::V(true))
+    r1 <- v1[!(v1 %in% v2)]
+    r2 <- v2[!(v2 %in% v1)]
+    learned <- igraph::delete_vertices(learned, r1)
+    true <- igraph::delete_vertices(true, r2)
+    return(list(learned=learned, true=true))
+}
+
 #' Feature Degree
 #'
 #' This function allows you to calculate the in-degree and out-degree of genes that have a certain feature (e.g. transcription factors or tumor suppressor genes).
