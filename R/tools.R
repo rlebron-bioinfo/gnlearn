@@ -264,7 +264,7 @@ plot_feature_graph <- function(x, genes, feature, from=NULL, feature.color='red'
     f_genes <- genes[genes[feature]==TRUE,]$name
     x <- x[x[,1] %in% f_genes | x[,2] %in% f_genes, ]
     g <- as_igraph(x, from='edges')
-    V(g)$color <- ifelse(names(igraph::V(g)) %in% f_genes, 'red', 'green')
+    igraph::V(g)$color <- ifelse(names(igraph::V(g)) %in% f_genes, 'red', 'green')
     if (is.null(layout)) {
         layout=igraph::layout_nicely(g)
     }
