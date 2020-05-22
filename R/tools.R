@@ -336,11 +336,11 @@ f1_score <- function(tp, fp, fn) {
 #' @param x Graph object.
 #' @param genes Geneset with features.
 #' @param features Features you want to analyze. Default: all boolean features.
+#' @param in.degree Whether or not to analyze in-degree (optional). Default: TRUE.
+#' @param out.degree Whether or not to analyze out-degree (optional). Default: TRUE.
+#' @param loops Whether or not to consider loops (optional). Default: FALSE.
+#' @param normalized Whether or not to normalize degrees (optional). Default: FALSE.
 #' @keywords vertices Vertices you want to analyze. Default: all vertices.
-#' @export in.degree Whether or not to analyze in-degree (optional). Default: TRUE.
-#' @export out.degree Whether or not to analyze out-degree (optional). Default: TRUE.
-#' @export loops Whether or not to consider loops (optional). Default: FALSE.
-#' @export normalized Whether or not to normalize degrees (optional). Default: FALSE.
 #' @examples
 #' mtx <- feature_degree(x, genes)
 #' mtx <- feature_degree(x, genes, features=c('tf', 'target', 'tumor.suppressor'))
