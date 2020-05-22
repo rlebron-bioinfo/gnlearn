@@ -4,7 +4,7 @@
 \alias{drop.all.zeros}
 \title{Drop rows and/or columns with all zeros}
 \usage{
-drop.all.zeros(mtx, rows = TRUE, columns = TRUE, square.matrix = NULL)
+drop.all.zeros(mtx, rows = TRUE, columns = TRUE, square.matrix = "none")
 }
 \arguments{
 \item{mtx}{Matrix or dataframe.}

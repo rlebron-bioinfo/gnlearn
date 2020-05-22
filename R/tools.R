@@ -224,7 +224,7 @@ as.bn <- function(x, from=NULL) {
 #' plot.graph(obj, interactive=FALSE)
 #' plot.graph(obj, interactive=TRUE)
 
-plot.graph <- function(x, from=NULL, layout=NULL, interactive=FALSE) {
+graph.plot <- function(x, from=NULL, layout=NULL, interactive=FALSE) {
     if (is.null(from)) {
         from=detect.format(x)
     }
@@ -256,7 +256,7 @@ plot.graph <- function(x, from=NULL, layout=NULL, interactive=FALSE) {
 #' plot.feature.graph(obj, genes, 'tf', interactive=FALSE)
 #' plot.feature.graph(obj, genes, 'tumor.suppressor', interactive=TRUE)
 
-plot.feature.graph <- function(x, genes, feature, from=NULL, feature.color='red', other.color='green', layout=NULL, interactive=FALSE) {
+feature.plot <- function(x, genes, feature, from=NULL, feature.color='red', other.color='green', layout=NULL, interactive=FALSE) {
     if (is.null(from)) {
         from=detect.format(x)
     }
@@ -286,7 +286,7 @@ plot.feature.graph <- function(x, genes, feature, from=NULL, feature.color='red'
 #' @examples
 #' heatmap.adjacency(obj)
 
-heatmap.adjacency <- function(x, from=NULL, col=NULL) {
+adjacency.heatmap <- function(x, from=NULL, col=NULL) {
     if (is.null(from)) {
         from=detect.format(x)
     }
@@ -527,22 +527,18 @@ feature.colnames <- function(features, in.degree, out.degree) {
 #' mtx <- drop.all.zeros(mtx, square.matrix='any')
 #' mtx <- drop.all.zeros(mtx, square.matrix='all')
 
-drop.all.zeros <- function(mtx, rows=TRUE, columns=TRUE, square.matrix=NULL) {
-    switch(square.matrix,
-        any = {
-            j <- apply(mtx, 1, function(x) !all(x==0)) & apply(mtx, 2, function(x) !all(x==0))
-            mtx <- mtx[j,j]
-        },
-        all = {
-            j <- apply(mtx, 1, function(x) !all(x==0)) | apply(mtx, 2, function(x) !all(x==0))
-            mtx <- mtx[j,j]
-        },
+drop.all.zeros <- function(mtx, rows=TRUE, columns=TRUE, square.matrix='none') {
+    nz.rows <- apply(mtx, 1, function(x) !all(x==0))
+    nz.cols <- apply(mtx, 2, function(x) !all(x==0))
+    mtx <- switch(square.matrix,
+        any = mtx[nz.rows & nz.cols, nz.rows & nz.cols],
+        all = mtx[nz.rows | nz.cols, nz.rows | nz.cols],
         {
             if (rows) {
-                mtx <- mtx[apply(df, 1, function(x) !all(x==0)),]
+                mtx <- mtx[nz.rows,]
             }
             if (columns) {
-                mtx <- mtx[,apply(df, 2, function(x) !all(x==0))]
+                mtx <- mtx[,nz.cols]
             }
         }
     )
