@@ -22,7 +22,7 @@ run.glasso <- function(df, rho=0.5, to='igraph', upper=FALSE, lower=TRUE, loops=
         lower <- TRUE
     }
     S <- cov(as.matrix(df))
-    gl <- glasso(S, rho=rho)
+    gl <- glasso::glasso(S, rho=rho)
     A <- gl$wi
     rownames(A) <- rownames(S)
     colnames(A) <- colnames(S)
