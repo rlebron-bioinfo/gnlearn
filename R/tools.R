@@ -7,24 +7,24 @@
 #' @keywords graph adjacency edges format
 #' @export
 #' @examples
-#' graph <- convert_format(mtx, 'igraph')
+#' graph <- convert.format(mtx, 'igraph')
 
-convert_format <- function(x, to, from=NULL) {
+convert.format <- function(x, to, from=NULL) {
     if (is.null(from)) {
-        from=detect_format(x)
+        from=detect.format(x)
     }
     obj <- switch(to,
         adjacency = {
-            obj <- as_adjacency(x, from=from)
+            obj <- as.adjacency(x, from=from)
         },
         edges = {
-            obj <- as_edges(x, from=from)
+            obj <- as.edges(x, from=from)
         },
         igraph = {
-            obj <- as_igraph(x, from=from)
+            obj <- as.igraph(x, from=from)
         },
         bn = {
-            obj <- as_bn(x, from=from)
+            obj <- as.bn(x, from=from)
         },
         NULL
     )
@@ -38,19 +38,19 @@ convert_format <- function(x, to, from=NULL) {
 #' @keywords graph format
 #' @export
 #' @examples
-#' detect_format(obj)
+#' detect.format(obj)
 
-detect_format <- function(x) {
+detect.format <- function(x) {
     fmt <- class(x)[1]
     fmt <- switch(fmt,
-        matrix = { adjacency_or_edges(x) },
-        data.frame = { adjacency_or_edges(x) },
+        matrix = { adjacency.or.edges(x) },
+        data.frame = { adjacency.or.edges(x) },
         fmt
     )
     return(fmt)
 }
 
-adjacency_or_edges <- function(x) {
+adjacency.or.edges <- function(x) {
     dims = dim(x)
     if (dims[1] == dims[2] & dims[2] != 2) {
         return('adjacency')
@@ -66,11 +66,11 @@ adjacency_or_edges <- function(x) {
 #' @param from Input format (optional).
 #' @export
 #' @examples
-#' mtx <- as_edges(obj)
+#' mtx <- as.edges(obj)
 
-as_edges <- function(x, from=NULL) {
+as.edges <- function(x, from=NULL) {
     if (is.null(from)) {
-        from=detect_format(x)
+        from=detect.format(x)
     }
     mtx <- switch(from,
         adjacency = {
@@ -84,7 +84,7 @@ as_edges <- function(x, from=NULL) {
             mtx <- igraph::as_edgelist(x, names=TRUE)
         },
         bn = {
-            g <- as_igraph(as.matrix(bnlearn::arcs(x)), from='edges')
+            g <- as.igraph(as.matrix(bnlearn::arcs(x)), from='edges')
             mtx <- igraph::as_edgelist(g, names=TRUE)
         },
         NULL
@@ -99,11 +99,11 @@ as_edges <- function(x, from=NULL) {
 #' @param from Input format (optional).
 #' @export
 #' @examples
-#' mtx <- as_adjacency(obj)
+#' mtx <- as.adjacency(obj)
 
-as_adjacency <- function(x, from=NULL) {
+as.adjacency <- function(x, from=NULL) {
     if (is.null(from)) {
-        from=detect_format(x)
+        from=detect.format(x)
     }
     mtx <- switch(from,
         adjacency = {
@@ -117,7 +117,7 @@ as_adjacency <- function(x, from=NULL) {
             mtx <- as.matrix(igraph::as_adjacency_matrix(x, type='both'))
         },
         bn = {
-            g <- as_igraph(as.matrix(bnlearn::arcs(x)), from='edges')
+            g <- as.igraph(as.matrix(bnlearn::arcs(x)), from='edges')
             mtx <- as.matrix(igraph::as_adjacency_matrix(g, type='both'))
         },
         NULL
@@ -132,11 +132,11 @@ as_adjacency <- function(x, from=NULL) {
 #' @param from Input format (optional).
 #' @export
 #' @examples
-#' g <- as_igraph(obj)
+#' g <- as.igraph(obj)
 
-as_igraph <- function(x, from=NULL) {
+as.igraph <- function(x, from=NULL) {
     if (is.null(from)) {
-        from=detect_format(x)
+        from=detect.format(x)
     }
     g <- switch(from,
         adjacency = {
@@ -149,7 +149,7 @@ as_igraph <- function(x, from=NULL) {
             g <- x
         },
         bn = {
-            g <- as_igraph(as.matrix(bnlearn::arcs(x)), from='edges')
+            g <- as.igraph(as.matrix(bnlearn::arcs(x)), from='edges')
         },
         NULL
     )
@@ -163,15 +163,15 @@ as_igraph <- function(x, from=NULL) {
 #' @param from Input format (optional).
 #' @export
 #' @examples
-#' g <- as_bn(obj)
+#' g <- as.bn(obj)
 
-as_bn <- function(x, from=NULL) {
+as.bn <- function(x, from=NULL) {
     if (is.null(from)) {
-        from=detect_format(x)
+        from=detect.format(x)
     }
     g <- switch(from,
         adjacency = {
-            mtx <- subset(as.data.frame(as_edges(x, from='adjacency')), select=c(1,2))
+            mtx <- subset(as.data.frame(as.edges(x, from='adjacency')), select=c(1,2))
             colnames(mtx) <- c('from', 'to')
             mtx$from <- as.character(mtx$from)
             mtx$to <- as.character(mtx$to)
@@ -193,7 +193,7 @@ as_bn <- function(x, from=NULL) {
             g
         },
         igraph = {
-            mtx <- subset(as.data.frame(as_edges(x, from='igraph')), select=c(1,2))
+            mtx <- subset(as.data.frame(as.edges(x, from='igraph')), select=c(1,2))
             colnames(mtx) <- c('from', 'to')
             mtx$from <- as.character(mtx$from)
             mtx$to <- as.character(mtx$to)
@@ -221,14 +221,14 @@ as_bn <- function(x, from=NULL) {
 #' @keywords graph plot
 #' @export
 #' @examples
-#' plot_graph(obj, interactive=FALSE)
-#' plot_graph(obj, interactive=TRUE)
+#' plot.graph(obj, interactive=FALSE)
+#' plot.graph(obj, interactive=TRUE)
 
-plot_graph <- function(x, from=NULL, layout=NULL, interactive=FALSE) {
+plot.graph <- function(x, from=NULL, layout=NULL, interactive=FALSE) {
     if (is.null(from)) {
-        from=detect_format(x)
+        from=detect.format(x)
     }
-    g <- as_igraph(x, from=from)
+    g <- as.igraph(x, from=from)
     if (is.null(layout)) {
         layout=igraph::layout_nicely(g)
     }
@@ -253,17 +253,17 @@ plot_graph <- function(x, from=NULL, layout=NULL, interactive=FALSE) {
 #' @keywords graph feature plot
 #' @export
 #' @examples
-#' plot_graph(obj, genes, 'tf', interactive=FALSE)
-#' plot_graph(obj, genes, 'tumor.suppressor', interactive=TRUE)
+#' plot.feature.graph(obj, genes, 'tf', interactive=FALSE)
+#' plot.feature.graph(obj, genes, 'tumor.suppressor', interactive=TRUE)
 
-plot_feature_graph <- function(x, genes, feature, from=NULL, feature.color='red', other.color='green', layout=NULL, interactive=FALSE) {
+plot.feature.graph <- function(x, genes, feature, from=NULL, feature.color='red', other.color='green', layout=NULL, interactive=FALSE) {
     if (is.null(from)) {
-        from=detect_format(x)
+        from=detect.format(x)
     }
-    x <- as_edges(x, from=from)
+    x <- as.edges(x, from=from)
     f_genes <- genes[genes[feature]==TRUE,]$name
     x <- x[x[,1] %in% f_genes | x[,2] %in% f_genes, ]
-    g <- as_igraph(x, from='edges')
+    g <- as.igraph(x, from='edges')
     igraph::V(g)$color <- ifelse(names(igraph::V(g)) %in% f_genes, 'red', 'green')
     if (is.null(layout)) {
         layout=igraph::layout_nicely(g)
@@ -284,13 +284,13 @@ plot_feature_graph <- function(x, genes, feature, from=NULL, feature.color='red'
 #' @keywords adjacency heatmap plot
 #' @export
 #' @examples
-#' heatmap_adjacency(obj)
+#' heatmap.adjacency(obj)
 
-heatmap_adjacency <- function(x, from=NULL, col=NULL) {
+heatmap.adjacency <- function(x, from=NULL, col=NULL) {
     if (is.null(from)) {
-        from=detect_format(x)
+        from=detect.format(x)
     }
-    mtx <- as_adjacency(x, from=from)
+    mtx <- as.adjacency(x, from=from)
     if (is.null(col)) {
         col=colorRampPalette(c('white', 'dark blue'))(100)
     }
@@ -306,11 +306,11 @@ heatmap_adjacency <- function(x, from=NULL, col=NULL) {
 #' @keywords graph comparison
 #' @export
 #' @examples
-#' comparison <- compare_graphs(obj1, obj2)
+#' comparison <- compare.graphs(obj1, obj2)
 
-compare_graphs <- function(learned, true, arcs=FALSE) {
-    learned <- as_igraph(learned)
-    true <- as_igraph(true)
+compare.graphs <- function(learned, true, arcs=FALSE) {
+    learned <- as.igraph(learned)
+    true <- as.igraph(true)
     learned <- igraph::simplify(learned, remove.multiple=TRUE, remove.loops=TRUE)
     true <- igraph::simplify(true, remove.multiple=TRUE, remove.loops=TRUE)
     v1 <- names(igraph::V(learned))
@@ -325,9 +325,9 @@ compare_graphs <- function(learned, true, arcs=FALSE) {
     fn <- igraph::difference(u, learned)
     p <- precision(igraph::ecount(tp), igraph::ecount(fp))
     r <- recall(igraph::ecount(tp), igraph::ecount(fn))
-    f1 <- f1_score(igraph::ecount(tp), igraph::ecount(fp), igraph::ecount(fn))
-    #bn_learned <- as_bn(learned)
-    #bn_true <- as_bn(true)
+    f1 <- f1.score(igraph::ecount(tp), igraph::ecount(fp), igraph::ecount(fn))
+    #bn_learned <- as.bn(learned)
+    #bn_true <- as.bn(true)
     #shd <- bnlearn::shd(bn_learned, bn_true)
     #hamming <- bnlearn::hamming(bn_learned, bn_true)
     if (arcs) {
@@ -345,7 +345,7 @@ compare_graphs <- function(learned, true, arcs=FALSE) {
         fn = fn,
         precision = p,
         recall = r,
-        f1_score = f1 #,
+        f1.score = f1 #,
         #shd = shd,
         #hamming = hamming
     ))
@@ -360,15 +360,15 @@ recall <- function(tp, fn) {
     return(tp/(tp+fn))
 }
 
-f1_score <- function(tp, fp, fn) {
+f1.score <- function(tp, fp, fn) {
     p <- precision(tp, fp)
     r <- recall(tp, fn)
     return((2*p*r)/(p+r))
 }
 
-common_edges <- function(learned, true) {
-    learned <- as_igraph(learned)
-    true <- as_igraph(true)
+common.edges <- function(learned, true) {
+    learned <- as.igraph(learned)
+    true <- as.igraph(true)
     learned <- igraph::simplify(learned, remove.multiple=TRUE, remove.loops=TRUE)
     true <- igraph::simplify(true, remove.multiple=TRUE, remove.loops=TRUE)
     v1 <- names(igraph::V(learned))
@@ -394,13 +394,13 @@ common_edges <- function(learned, true) {
 #' @keywords graph feature vertex degree
 #' @export
 #' @examples
-#' mtx <- feature_degree(x, genes)
-#' mtx <- feature_degree(x, genes, features=c('tf', 'target', 'tumor.suppressor'))
-#' mtx <- feature_degree(x, genes, features='tumor.suppressor', in.degree=TRUE, out.degree=FALSE)
-#' mtx <- feature_degree(x, genes, features='essential', vertices=c('ADRB1', 'HSF2'), normalized=TRUE)
+#' mtx <- feature.degree(x, genes)
+#' mtx <- feature.degree(x, genes, features=c('tf', 'target', 'tumor.suppressor'))
+#' mtx <- feature.degree(x, genes, features='tumor.suppressor', in.degree=TRUE, out.degree=FALSE)
+#' mtx <- feature.degree(x, genes, features='essential', vertices=c('ADRB1', 'HSF2'), normalized=TRUE)
 
-feature_degree <- function(x, genes, features=NULL, vertices=NULL, in.degree=TRUE, out.degree=TRUE, loops=FALSE, normalized=FALSE) {
-    x <- as_adjacency(x)
+feature.degree <- function(x, genes, features=NULL, vertices=NULL, in.degree=TRUE, out.degree=TRUE, loops=FALSE, normalized=FALSE) {
+    x <- as.adjacency(x)
     if (!loops) {
         diag(x) <- 0
     }
@@ -411,20 +411,20 @@ feature_degree <- function(x, genes, features=NULL, vertices=NULL, in.degree=TRU
         k = 2
     }
     if (!is.null(features)) {
-        features <- features[as.logical(lapply(features, valid_feature, genes=genes))]
+        features <- features[as.logical(lapply(features, valid.feature, genes=genes))]
         n.features <- length(features)
         if (n.features==0) {
             features <- colnames(genes)
-            features <- features[as.logical(lapply(features, valid_feature, genes=genes))]
+            features <- features[as.logical(lapply(features, valid.feature, genes=genes))]
             n.features <- length(features)
         }
     } else {
         features <- colnames(genes)
-        features <- features[as.logical(lapply(features, valid_feature, genes=genes))]
+        features <- features[as.logical(lapply(features, valid.feature, genes=genes))]
         n.features <- length(features)
     }
     if (!is.null(vertices)) {
-        vertices <- vertices[as.logical(lapply(vertices, valid_vertex, x=x))]
+        vertices <- vertices[as.logical(lapply(vertices, valid.vertex, x=x))]
         n.vertices <- length(vertices)
         if (n.vertices==0) {
             vertices <- colnames(x)
@@ -436,13 +436,13 @@ feature_degree <- function(x, genes, features=NULL, vertices=NULL, in.degree=TRU
     }
     mtx = matrix(NA, n.vertices, k+n.features*k)
     rownames(mtx) <- vertices
-    colnames(mtx) <- feature_colnames(features, in.degree, out.degree)
+    colnames(mtx) <- feature.colnames(features, in.degree, out.degree)
     for (v in vertices) {
         if (in.degree) {
-            mtx[v, 'in.degree'] <- igraph::degree(as_igraph(x), v, mode='in', normalized=normalized)
+            mtx[v, 'in.degree'] <- igraph::degree(as.igraph(x), v, mode='in', normalized=normalized)
         }
         if (out.degree) {
-            mtx[v, 'out.degree'] <- igraph::degree(as_igraph(x), v, mode='out', normalized=normalized)
+            mtx[v, 'out.degree'] <- igraph::degree(as.igraph(x), v, mode='out', normalized=normalized)
         }
         for (f in features) {
             f_genes <- intersect(colnames(x), genes[genes[f]==TRUE,]$name)
@@ -464,14 +464,14 @@ feature_degree <- function(x, genes, features=NULL, vertices=NULL, in.degree=TRU
                 f_x[v, v] <- s
                 if (in.degree) {
                     f_col <- paste(f, 'in.degree', sep='|')
-                    mtx[v, f_col] <- igraph::degree(as_igraph(f_x, from='adjacency'), v, mode='in')
+                    mtx[v, f_col] <- igraph::degree(as.igraph(f_x, from='adjacency'), v, mode='in')
                     if (normalized) {
                         mtx[v, f_col] <- mtx[v, f_col]/(length(f_genes)-j)
                     }
                 }
                 if (out.degree) {
                     f_col <- paste(f, 'out.degree', sep='|')
-                    mtx[v, f_col] <- igraph::degree(as_igraph(f_x, from='adjacency'), v, mode='out')
+                    mtx[v, f_col] <- igraph::degree(as.igraph(f_x, from='adjacency'), v, mode='out')
                     if (normalized) {
                         mtx[v, f_col] <- mtx[v, f_col]/(length(f_genes)-j)
                     }
@@ -482,7 +482,7 @@ feature_degree <- function(x, genes, features=NULL, vertices=NULL, in.degree=TRU
     return(mtx)
 }
 
-valid_feature <- function(genes, feature) {
+valid.feature <- function(genes, feature) {
     col.classes <- lapply(genes, class)
     if (feature %in% colnames(genes)) {
         if (col.classes[feature]=='logical') {
@@ -495,12 +495,12 @@ valid_feature <- function(genes, feature) {
     }
 }
 
-valid_vertex <- function(x, vertex) {
-    x <- as_adjacency(x)
+valid.vertex <- function(x, vertex) {
+    x <- as.adjacency(x)
     return(vertex %in% colnames(x))
 }
 
-feature_colnames <- function(features, in.degree, out.degree) {
+feature.colnames <- function(features, in.degree, out.degree) {
     cols <- c('in.degree', 'out.degree')[c(in.degree, out.degree)]
     for (feature in features) {
         if (in.degree) {
@@ -511,4 +511,40 @@ feature_colnames <- function(features, in.degree, out.degree) {
         }
     }
     return(cols)
+}
+
+#' Drop rows and/or columns with all zeros
+#'
+#' This function allows you to drop rows and/or columns with all zeros.
+#' @param mtx Matrix or dataframe.
+#' @param rows Drop rows with all zeros.
+#' @param columns Drop columns with all zeros.
+#' @param square.matrix Special mode for square matrices ('any' or 'all'). any: if the column or row is full of zeros, delete both; all: if the column or row is not full of zeros, keep both
+#' @keywords matrix dataframe zeros
+#' @export
+#' @examples
+#' mtx <- drop.all.zeros(mtx)
+#' mtx <- drop.all.zeros(mtx, square.matrix='any')
+#' mtx <- drop.all.zeros(mtx, square.matrix='all')
+
+drop.all.zeros <- function(mtx, rows=TRUE, columns=TRUE, square.matrix=NULL) {
+    switch(square.matrix,
+        any = {
+            j <- apply(mtx, 1, function(x) !all(x==0)) & apply(mtx, 2, function(x) !all(x==0))
+            mtx <- mtx[j,j]
+        },
+        all = {
+            j <- apply(mtx, 1, function(x) !all(x==0)) | apply(mtx, 2, function(x) !all(x==0))
+            mtx <- mtx[j,j]
+        },
+        {
+            if (rows) {
+                mtx <- mtx[apply(df, 1, function(x) !all(x==0)),]
+            }
+            if (columns) {
+                mtx <- mtx[,apply(df, 2, function(x) !all(x==0))]
+            }
+        }
+    )
+    return(mtx)
 }

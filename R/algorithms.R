@@ -15,6 +15,7 @@
 #' graph <- run.glasso(df)
 
 run.glasso <- function(df, rho=0.5, to='igraph', upper=FALSE, lower=TRUE, loops=FALSE, non.zero.coeff=NULL, unconnected.nodes=FALSE) {
+    df <- drop.all.zeros(df)
     k <- sum(c(upper, lower))
     if (k==0) {
         upper <- TRUE
@@ -38,10 +39,9 @@ run.glasso <- function(df, rho=0.5, to='igraph', upper=FALSE, lower=TRUE, loops=
         A <- ifelse(A!=0, non.zero.coeff, 0)
     }
     if (!unconnected.nodes) {
-        j <- apply(A, 1, function(x) !all(x==0)) | apply(A, 2, function(x) !all(x==0))
-        A <- A[j,j]
+        A <- drop.all.zeros(A, square.matrix='all')
     }
-    g <- convert_format(A, to=to)
+    g <- convert.format(A, to=to)
     return(g)
 }
 
@@ -66,8 +66,7 @@ run.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.
     library(foreach)
     library(doParallel)
 
-    df <- df[apply(df, 1, function(x) !all(x==0)),]
-    df <- df[,apply(df, 2, function(x) !all(x==0))]
+    df <- drop.all.zeros(df)
     df <- as.matrix(df)
     n.genes <- ncol(df)
     if (is.null(m)) {
@@ -81,10 +80,8 @@ run.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.
             ixs <- sample(1:nrow(df), size=m, replace=FALSE)
             S.train <- cov(df[ixs,])
             S.test <-  cov(df[-ixs,])
-            j <- apply(S.train, 1, function(x) !all(x==0)) | apply(S.train, 2, function(x) !all(x==0))
-            S.train <- S.train[j,j]
-            j <- apply(S.test, 1, function(x) !all(x==0)) | apply(S.test, 2, function(x) !all(x==0))
-            S.test <- S.test[j,j]
+            S.train <- drop.all.zeros(S.train, square.matrix='all')
+            S.test <- drop.all.zeros(S.test, square.matrix='all')
             if (dim(S.train)[2]==n.genes & dim(S.test)[2]==n.genes) {
                 break
             }
@@ -132,12 +129,11 @@ run.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.
         diag(A) <- 0
     }
     if (!unconnected.nodes) {
-        j <- apply(A, 1, function(x) !all(x==0)) | apply(A, 2, function(x) !all(x==0))
-        A <- A[j,j]
+        A <- drop.all.zeros(A, square.matrix='all')
     }
     rownames(A) <- colnames(df)
     colnames(A) <- colnames(df)
-    g <- convert_format(A, to=to)
+    g <- convert.format(A, to=to)
     return(g)
 }
 

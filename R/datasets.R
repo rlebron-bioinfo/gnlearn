@@ -9,11 +9,11 @@ HOST = 'https://gnlearn-api.herokuapp.com'
 #' @keywords genes api
 #' @export
 #' @examples
-#' genesets <- list_genesets()
-#' genesets <- list_genesets(sp.common='human')
-#' genesets <- list_genesets(sp.common='mouse')
+#' genesets <- list.genesets()
+#' genesets <- list.genesets(sp.common='human')
+#' genesets <- list.genesets(sp.common='mouse')
 
-list_genesets <- function(sp.scientific=NULL, sp.common=NULL, dataset=NULL, host=HOST) {
+list.genesets <- function(sp.scientific=NULL, sp.common=NULL, dataset=NULL, host=HOST) {
     uri <- file.path(host, 'genesets')
     df <- jsonlite::fromJSON(uri)
     if (!is.null(sp.scientific)) {
@@ -46,11 +46,11 @@ list_genesets <- function(sp.scientific=NULL, sp.common=NULL, dataset=NULL, host
 #' @keywords datasets api
 #' @export
 #' @examples
-#' datasets <- list_datasets()
-#' datasets <- list_datasets(sp.common='human')
-#' datasets <- list_datasets(sp.common='mouse')
+#' datasets <- list.datasets()
+#' datasets <- list.datasets(sp.common='human')
+#' datasets <- list.datasets(sp.common='mouse')
 
-list_datasets <- function(sp.scientific=NULL, sp.common=NULL, bio.layer=NULL, seq.protocol=NULL, cell.identity=NULL,
+list.datasets <- function(sp.scientific=NULL, sp.common=NULL, bio.layer=NULL, seq.protocol=NULL, cell.identity=NULL,
                           min.genes=0, max.genes=Inf, min.cells=0, max.cells=Inf, host=HOST) {
     uri <- file.path(host, 'datasets')
     df <- jsonlite::fromJSON(uri)
@@ -82,13 +82,13 @@ list_datasets <- function(sp.scientific=NULL, sp.common=NULL, bio.layer=NULL, se
 #' Download A Geneset Via RESTful API
 #'
 #' This function allows you to download a geneset available via RESTful API.
-#' @param code Download Code (indicated by list_genesets() output).
+#' @param code Download Code (indicated by list.genesets() output).
 #' @keywords genes api
 #' @export
 #' @examples
-#' df <- download_geneset(1)
+#' df <- download.geneset(1)
 
-download_geneset <- function(code, host=HOST) {
+download.geneset <- function(code, host=HOST) {
     uri <- file.path(host, 'genesets', code)
     df <- jsonlite::fromJSON(uri)
     url <- df$url
@@ -105,14 +105,14 @@ download_geneset <- function(code, host=HOST) {
 #' Download A Dataset Via RESTful API
 #'
 #' This function allows you to download a dataset available via RESTful API.
-#' @param code Download Code (indicated by list_datasets() output).
+#' @param code Download Code (indicated by list.datasets() output).
 #' @param log Whether or not to apply log(x+1) (optional). Default: TRUE
 #' @keywords datasets api
 #' @export
 #' @examples
-#' df <- download_dataset(1)
+#' df <- download.dataset (1)
 
-download_dataset <- function(code, log=TRUE, host=HOST) {
+download.dataset  <- function(code, log=TRUE, host=HOST) {
     uri <- file.path(host, 'datasets', code)
     df <- jsonlite::fromJSON(uri)
     url <- df$raw.dataset
@@ -122,8 +122,7 @@ download_dataset <- function(code, log=TRUE, host=HOST) {
         tmp <- gzfile(tmp, 'rt')
         df <- read.table(tmp, sep='\t', header=TRUE, check.names=FALSE)
         df <- as.data.frame(lapply(df, as.double))
-        df <- df[apply(df, 1, function(x) !all(x==0)),]
-        df <- df[,apply(df, 2, function(x) !all(x==0))]
+        df <- drop.all.zeros(df)
         if (log) {
             df <- log(df+1)
         }
@@ -145,9 +144,9 @@ download_dataset <- function(code, log=TRUE, host=HOST) {
 #' @keywords datasets
 #' @export
 #' @examples
-#' df <- import_dataset('mydataset.tsv')
+#' df <- import.dataset('mydataset.tsv')
 
-import_dataset <- function(path, log=FALSE, sep='\t', header=TRUE, index=FALSE, transpose=FALSE) {
+import.dataset <- function(path, log=FALSE, sep='\t', header=TRUE, index=FALSE, transpose=FALSE) {
     ext <- tools::file_ext(path)
     if (ext == 'gz') {
         file <- gzfile(path, 'rt')
@@ -162,8 +161,7 @@ import_dataset <- function(path, log=FALSE, sep='\t', header=TRUE, index=FALSE, 
         df <- read.table(file, sep=sep, header=header, check.names=FALSE)
     }
     df <- as.data.frame(lapply(df, as.double))
-    df <- df[apply(df, 1, function(x) !all(x==0)),]
-    df <- df[,apply(df, 2, function(x) !all(x==0))]
+    df <- drop.all.zeros(df)
     if (transpose) {
         df <- as.data.frame(t(as.matrix(df)))
     }
@@ -187,10 +185,10 @@ import_dataset <- function(path, log=FALSE, sep='\t', header=TRUE, index=FALSE, 
 #' @keywords genes select
 #' @export
 #' @examples
-#' df <- select_genes(df, max.genes=100, min.non.zeros=2)
-#' df <- select_genes(df, genes=genes, features=c('tumor.suppressor', 'breast.cancer'), glasso=TRUE, rho=0.5)
+#' df <- select.genes(df, max.genes=100, min.non.zeros=2)
+#' df <- select.genes(df, genes=genes, features=c('tumor.suppressor', 'breast.cancer'), glasso=TRUE, rho=0.5)
 
-select_genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max.genes=100, min.non.zeros=2, glasso=TRUE, rho=0.5) {
+select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max.genes=100, min.non.zeros=2, glasso=TRUE, rho=0.5) {
     if (is.null(selected.genes)) {
         selected.genes <- colnames(df)
     }
