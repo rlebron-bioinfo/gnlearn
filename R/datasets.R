@@ -206,7 +206,12 @@ select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max
         g <- run.glasso(df, rho, unconnected.nodes=FALSE)
         selected.genes <- names(igraph::V(g))
     }
-    if (length(selected.genes) > max.genes) {
+    df <- subset(df, select=selected.genes)
+    if (is.null(selected.genes)) {
+        if (colnames(df) > max.genes) {
+            df <- df[,1:max.genes]
+        }
+    } else if (length(selected.genes) > max.genes) {
         df <- df[,1:max.genes]
     }
     return(df)
