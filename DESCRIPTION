@@ -18,7 +18,9 @@ Imports:
     threejs,
     glasso,
     bnlearn,
-    jsonlite
+    jsonlite,
+    foreach,
+    doParallel
 Remotes:
     gherardovarando/gclm
 Suggests:

@@ -31,8 +31,6 @@ run.glasso(
 \item{non.zero.coeff}{If other than NULL, non-zero adjacency coefficients shall be replaced by the value provided (optional). Default: NULL}
 
 \item{unconnected.nodes}{Include unconnected nodes (optional). Default: FALSE}
-
-\item{from}{Input format (optional).}
 }
 \description{
 This function allows you to learn an undirected graph from a dataset using the GLASSO algorithm.
