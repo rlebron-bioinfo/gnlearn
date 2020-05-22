@@ -133,6 +133,8 @@ run.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.
         j <- apply(A, 1, function(x) !all(x==0)) | apply(A, 2, function(x) !all(x==0))
         A <- A[j,j]
     }
+    rownames(A) <- colnames(df)
+    colnames(A) <- colnames(df)
     g <- convert_format(A, to=to)
     return(g)
 }
