@@ -63,6 +63,9 @@ run.glasso <- function(df, rho=0.5, to='igraph', upper=FALSE, lower=TRUE, loops=
 
 run.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.nodes=FALSE, to='igraph', cluster=4) {
 
+    library(foreach)
+    library(doParallel)
+
     df <- as.matrix(df)
     n.genes <- ncol(df)
     if (is.null(m)) {
