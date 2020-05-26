@@ -11,8 +11,7 @@ select.genes(
   features = NULL,
   max.genes = 100,
   min.non.zeros = 2,
-  glasso = TRUE,
-  rho = 0.1
+  glasso = TRUE
 )
 }
 \arguments{
@@ -29,8 +28,6 @@ select.genes(
 \item{min.non.zeros}{Minimum number of non-zero values per gene (optional).}
 
 \item{glasso}{Using the GLASSO algorithm to exclude unconnected genes (optional).}
-
-\item{rho}{Non-negative regularization parameter for GLASSO.}
 }
 \description{
 This function allows you to (automatically) select the most appropriate gene columns of your dataset.

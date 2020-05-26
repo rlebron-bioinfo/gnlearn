@@ -32,7 +32,7 @@ run.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, l
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- split.dataframe(df, m=m)
+        splitted.df <- dataframe.split(df, m=m)
         S <- cov(as.matrix(splitted.df$train))
         g <- glasso::glasso(S, rho=rho)
         g$wi
@@ -85,7 +85,7 @@ run.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.
 
     graphs <- foreach(rep=1:R) %dopar% {
 
-        splitted.df <- split.dataframe(df, m=m)
+        splitted.df <- dataframe.split(df, m=m)
         S.train <- cov(splitted.df$train)
         S.test <-  cov(splitted.df$test)
         dd <- diag(1/sqrt(diag(S.train)))
@@ -163,7 +163,7 @@ run.aracne <- function(df, whitelist=NULL, blacklist=NULL, mi=c('mi-g','mi'), R=
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- split.dataframe(df, m=m)
+        splitted.df <- dataframe.split(df, m=m)
         g <- bnlearn::aracne(splitted.df$train, whitelist=whitelist, blacklist=blacklist, mi=mi)
         convert.format(g, to='adjacency')
     }
@@ -202,7 +202,7 @@ run.chowliu <- function(df, whitelist=NULL, blacklist=NULL, mi=c('mi-g','mi'), R
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- split.dataframe(df, m=m)
+        splitted.df <- dataframe.split(df, m=m)
         g <- bnlearn::chow.liu(splitted.df$train, whitelist=whitelist, blacklist=blacklist, mi=mi)
         convert.format(g, to='adjacency')
     }

@@ -181,14 +181,13 @@ import.dataset <- function(path, log=FALSE, sep='\t', header=TRUE, index=FALSE, 
 #' @param max.genes Maximum number of selected genes (optional).
 #' @param min.non.zeros Minimum number of non-zero values per gene (optional).
 #' @param glasso Using the GLASSO algorithm to exclude unconnected genes (optional).
-#' @param rho Non-negative regularization parameter for GLASSO.
-#' @keywords genes select
+#' @keywords select genes
 #' @export
 #' @examples
 #' df <- select.genes(df, max.genes=100, min.non.zeros=2)
 #' df <- select.genes(df, genes=genes, features=c('tumor.suppressor', 'breast.cancer'), glasso=TRUE, rho=0.5)
 
-select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max.genes=100, min.non.zeros=2, glasso=TRUE, rho=0.1) {
+select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max.genes=100, min.non.zeros=2, glasso=TRUE) {
     if (is.null(selected.genes)) {
         selected.genes <- colnames(df)
     }
@@ -203,7 +202,7 @@ select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max
     }
     df <- subset(df, select=selected.genes)
     if (glasso & !is.null(rho)) {
-        g <- run.glasso(df, rho, unconnected.nodes=FALSE)
+        g <- run.glasso(df, rho=0.1, R=10, m=NULL, threshold=0.5, unconnected.nodes=FALSE, cluster=4)
         selected.genes <- names(igraph::V(g))
     }
     if (is.null(selected.genes)) {
@@ -226,11 +225,11 @@ select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max
 #' @keywords training test dataframe
 #' @export
 #' @examples
-#' splitted.df <- valid.split(df)
+#' splitted.df <- dataframe.split(df)
 #' splitted.df$train
 #' splitted.df$test
 
-split.dataframe <- function(df, m=NULL) {
+dataframe.split <- function(df, m=NULL) {
     if (is.null(m)) {
         m <- nrow(df)/2
     }

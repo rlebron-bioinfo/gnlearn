@@ -18,6 +18,7 @@ Imports:
     threejs,
     glasso,
     bnlearn,
+    pcalg,
     jsonlite,
     foreach,
     doParallel
