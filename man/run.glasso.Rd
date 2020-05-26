@@ -6,13 +6,16 @@
 \usage{
 run.glasso(
   df,
-  rho = 0.5,
-  to = "igraph",
+  rho = 0.1,
+  R = 200,
+  m = NULL,
+  threshold = 0.5,
   upper = FALSE,
   lower = TRUE,
   loops = FALSE,
-  non.zero.coeff = NULL,
-  unconnected.nodes = FALSE
+  unconnected.nodes = FALSE,
+  to = "igraph",
+  cluster = 4
 )
 }
 \arguments{
@@ -20,7 +23,11 @@ run.glasso(
 
 \item{rho}{Non-negative regularization parameter for GLASSO.}
 
-\item{to}{Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).}
+\item{R}{Number of bootstrap replicates (optional). Default: 200}
+
+\item{m}{Size of each bootstrap replicate (optional). Default: nrow(df)/2}
+
+\item{threshold}{Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5}
 
 \item{upper}{Whether or not to ignore the upper triangular adjacency matrix (optional).}
 
@@ -28,15 +35,17 @@ run.glasso(
 
 \item{loops}{Whether or not to ignore the diagonal of the adjacency matrix (optional).}
 
-\item{non.zero.coeff}{If other than NULL, non-zero adjacency coefficients shall be replaced by the value provided (optional). Default: NULL}
-
 \item{unconnected.nodes}{Include unconnected nodes (optional). Default: FALSE}
+
+\item{to}{Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).}
+
+\item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: 4}
 }
 \description{
 This function allows you to learn an undirected graph from a dataset using the GLASSO algorithm.
 }
 \examples{
-graph <- run.glasso(df)
+graph <- run.glasso(df, rho=0.1)
 }
 \keyword{graph}
 \keyword{learning}

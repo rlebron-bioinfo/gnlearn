@@ -217,3 +217,36 @@ select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max
     }
     return(df)
 }
+
+#' Split A Dataframe Into Training And Test Datasets
+#'
+#' This function allows you to split a dataframe into training and test datasets.
+#' @param df Dataset.
+#' @param m Size of training dataset (optional). Default: nrow(df)/2
+#' @keywords training test dataframe
+#' @export
+#' @examples
+#' splitted.df <- valid.split(df)
+#' splitted.df$train
+#' splitted.df$test
+
+split.dataframe <- function(df, m=NULL) {
+    if (is.null(m)) {
+        m <- nrow(df)/2
+    }
+    n.genes <- ncol(df)
+    repeat {
+        ixs <- sample(1:nrow(df), size=m, replace=FALSE)
+        train <- df[ixs,]
+        test <- df[-ixs,]
+        train <- drop.all.zeros(train, rows=TRUE, columns=TRUE)
+        test <- drop.all.zeros(test, rows=TRUE, columns=TRUE)
+        if (dim(train)[2]==n.genes & dim(test)[2]==n.genes) {
+            break
+        }
+    }
+    return(list(
+        train = train,
+        test = test
+    ))
+}

@@ -3,29 +3,44 @@
 #' This function allows you to learn an undirected graph from a dataset using the GLASSO algorithm.
 #' @param df Dataset.
 #' @param rho Non-negative regularization parameter for GLASSO.
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
 #' @param upper Whether or not to ignore the upper triangular adjacency matrix (optional).
 #' @param lower Whether or not to ignore the lower triangular adjacency matrix (optional).
 #' @param loops Whether or not to ignore the diagonal of the adjacency matrix (optional).
-#' @param non.zero.coeff If other than NULL, non-zero adjacency coefficients shall be replaced by the value provided (optional). Default: NULL
 #' @param unconnected.nodes Include unconnected nodes (optional). Default: FALSE
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.glasso(df)
+#' graph <- run.glasso(df, rho=0.1)
 
-run.glasso <- function(df, rho=0.5, to='igraph', upper=FALSE, lower=TRUE, loops=FALSE, non.zero.coeff=NULL, unconnected.nodes=FALSE) {
-    df <- drop.all.zeros(df)
+run.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, lower=TRUE, loops=FALSE, unconnected.nodes=FALSE, to='igraph', cluster=4) {
     k <- sum(c(upper, lower))
     if (k==0) {
         upper <- TRUE
         lower <- TRUE
     }
-    S <- cov(as.matrix(df))
-    gl <- glasso::glasso(S, rho=rho)
-    A <- gl$wi
-    rownames(A) <- rownames(S)
-    colnames(A) <- colnames(S)
+
+    library(foreach)
+    library(doParallel)
+
+    df <- drop.all.zeros(df)
+
+    registerDoParallel(cluster)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+        splitted.df <- split.dataframe(df, m=m)
+        S <- cov(as.matrix(splitted.df$train))
+        g <- glasso::glasso(S, rho=rho)
+        g$wi
+    }
+
+    stopImplicitCluster()
+
+    A <- averaged.graph(graphs, colnames(df), threshold=threshold, to='adjacency')
     if (!loops) {
         diag(A) <- 0
     }
@@ -34,9 +49,6 @@ run.glasso <- function(df, rho=0.5, to='igraph', upper=FALSE, lower=TRUE, loops=
     }
     if (!lower) {
         A[lower.tri(A)] <- 0
-    }
-    if (!is.null(non.zero.coeff)) {
-        A <- ifelse(A!=0, non.zero.coeff, 0)
     }
     if (!unconnected.nodes) {
         A <- drop.all.zeros(A, square.matrix='all')
@@ -68,25 +80,14 @@ run.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
-    n.genes <- ncol(df)
-    if (is.null(m)) {
-        m <- nrow(df)/2
-    }
 
     registerDoParallel(cluster)
 
-    results <- foreach(rep=1:R) %dopar% {
-        repeat {
-            ixs <- sample(1:nrow(df), size=m, replace=FALSE)
-            S.train <- cov(df[ixs,])
-            S.test <-  cov(df[-ixs,])
-            S.train <- drop.all.zeros(S.train, square.matrix='all')
-            S.test <- drop.all.zeros(S.test, square.matrix='all')
-            if (dim(S.train)[2]==n.genes & dim(S.test)[2]==n.genes) {
-                break
-            }
-        }
+    graphs <- foreach(rep=1:R) %dopar% {
 
+        splitted.df <- split.dataframe(df, m=m)
+        S.train <- cov(splitted.df$train)
+        S.test <-  cov(splitted.df$test)
         dd <- diag(1/sqrt(diag(S.train)))
         S.train.cor <- cov2cor(S.train)
 
@@ -113,26 +114,19 @@ run.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.
             mll(solve(res$Sigma), dd %*% S.test %*% dd)
         })
         bidx <- which.min(tmp)
-        results.path[[bidx]]$B
+        t(results.path[[bidx]]$B)
 
     }
 
     stopImplicitCluster()
 
-    B <- array(data=NA, dim=c(n.genes, n.genes, R))
-    for (i in 1:R) {
-        B[, , i] <- results[[i]]
-    }
-    B <- apply(sign(abs(B)), c(1,2), mean)
-    A <- sign(abs(t(B >= threshold)))
+    A <- averaged.graph(graphs, colnames(df), threshold=threshold, to='adjacency')
     if (!loops) {
         diag(A) <- 0
     }
     if (!unconnected.nodes) {
         A <- drop.all.zeros(A, square.matrix='all')
     }
-    rownames(A) <- colnames(df)
-    colnames(A) <- colnames(df)
     g <- convert.format(A, to=to)
     return(g)
 }
@@ -160,35 +154,22 @@ mll <- function(P, S) {
 
 run.aracne <- function(df, whitelist=NULL, blacklist=NULL, mi=c('mi-g','mi'), R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
     mi <- match.arg(mi)
+
     library(foreach)
     library(doParallel)
+
     df <- drop.all.zeros(df)
-    n.genes <- ncol(df)
-    if (is.null(m)) {
-        m <- nrow(df)/2
-    }
+
     registerDoParallel(cluster)
-    stopImplicitCluster()
+
     graphs <- foreach(rep=1:R) %dopar% {
-        repeat {
-            ixs <- sample(1:nrow(df), size=m, replace=FALSE)
-            train <- df[ixs,]
-            train <- drop.all.zeros(train, rows=TRUE, columns=TRUE)
-            if (dim(train)[2]==n.genes) {
-                break
-            }
-        }
-        g <- bnlearn::aracne(train, whitelist=whitelist, blacklist=blacklist, mi=mi)
+        splitted.df <- split.dataframe(df, m=m)
+        g <- bnlearn::aracne(splitted.df$train, whitelist=whitelist, blacklist=blacklist, mi=mi)
         convert.format(g, to='adjacency')
     }
-    A <- array(data=NA, dim=c(n.genes, n.genes, R))
-    for (i in 1:R) {
-        A[, , i] <- graphs[[i]]
-    }
-    A <- apply(sign(abs(A)), c(1,2), mean)
-    A[A < threshold] <- 0
-    rownames(A) <- colnames(df)
-    colnames(A) <- colnames(df)
-    g <- convert.format(A, to=to)
+
+    stopImplicitCluster()
+
+    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
     return(g)
 }

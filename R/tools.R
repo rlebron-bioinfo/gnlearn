@@ -544,3 +544,29 @@ drop.all.zeros <- function(mtx, rows=TRUE, columns=TRUE, square.matrix='none') {
     )
     return(mtx)
 }
+
+#' Calculate The Averaged Graph
+#'
+#' This function allows you to calculate the averaged graph from a list of graphs.
+#' @param graphs List of graphs (with the same genes and in the same order).
+#' @param names Vector with gene names (in order).
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged graph (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @keywords average graph
+#' @export
+#' @examples
+#' graph <- run.aracne(df)
+
+averaged.graph <- function(graphs, names, threshold=0.5, to='igraph') {
+    R <- length(graphs)
+    A <- array(data=NA, dim=c(dim(graphs[[1]]), R))
+    for (i in 1:R) {
+        A[, , i] <- graphs[[i]]
+    }
+    A <- apply(sign(abs(A)), c(1,2), mean)
+    A[A < threshold] <- 0
+    rownames(A) <- names
+    colnames(A) <- names
+    g <- convert.format(A, to=to)
+    return(g)
+}
