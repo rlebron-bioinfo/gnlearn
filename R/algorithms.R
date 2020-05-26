@@ -294,3 +294,53 @@ run.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores,
     g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
     return(g)
 }
+
+#' Run Tabu Search Algorithm (TABU)
+#'
+#' This function allows you to learn a undirected graph from a dataset using the Tabu Search algorithm.
+#' @param df Dataset.
+#' @param start Preseeded directed acyclic graph used to initialize the algorithm (optional).
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param score Score to be used: 'pred-loglik-g', 'loglik-g', 'aic-g', 'bic-g', or 'bge'. Default: 'pred-loglik-g'
+#' @param tabu Length of the tabu list. Default: 10
+#' @param max.tabu Iterations tabu search can perform without improving the best score. Default: tabu (10)
+#' @param max.iter Maximum number of iterations. Default: Inf
+#' @param maxp Maximum number of parents for a node. Default: Inf
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @keywords learning graph
+#' @export
+#' @examples
+#' graph <- run.tabu(df)
+
+run.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, tabu=10, max.tabu=NULL, max.iter=Inf, maxp=Inf,
+                   R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+    start <- convert.format(start, to='bn')
+    score <- match.arg(score)
+    if (is.null(max.tabu)) {
+        max.tabu <- tabu
+    }
+
+    library(foreach)
+    library(doParallel)
+
+    df <- drop.all.zeros(df)
+
+    registerDoParallel(cluster)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+        splitted.df <- dataframe.split(df, m=m)
+        g <- bnlearn::tabu(splitted.df$train, newdata=splitted.df$test, start=start, whitelist=whitelist, blacklist=blacklist, score=score,
+                           tabu=tabu, max.tabu=max.tabu, max.iter=max.iter, maxp=maxp, optimized=TRUE)
+        convert.format(g, to='adjacency')
+    }
+
+    stopImplicitCluster()
+
+    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    return(g)
+}
