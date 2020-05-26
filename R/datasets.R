@@ -188,7 +188,7 @@ import.dataset <- function(path, log=FALSE, sep='\t', header=TRUE, index=FALSE, 
 #' df <- select.genes(df, max.genes=100, min.non.zeros=2)
 #' df <- select.genes(df, genes=genes, features=c('tumor.suppressor', 'breast.cancer'), glasso=TRUE, rho=0.5)
 
-select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max.genes=100, min.non.zeros=2, glasso=TRUE, rho=0.5) {
+select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max.genes=100, min.non.zeros=2, glasso=TRUE, rho=0.1) {
     if (is.null(selected.genes)) {
         selected.genes <- colnames(df)
     }
@@ -206,13 +206,14 @@ select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max
         g <- run.glasso(df, rho, unconnected.nodes=FALSE)
         selected.genes <- names(igraph::V(g))
     }
-    df <- subset(df, select=selected.genes)
     if (is.null(selected.genes)) {
         if (colnames(df) > max.genes) {
             df <- df[,1:max.genes]
         }
     } else if (length(selected.genes) > max.genes) {
         df <- df[,1:max.genes]
+    } else {
+        df <- subset(df, select=selected.genes)
     }
     return(df)
 }
