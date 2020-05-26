@@ -13,6 +13,7 @@ Authors@R:
            email = "gherardo.varando@upm.es",
            comment = c(Google.Scholar = "ALjiTg0AAAAJ"))
 Description: Genetic Network Learning.
+biocViews:
 Imports:
     igraph,
     threejs,
@@ -21,13 +22,13 @@ Imports:
     pcalg,
     jsonlite,
     foreach,
-    doParallel
+    doParallel,
+    graph,
+    RBGL
 Remotes:
     gherardovarando/gclm
 Suggests:
-    graph,
     Rgraphviz,
-    RBGL,
     gRain,
     glmnet,
     MASS,
