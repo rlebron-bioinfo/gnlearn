@@ -51,7 +51,7 @@ run.hc(
 \item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: 4}
 }
 \description{
-This function allows you to learn a undirected graph from a dataset using the Hill-Climbing algorithm.
+This function allows you to learn a directed graph from a dataset using the Hill-Climbing algorithm.
 }
 \examples{
 graph <- run.hc(df)

@@ -250,7 +250,7 @@ run.lingam <- function(df, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4)
 
 #' Run Hill-Climbing Algorithm (HC)
 #'
-#' This function allows you to learn a undirected graph from a dataset using the Hill-Climbing algorithm.
+#' This function allows you to learn a directed graph from a dataset using the Hill-Climbing algorithm.
 #' @param df Dataset.
 #' @param start Preseeded directed acyclic graph used to initialize the algorithm (optional).
 #' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
@@ -297,7 +297,7 @@ run.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores,
 
 #' Run Tabu Search Algorithm (TABU)
 #'
-#' This function allows you to learn a undirected graph from a dataset using the Tabu Search algorithm.
+#' This function allows you to learn a directed graph from a dataset using the Tabu Search algorithm.
 #' @param df Dataset.
 #' @param start Preseeded directed acyclic graph used to initialize the algorithm (optional).
 #' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
@@ -318,7 +318,7 @@ run.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores,
 #' graph <- run.tabu(df)
 
 run.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, tabu=10, max.tabu=NULL, max.iter=Inf, maxp=Inf,
-                   R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+                     R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
     start <- convert.format(start, to='bn')
     score <- match.arg(score)
     if (is.null(max.tabu)) {
@@ -336,6 +336,50 @@ run.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=score
         splitted.df <- dataframe.split(df, m=m)
         g <- bnlearn::tabu(splitted.df$train, newdata=splitted.df$test, start=start, whitelist=whitelist, blacklist=blacklist, score=score,
                            tabu=tabu, max.tabu=max.tabu, max.iter=max.iter, maxp=maxp, optimized=TRUE)
+        convert.format(g, to='adjacency')
+    }
+
+    stopImplicitCluster()
+
+    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    return(g)
+}
+
+#' Run Grow-Shrink Algorithm (GS)
+#'
+#' This function allows you to learn a directed graph from a dataset using the Grow-Shrink algorithm.
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param test Conditional independence test to be used: 'cor', 'mc-cor', 'smc-cor', 'zf', 'mc-zf', 'smc-zf', 'mi-g', 'mc-mi-g', 'smc-mi-g', or 'mi-g-sh'. Default: 'cor'
+#' @param alpha Target nominal type I error rate. Default: 0.01
+#' @param B Number of permutations considered for each permutation test.
+#' @param max.sx Maximum allowed size of the conditioning sets.
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @keywords learning graph
+#' @export
+#' @examples
+#' graph <- run.gs(df)
+
+run.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL,
+                   R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+    test <- match.arg(test)
+
+    library(foreach)
+    library(doParallel)
+
+    df <- drop.all.zeros(df)
+
+    registerDoParallel(cluster)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+        splitted.df <- dataframe.split(df, m=m)
+        g <- bnlearn::gs(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
+                         B=B, max.sx=max.sx, undirected=FALSE)
         convert.format(g, to='adjacency')
     }
 
