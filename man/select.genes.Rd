@@ -12,7 +12,7 @@ select.genes(
   max.genes = 100,
   min.non.zeros = 2,
   glasso = TRUE,
-  rho = 0.5
+  rho = 0.1
 )
 }
 \arguments{

@@ -124,7 +124,7 @@ run.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.
         B[, , i] <- results[[i]]
     }
     B <- apply(sign(abs(B)), c(1,2), mean)
-    A <- sign(abs(t(B > threshold)))
+    A <- sign(abs(t(B >= threshold)))
     if (!loops) {
         diag(A) <- 0
     }
@@ -139,4 +139,56 @@ run.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.
 
 mll <- function(P, S) {
     -determinant(P, logarithm=TRUE)$modulus + sum(S*P)
+}
+
+#' Run ARACNE Algorithm
+#'
+#' This function allows you to learn a undirected graph from a dataset using the ARACNE algorithm.
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph.
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph.
+#' @param mi The estimator used for the pairwise mutual information coefficients: 'mi' (discrete mutual information) or 'mi-g' (Gaussian mutual information). Default: 'mi-g'
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @keywords learning graph
+#' @export
+#' @examples
+#' graph <- run.aracne(df)
+
+run.aracne <- function(df, whitelist=NULL, blacklist=NULL, mi=c('mi-g','mi'), R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+    mi <- match.arg(mi)
+    library(foreach)
+    library(doParallel)
+    df <- drop.all.zeros(df)
+    n.genes <- ncol(df)
+    if (is.null(m)) {
+        m <- nrow(df)/2
+    }
+    registerDoParallel(cluster)
+    stopImplicitCluster()
+    graphs <- foreach(rep=1:R) %dopar% {
+        repeat {
+            ixs <- sample(1:nrow(df), size=m, replace=FALSE)
+            train <- df[ixs,]
+            train <- drop.all.zeros(train, rows=TRUE, columns=TRUE)
+            if (dim(train)[2]==n.genes) {
+                break
+            }
+        }
+        g <- bnlearn::aracne(train, whitelist=whitelist, blacklist=blacklist, mi=mi)
+        convert.format(g, to='adjacency')
+    }
+    A <- array(data=NA, dim=c(n.genes, n.genes, R))
+    for (i in 1:R) {
+        A[, , i] <- graphs[[i]]
+    }
+    A <- apply(sign(abs(A)), c(1,2), mean)
+    A[A < threshold] <- 0
+    rownames(A) <- colnames(df)
+    colnames(A) <- colnames(df)
+    g <- convert.format(A, to=to)
+    return(g)
 }
