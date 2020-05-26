@@ -173,3 +173,42 @@ run.aracne <- function(df, whitelist=NULL, blacklist=NULL, mi=c('mi-g','mi'), R=
     g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
     return(g)
 }
+
+#' Run Chow-Liu Algorithm
+#'
+#' This function allows you to learn a undirected graph from a dataset using the Chow-Liu algorithm.
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph.
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph.
+#' @param mi The estimator used for the pairwise mutual information coefficients: 'mi' (discrete mutual information) or 'mi-g' (Gaussian mutual information). Default: 'mi-g'
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @keywords learning graph
+#' @export
+#' @examples
+#' graph <- run.chowliu(df)
+
+run.chowliu <- function(df, whitelist=NULL, blacklist=NULL, mi=c('mi-g','mi'), R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+    mi <- match.arg(mi)
+
+    library(foreach)
+    library(doParallel)
+
+    df <- drop.all.zeros(df)
+
+    registerDoParallel(cluster)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+        splitted.df <- split.dataframe(df, m=m)
+        g <- bnlearn::chow.liu(splitted.df$train, whitelist=whitelist, blacklist=blacklist, mi=mi)
+        convert.format(g, to='adjacency')
+    }
+
+    stopImplicitCluster()
+
+    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    return(g)
+}
