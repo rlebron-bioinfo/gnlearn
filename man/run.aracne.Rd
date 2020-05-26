@@ -8,7 +8,6 @@ run.aracne(
   df,
   whitelist = NULL,
   blacklist = NULL,
-  mi = c("mi-g", "mi"),
   R = 200,
   m = NULL,
   threshold = 0.5,
@@ -22,8 +21,6 @@ run.aracne(
 \item{whitelist}{A data frame with two columns, containing a set of arcs to be included in the graph.}
 
 \item{blacklist}{A data frame with two columns, containing a set of arcs not to be included in the graph.}
-
-\item{mi}{The estimator used for the pairwise mutual information coefficients: 'mi' (discrete mutual information) or 'mi-g' (Gaussian mutual information). Default: 'mi-g'}
 
 \item{R}{Number of bootstrap replicates (optional). Default: 200}
 
