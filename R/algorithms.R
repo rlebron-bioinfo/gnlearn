@@ -441,3 +441,55 @@ run.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.
     g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
     return(g)
 }
+
+#' Run Parents & Children Algorithm
+#'
+#' This function allows you to learn a directed graph from a dataset using Parents & Children algorithms.
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param test Conditional independence test to be used: 'cor', 'mc-cor', 'smc-cor', 'zf', 'mc-zf', 'smc-zf', 'mi-g', 'mc-mi-g', 'smc-mi-g', or 'mi-g-sh'. Default: 'cor'
+#' @param alpha Target nominal type I error rate. Default: 0.01
+#' @param B Number of permutations considered for each permutation test.
+#' @param max.sx Maximum allowed size of the conditioning sets.
+#' @param version Algorithm version: 'mmpc', 'si.hiton.pc', or 'hpc'. Default: 'mmpc'
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @keywords learning graph
+#' @export
+#' @examples
+#' graph <- run.parents.children(df)
+
+run.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('mmpc','si.hiton.pc','hpc'),
+                                 R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+    test <- match.arg(test)
+    version <- match.arg(version)
+
+    algorithm <- switch(version,
+        mmpc = bnlearn::mmpc,
+        si.hiton.pc = bnlearn::si.hiton.pc,
+        hpc = bnlearn::hpc
+    )
+
+    library(foreach)
+    library(doParallel)
+
+    df <- drop.all.zeros(df)
+
+    registerDoParallel(cluster)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+        splitted.df <- dataframe.split(df, m=m)
+        g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
+                         B=B, max.sx=max.sx, undirected=FALSE)
+        convert.format(g, to='adjacency')
+    }
+
+    stopImplicitCluster()
+
+    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    return(g)
+}
