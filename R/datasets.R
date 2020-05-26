@@ -201,7 +201,7 @@ select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max
         selected.genes <- f_genes
     }
     df <- subset(df, select=selected.genes)
-    if (glasso & !is.null(rho)) {
+    if (glasso) {
         g <- run.glasso(df, rho=0.1, R=10, m=NULL, threshold=0.5, unconnected.nodes=FALSE, cluster=4)
         selected.genes <- names(igraph::V(g))
     }

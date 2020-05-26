@@ -212,3 +212,38 @@ run.chowliu <- function(df, whitelist=NULL, blacklist=NULL, mi=c('mi-g','mi'), R
     g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
     return(g)
 }
+
+#' Run LINGAM Algorithm
+#'
+#' This function allows you to learn a directed graph from a dataset using the LINGAM algorithm.
+#' @param df Dataset.
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @keywords learning graph
+#' @export
+#' @examples
+#' graph <- run.lingam(df)
+
+run.lingam <- function(df, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+
+    library(foreach)
+    library(doParallel)
+
+    df <- drop.all.zeros(df)
+
+    registerDoParallel(cluster)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+        splitted.df <- dataframe.split(df, m=m)
+        g <- pcalg::lingam(splitted.df$train)
+        g$Bpruned
+    }
+
+    stopImplicitCluster()
+
+    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    return(g)
+}
