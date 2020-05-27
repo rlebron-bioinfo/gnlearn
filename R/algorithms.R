@@ -706,3 +706,76 @@ run.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=
     g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
     return(g)
 }
+
+#' Run Fast Causal Inference Algorithm (FCI)
+#'
+#' This function allows you to learn a directed graph from a dataset using the Fast Causal Inference algorithm (stable version).
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param indep.test Conditional independence test to be used (pcalg implementation). Default: pcalg::gaussCItest
+#' @param alpha Target nominal type I error rate. Default: 0.01
+#' @param max.sx Maximum allowed size of the conditioning sets.
+#' @param pdsep.max Maximum size of Possible-D-SEP for which subsets are considered as conditioning sets in the conditional independence tests.
+#' @param conservative Whether or not the conservative PC is used (pcalg implementation). Default: FALSE
+#' @param maj.rule Whether or not the triples shall be checked for ambiguity using a majority rule idea, which is less strict than the conservative PC algorithm (pcalg implementation). Default: FALSE
+#' @param version Version of FCI algorithm to be used: 'fci', 'rfci', or 'fci.plus'. Default: 'fci'
+#' @param type Type of FCI algorithm to be used: 'normal', 'anytime', or 'adaptive'. Default: 'normal'
+#' @param rules Logical vector of length 10 indicating which rules should be used when directing edges. Default: rep(TRUE,10)
+#' @param doPdsep If FALSE, Possible-D-SEP is not computed, so that the algorithm simplifies to the Modified PC algorithm of Spirtes, Glymour and Scheines (2000, p.84). Default: TRUE
+#' @param biCC If TRUE, only nodes on paths between nodes x and y are considered to be in Possible-D-SEP(x) when testing independence between x and y. Default: TRUE
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @keywords learning graph
+#' @export
+#' @examples
+#' graph <- run.fci(df)
+
+run.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf, pdsep.max=Inf,
+                    conservative=FALSE, maj.rule=FALSE, version=c('fci','rfci','fci.plus'), type=c('normal','anytime','adaptive'),
+                    rules=rep(TRUE,10), doPdsep=TRUE, biCC=FALSE,
+                    R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+    version <- match.arg(version)
+    type <- match.arg(type)
+
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'adjacency')
+        whitelist <- whitelist > 0
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'adjacency')
+        blacklist <- blacklist > 0
+    }
+
+    library(foreach)
+    library(doParallel)
+
+    df <- drop.all.zeros(df)
+
+    registerDoParallel(cluster)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+        splitted.df <- dataframe.split(df, m=m)
+        suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
+        varNames <- colnames(splitted.df$train)
+        g <- switch(version,
+            fci = { pcalg::fci(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha, m.max=max.sx, pdsep.max=pdsep.max,
+                             conservative=conservative, maj.rule=maj.rule, type=type, rules=rules, doPdsep=doPdsep, biCC=biCC,
+                             fixedEdges=whitelist, fixedGaps=blacklist, skel.method='stable', NAdelete=TRUE) },
+            rfci = { pcalg::rfci(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha, m.max=max.sx, pdsep.max=pdsep.max,
+                               conservative=conservative, maj.rule=maj.rule, rules=rules, doPdsep=doPdsep, biCC=biCC,
+                               fixedEdges=whitelist, fixedGaps=blacklist, skel.method='stable', NAdelete=TRUE) },
+            fci.plus = { pcalg::fciPlus(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha) }
+        )
+        g <- as(g, 'matrix')
+    }
+
+    stopImplicitCluster()
+
+    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    return(g)
+}
