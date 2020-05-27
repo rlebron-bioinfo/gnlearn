@@ -764,11 +764,11 @@ run.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussC
         varNames <- colnames(splitted.df$train)
         g <- switch(version,
             fci = { pcalg::fci(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha, m.max=max.sx, pdsep.max=pdsep.max,
-                             conservative=conservative, maj.rule=maj.rule, type=type, rules=rules, doPdsep=doPdsep, biCC=biCC,
-                             fixedEdges=whitelist, fixedGaps=blacklist, skel.method='stable', NAdelete=TRUE) },
-            rfci = { pcalg::rfci(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha, m.max=max.sx, pdsep.max=pdsep.max,
-                               conservative=conservative, maj.rule=maj.rule, rules=rules, doPdsep=doPdsep, biCC=biCC,
+                               conservative=conservative, maj.rule=maj.rule, type=type, rules=rules, doPdsep=doPdsep, biCC=biCC,
                                fixedEdges=whitelist, fixedGaps=blacklist, skel.method='stable', NAdelete=TRUE) },
+            rfci = { pcalg::rfci(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha, m.max=max.sx,
+                                 conservative=conservative, maj.rule=maj.rule, rules=rules,
+                                 fixedEdges=whitelist, fixedGaps=blacklist, skel.method='stable', NAdelete=TRUE) },
             fci.plus = { pcalg::fciPlus(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha) }
         )
         g <- as(g, 'matrix')
