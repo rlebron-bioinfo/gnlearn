@@ -827,3 +827,66 @@ run.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples
     g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
     return(g)
 }
+
+#' Run Adaptively Restricted Greedy Equivalence Search Algorithm (ARGES)
+#'
+#' This function allows you to learn a directed graph from a dataset using the Adaptively Restricted Greedy Equivalence Search (ARGES) algorithm.
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param indep.test Conditional independence test to be used (pcalg implementation). Default: pcalg::gaussCItest
+#' @param alpha Target nominal type I error rate. Default: 0.01
+#' @param max.sx Maximum allowed size of the conditioning sets.
+#' @param adaptive Whether constraints should be adapted to newly detected v-structures or unshielded triples: 'none', 'vstructures', or 'triples'. Default: 'none'
+#' @param maxDegree Parameter used to limit the vertex degree of the estimated graph. Default: integer(0)
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @keywords learning graph
+#' @export
+#' @examples
+#' graph <- run.arges(df)
+
+run.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf,
+                      adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
+                      R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+
+    adaptive <- match.arg(adaptive)
+
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'adjacency')
+        whitelist <- whitelist > 0
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'adjacency')
+        blacklist <- blacklist > 0
+    }
+
+    library(foreach)
+    library(doParallel)
+
+    df <- drop.all.zeros(df)
+
+    registerDoParallel(cluster)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+        splitted.df <- dataframe.split(df, m=m)
+        suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
+        varNames <- colnames(splitted.df$train)
+        skel <- pcalg::skeleton(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha, m.max=max.sx,
+                                fixedEdges=whitelist, fixedGaps=blacklist, method='stable', NAdelete=TRUE)
+        skel <- as(skel@graph, 'matrix')
+        score <- new('GaussL0penObsScore', data=splitted.df$train)
+        g <- pcalg::ges(score, labels=score$getNodes(), fixedGaps=!skel, maxDegree=maxDegree,
+                        adaptive=adaptive, phase=c('forward','backward'), iterate=TRUE)
+        g <- g$repr$weight.mat()
+    }
+
+    stopImplicitCluster()
+
+    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    return(g)
+}
