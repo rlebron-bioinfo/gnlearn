@@ -621,8 +621,82 @@ run.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, R
                            fixedEdges=whitelist, fixedGaps=blacklist, skel.method='stable', NAdelete=TRUE)
             g <- as(g@graph, 'matrix')
         } else if (implementation=='bnlearn') {
-            g <- bnlearn::gs(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
-                             B=bnlearn.B, max.sx=max.sx, undirected=FALSE)
+            g <- bnlearn::pc.stable(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
+                                    B=bnlearn.B, max.sx=max.sx, undirected=FALSE)
+            convert.format(g, to='adjacency')
+        }
+    }
+
+    stopImplicitCluster()
+
+    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    return(g)
+}
+
+#' Run Peter & Clark Skeleton Algorithm
+#'
+#' This function allows you to learn a directed graph from a dataset using the Peter & Clark skeleton algorithm (stable version).
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param alpha Target nominal type I error rate. Default: 0.01
+#' @param max.sx Maximum allowed size of the conditioning sets.
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param implementation Peter & Clark algorithm implementation: 'pcalg' or 'bnlearn'. Default: 'pcalg'
+#' @param pcalg.indep.test Conditional independence test to be used (pcalg implementation). Default: pcalg::gaussCItest
+#' @param bnlearn.test Conditional independence test to be used (bnlearn implementation): 'cor', 'mc-cor', 'smc-cor', 'zf', 'mc-zf', 'smc-zf', 'mi-g', 'mc-mi-g', 'smc-mi-g', or 'mi-g-sh'. Default: 'cor'
+#' @param bnlearn.B Number of permutations considered for each permutation test (bnlearn implementation).
+#' @keywords learning graph
+#' @export
+#' @examples
+#' graph <- run.skeleton(df, implementation='pcalg')
+#' graph <- run.skeleton(df, implementation='bnlearn')
+
+run.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, R=200, m=NULL, threshold=0.5,
+                   to='igraph', cluster=4, implementation=c('pcalg','bnlearn'),
+                   pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
+                   pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
+                   bnlearn.test=ci.tests, bnlearn.B=NULL) {
+    implementation <- match.arg(implementation)
+    pcalg.u2pd <- match.arg(pcalg.u2pd)
+    bnlearn.test <- match.arg(bnlearn.test)
+
+    if (pcalg.conservative | pcalg.solve.confl) {
+        pcalg.u2pd <- 'relaxed'
+    }
+
+    if (!is.null(whitelist) & implementation=='pcalg') {
+        whitelist <- convert.format(whitelist, 'adjacency')
+        whitelist <- whitelist > 0
+    }
+
+    if (!is.null(blacklist) & implementation=='pcalg') {
+        blacklist <- convert.format(blacklist, 'adjacency')
+        blacklist <- blacklist > 0
+    }
+
+    library(foreach)
+    library(doParallel)
+
+    df <- drop.all.zeros(df)
+
+    registerDoParallel(cluster)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+        splitted.df <- dataframe.split(df, m=m)
+        if (implementation=='pcalg') {
+            suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
+            varNames <- colnames(splitted.df$train)
+            g <- pcalg::skeleton(suffStat, indepTest=pcalg.indep.test, labels=varNames, alpha=alpha, m.max=max.sx,
+                                 fixedEdges=whitelist, fixedGaps=blacklist, method='stable', NAdelete=TRUE)
+            g <- as(g@graph, 'matrix')
+        } else if (implementation=='bnlearn') {
+            g <- bnlearn::pc.stable(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
+                             B=bnlearn.B, max.sx=max.sx, undirected=TRUE)
             convert.format(g, to='adjacency')
         }
     }
