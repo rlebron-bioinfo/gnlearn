@@ -493,3 +493,63 @@ run.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tes
     g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
     return(g)
 }
+
+#' Run General 2-Phase Restricted Maximization Algorithm (rsmax2)
+#'
+#' This function allows you to learn a directed graph from a dataset using the General 2-Phase Restricted Maximization algorithm.
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param restrict Constraint-based or local search algorithm to be used in the restrict phase: 'pc.stable', 'gs', 'iamb', 'fast.iamb', 'inter.iamb', 'iamb.fdr', 'mmpc', 'si.hiton.pc', or 'hpc'. Default: 'pc.stable'
+#' @param maximize Score-based algorithm to be used in the maximize phase: 'hc' or 'tabu'. Default: 'hc'
+#' @param restrict.args List of arguments to be passed to the algorithm specified by restrict.
+#' @param maximize.args List of arguments to be passed to the algorithm specified by maximize.
+#' @param version Algorithm version: 'rsmax2','mmhc', or 'h2pc'. Default: 'rsmax2'
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @keywords learning graph
+#' @export
+#' @examples
+#' graph <- run.rsmax2(df)
+
+run.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','gs','iamb','fast.iamb','inter.iamb','iamb.fdr','mmpc','si.hiton.pc','hpc'),
+                       maximize=c('hc','tabu'), restrict.args=list(), maximize.args=list(), version=c('rsmax2','mmhc','h2pc'),
+                       R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+    restrict <- match.arg(restrict)
+    maximize <- match.arg(maximize)
+    version <- match.arg(version)
+
+    restrict <- switch(version,
+        rsmax2 = restrict,
+        mmhc = 'mmpc',
+        h2pc = 'hpc'
+    )
+
+    maximize <- switch(version,
+        rsmax2 = maximize,
+        mmhc = 'hc',
+        h2pc = 'hc'
+    )
+
+    library(foreach)
+    library(doParallel)
+
+    df <- drop.all.zeros(df)
+
+    registerDoParallel(cluster)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+        splitted.df <- dataframe.split(df, m=m)
+        g <- bnlearn::rsmax2(splitted.df$train, whitelist=whitelist, blacklist=blacklist, restrict=restrict, maximize=maximize,
+                             restrict.args=restrict.args, maximize.args=maximize.args)
+        convert.format(g, to='adjacency')
+    }
+
+    stopImplicitCluster()
+
+    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    return(g)
+}
