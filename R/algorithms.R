@@ -779,3 +779,51 @@ run.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussC
     g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
     return(g)
 }
+
+#' Run Greedy Equivalence Search Algorithm (GES)
+#'
+#' This function allows you to learn a directed graph from a dataset using the Greedy Equivalence Search (GES) algorithm of Chickering (2002).
+#' @param df Dataset.
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param adaptive Whether constraints should be adapted to newly detected v-structures or unshielded triples: 'none', 'vstructures', or 'triples'. Default: 'none'
+#' @param maxDegree Parameter used to limit the vertex degree of the estimated graph. Default: integer(0)
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @keywords learning graph
+#' @export
+#' @examples
+#' graph <- run.ges(df)
+
+run.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
+                    R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+
+    adaptive <- match.arg(adaptive)
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'adjacency')
+        blacklist <- blacklist > 0
+    }
+
+    library(foreach)
+    library(doParallel)
+
+    df <- drop.all.zeros(df)
+
+    registerDoParallel(cluster)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+        splitted.df <- dataframe.split(df, m=m)
+        score <- new('GaussL0penObsScore', data=splitted.df$train)
+        g <- pcalg::ges(score, labels=score$getNodes(), fixedGaps=blacklist, maxDegree=maxDegree,
+                        adaptive=adaptive, phase=c('forward','backward'), iterate=TRUE)
+        g <- g$repr$weight.mat()
+    }
+
+    stopImplicitCluster()
+
+    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    return(g)
+}
