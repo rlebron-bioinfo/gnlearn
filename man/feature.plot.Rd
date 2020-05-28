@@ -33,8 +33,8 @@ feature.plot(
 This function allows you to plot the graph of a feature (e.g. transcription factors or tumor suppressors).
 }
 \examples{
-plot.feature.graph(obj, genes, 'tf', interactive=FALSE)
-plot.feature.graph(obj, genes, 'tumor.suppressor', interactive=TRUE)
+feature.plot(obj, genes, 'tf', interactive=FALSE)
+feature.plot(obj, genes, 'tumor.suppressor', interactive=TRUE)
 }
 \keyword{feature}
 \keyword{graph}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/tools.R
 \name{compare.graphs}
 \alias{compare.graphs}
-\title{Adjacency Matrix Plotting}
+\title{Graph Comparison}
 \usage{
 compare.graphs(learned, true, arcs = FALSE)
 }
@@ -12,25 +12,12 @@ compare.graphs(learned, true, arcs = FALSE)
 \item{true}{Ground truth graph or graph 2 (reference).}
 
 \item{arcs}{Whether or not to list the arcs (optional). Default: FALSE.}
-
-\item{x}{Graph object.}
-
-\item{from}{Input format (optional).}
-
-\item{col}{Heatmap color palette (optional).}
 }
 \description{
-This function allows you to plot a graph as an adjacency matrix, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
+This function allows you to compare two graphs, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
 }
 \examples{
-heatmap.adjacency(obj)
-Graph Comparison
-
-This function allows you to compare two graphs, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
 comparison <- compare.graphs(obj1, obj2)
 }
-\keyword{adjacency}
 \keyword{comparison}
 \keyword{graph}
-\keyword{heatmap}
-\keyword{plot}

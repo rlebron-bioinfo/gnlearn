@@ -221,8 +221,8 @@ as.bn <- function(x, from=NULL) {
 #' @keywords graph plot
 #' @export
 #' @examples
-#' plot.graph(obj, interactive=FALSE)
-#' plot.graph(obj, interactive=TRUE)
+#' graph.plot(obj, interactive=FALSE)
+#' graph.plot(obj, interactive=TRUE)
 
 graph.plot <- function(x, from=NULL, layout=c('grid','star','circle','tree','nicely'),
                        interactive=FALSE) {
@@ -276,8 +276,8 @@ graph.plot <- function(x, from=NULL, layout=c('grid','star','circle','tree','nic
 #' @keywords graph feature plot
 #' @export
 #' @examples
-#' plot.feature.graph(obj, genes, 'tf', interactive=FALSE)
-#' plot.feature.graph(obj, genes, 'tumor.suppressor', interactive=TRUE)
+#' feature.plot(obj, genes, 'tf', interactive=FALSE)
+#' feature.plot(obj, genes, 'tumor.suppressor', interactive=TRUE)
 
 feature.plot <- function(x, genes, feature, from=NULL, feature.color=rgb(0.7,0.9,0.9,0.9),
                          layout=c('grid','star','circle','tree','nicely'), interactive=FALSE) {
@@ -320,16 +320,61 @@ feature.plot <- function(x, genes, feature, from=NULL, feature.color=rgb(0.7,0.9
     }
 }
 
-#' Adjacency Matrix Plotting
+#' Community Plotting
 #'
-#' This function allows you to plot a graph as an adjacency matrix, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
+#' This function allows you to plot a graph with each community in a different color.
 #' @param x Graph object.
 #' @param from Input format (optional).
-#' @param col Heatmap color palette (optional).
-#' @keywords adjacency heatmap plot
+#' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'
+#' @param interactive Interactive plot (optional). Default: FALSE
+#' @keywords graph community plot
 #' @export
 #' @examples
-#' heatmap.adjacency(obj)
+#' community.plot(obj, interactive=FALSE)
+#' community.plot(obj, interactive=TRUE)
+
+community.plot <- function(x, from=NULL, layout=c('grid','star','circle','tree','nicely'),
+                           interactive=FALSE) {
+    layout <- match.arg(layout)
+
+    if (is.null(from)) {
+        from=detect.format(x)
+    }
+
+    g <- as.igraph(x, from=from)
+    igraph::V(g)$community <- igraph::membership(igraph::optimal.community(g))
+    palette <- rainbow(length(unique(igraph::V(g)$community)))
+
+    layout <- switch(layout,
+        grid = igraph::layout_on_grid(g),
+        star = igraph::layout_as_star(g),
+        circle = igraph::layout_in_circle(g),
+        tree = igraph::layout_as_tree(g),
+        nicely = igraph::layout_nicely(g)
+    )
+
+    igraph::V(g)$color <- rgb(0.9,0.9,0.9,0.9)
+
+    if (interactive) {
+        threejs::graphjs(g,
+            vertex.color = palette[as.numeric(as.factor(igraph::vertex_attr(g, 'community')))],
+            edge.color=rgb(0.2,0.2,0.2,0.9)
+        )
+    } else {
+        igraph::plot.igraph(g,
+            vertex.color = palette[as.numeric(as.factor(igraph::vertex_attr(g, 'community')))],
+            vertex.label.color='black',
+            vertex.label.family='Helvetica',
+            vertex.frame.color='black',
+            vertex.shape='circle',
+            vertex.size=25,
+            edge.lty='solid',
+            edge.width=2,
+            edge.arrow.width=1,
+            edge.color=rgb(0.2,0.2,0.2,0.9),
+            layout=layout)
+    }
+}
 
 #' Graph Comparison
 #'
@@ -594,12 +639,18 @@ averaged.graph <- function(graphs, names, threshold=0.5, to='igraph') {
 #' Graph Communities
 #'
 #' This function allows you to detect how many communities are in the graph and to which community each node and edge belongs.
-#' @param g Graph object.
+#' @param x Graph object.
+#' @param from Input format (optional).
 #' @keywords graph community
 #' @export
 #' @examples
 #' communities <- graph.communities(g)
-graph.communities <- function(g) {
+graph.communities <- function(x, from=NULL) {
+    library(dplyr)
+    if (is.null(from)) {
+        from=detect.format(x)
+    }
+    g <- as.igraph(x, from=from)
     igraph::V(g)$community <- igraph::membership(igraph::optimal.community(g))
     node.community <- igraph::get.data.frame(g, what='vertices')
     edge.community <- igraph::get.data.frame(g, what='edges') %>%

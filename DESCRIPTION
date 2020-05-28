@@ -15,8 +15,7 @@ Authors@R:
 Description: Genetic Network Learning.
 Depends:
     foreach,
-    doParallel,
-    dplyr
+    doParallel
 biocViews:
 Imports:
     igraph,
@@ -27,7 +26,8 @@ Imports:
     jsonlite,
     graph,
     RBGL,
-    matrixcalc
+    matrixcalc,
+    dplyr
 Remotes:
     gherardovarando/gclm
 Suggests:

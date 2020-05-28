@@ -4,10 +4,12 @@
 \alias{graph.communities}
 \title{Graph Communities}
 \usage{
-graph.communities(g)
+graph.communities(x, from = NULL)
 }
 \arguments{
-\item{g}{Graph object.}
+\item{x}{Graph object.}
+
+\item{from}{Input format (optional).}
 }
 \description{
 This function allows you to detect how many communities are in the graph and to which community each node and edge belongs.

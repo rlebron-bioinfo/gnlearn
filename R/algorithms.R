@@ -553,8 +553,8 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
 
 boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
                     R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
-
     adaptive <- match.arg(adaptive)
+    library(pcalg)
 
     if (!is.null(blacklist)) {
         blacklist <- convert.format(blacklist, 'adjacency')
@@ -832,6 +832,7 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
                       R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
 
     adaptive <- match.arg(adaptive)
+    library(pcalg)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'adjacency')
