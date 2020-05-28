@@ -24,6 +24,7 @@ Genetic Network Learning
 * Hill Climbing (HC) -> bnlearn
 * Tabu Search (Tabu) -> bnlearn
 * Greedy-Equivalent-Search (GES) -> pcalg
+* Linear NO-TEARS -> own reimplementation in R 
 
 ### Hybrid (Skeleton/Constraint-Based + Score-Based)
 * General 2-Phase Restricted Maximization (RSMAX2) -> bnlearn

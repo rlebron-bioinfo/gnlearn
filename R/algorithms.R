@@ -1,7 +1,7 @@
 ci.tests <- c('cor', 'mc-cor', 'smc-cor', 'zf', 'mc-zf', 'smc-zf', 'mi-g', 'mc-mi-g', 'smc-mi-g', 'mi-g-sh')
 scores <- c('pred-loglik-g', 'loglik-g', 'aic-g', 'bic-g', 'bge')
 
-#' Run GLASSO Algorithm
+#' GLASSO Algorithm With Bootstrapping
 #'
 #' This function allows you to learn an undirected graph from a dataset using the GLASSO algorithm.
 #' @param df Dataset.
@@ -18,9 +18,9 @@ scores <- c('pred-loglik-g', 'loglik-g', 'aic-g', 'bic-g', 'bge')
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.glasso(df, rho=0.1)
+#' graph <- boot.glasso(df, rho=0.1)
 
-run.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, lower=TRUE, loops=FALSE, unconnected.nodes=FALSE, to='igraph', cluster=4) {
+boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, lower=TRUE, loops=FALSE, unconnected.nodes=FALSE, to='igraph', cluster=4) {
     k <- sum(c(upper, lower))
     if (k==0) {
         upper <- TRUE
@@ -60,7 +60,7 @@ run.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, l
     return(g)
 }
 
-#' Run GCLM Algorithm
+#' GCLM Algorithm With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the GCLM algorithm.
 #' @param df Dataset.
@@ -74,9 +74,9 @@ run.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, l
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.gclm(df)
+#' graph <- boot.gclm(df)
 
-run.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.nodes=FALSE, to='igraph', cluster=4) {
+boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.nodes=FALSE, to='igraph', cluster=4) {
 
     library(foreach)
     library(doParallel)
@@ -138,7 +138,7 @@ mll <- function(P, S) {
     -determinant(P, logarithm=TRUE)$modulus + sum(S*P)
 }
 
-#' Run ARACNE Algorithm
+#' ARACNE Algorithm With Bootstrapping
 #'
 #' This function allows you to learn a undirected graph from a dataset using the ARACNE algorithm.
 #' @param df Dataset.
@@ -152,9 +152,9 @@ mll <- function(P, S) {
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.aracne(df)
+#' graph <- boot.aracne(df)
 
-run.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
     mi <- match.arg(mi)
 
     library(foreach)
@@ -176,7 +176,7 @@ run.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thresh
     return(g)
 }
 
-#' Run Chow-Liu Algorithm
+#' Chow-Liu Algorithm With Bootstrapping
 #'
 #' This function allows you to learn a undirected graph from a dataset using the Chow-Liu algorithm.
 #' @param df Dataset.
@@ -190,9 +190,9 @@ run.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thresh
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.chowliu(df)
+#' graph <- boot.chowliu(df)
 
-run.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
 
     library(foreach)
     library(doParallel)
@@ -213,7 +213,7 @@ run.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
     return(g)
 }
 
-#' Run LINGAM Algorithm
+#' LINGAM Algorithm With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the LINGAM algorithm.
 #' @param df Dataset.
@@ -225,9 +225,9 @@ run.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.lingam(df)
+#' graph <- boot.lingam(df)
 
-run.lingam <- function(df, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
 
     library(foreach)
     library(doParallel)
@@ -248,7 +248,7 @@ run.lingam <- function(df, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4)
     return(g)
 }
 
-#' Run Hill-Climbing Algorithm (HC)
+#' Hill-Climbing Algorithm (HC) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the Hill-Climbing algorithm.
 #' @param df Dataset.
@@ -268,9 +268,9 @@ run.lingam <- function(df, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4)
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.hc(df)
+#' graph <- boot.hc(df)
 
-run.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, restart=0, perturb=1, max.iter=Inf, maxp=Inf,
+boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, restart=0, perturb=1, max.iter=Inf, maxp=Inf,
                    R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
     start <- convert.format(start, to='bn')
     score <- match.arg(score)
@@ -295,7 +295,7 @@ run.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores,
     return(g)
 }
 
-#' Run Tabu Search Algorithm (TABU)
+#' Tabu Search Algorithm (TABU) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the Tabu Search algorithm.
 #' @param df Dataset.
@@ -315,9 +315,9 @@ run.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores,
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.tabu(df)
+#' graph <- boot.tabu(df)
 
-run.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, tabu=10, max.tabu=NULL, max.iter=Inf, maxp=Inf,
+boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, tabu=10, max.tabu=NULL, max.iter=Inf, maxp=Inf,
                      R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
     start <- convert.format(start, to='bn')
     score <- match.arg(score)
@@ -345,7 +345,7 @@ run.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=score
     return(g)
 }
 
-#' Run Grow-Shrink Algorithm (GS)
+#' Grow-Shrink Algorithm (GS) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the Grow-Shrink algorithm.
 #' @param df Dataset.
@@ -363,9 +363,9 @@ run.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=score
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.gs(df)
+#' graph <- boot.gs(df)
 
-run.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL,
+boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL,
                    R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
     test <- match.arg(test)
 
@@ -389,7 +389,7 @@ run.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01
     return(g)
 }
 
-#' Run Incremental Association Algorithm (IAMB)
+#' Incremental Association Algorithm (IAMB) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the Incremental Association algorithm.
 #' @param df Dataset.
@@ -408,9 +408,9 @@ run.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.iamb(df)
+#' graph <- boot.iamb(df)
 
-run.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('iamb','fast.iamb','inter.iamb','iamb.fdr'),
+boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('iamb','fast.iamb','inter.iamb','iamb.fdr'),
                      R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
     test <- match.arg(test)
     version <- match.arg(version)
@@ -442,7 +442,7 @@ run.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.
     return(g)
 }
 
-#' Run Parents & Children Algorithm
+#' Parents & Children Algorithm With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using Parents & Children algorithms.
 #' @param df Dataset.
@@ -461,9 +461,9 @@ run.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.parents.children(df)
+#' graph <- boot.parents.children(df)
 
-run.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('mmpc','si.hiton.pc','hpc'),
+boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('mmpc','si.hiton.pc','hpc'),
                                  R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
     test <- match.arg(test)
     version <- match.arg(version)
@@ -494,7 +494,7 @@ run.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tes
     return(g)
 }
 
-#' Run General 2-Phase Restricted Maximization Algorithm (rsmax2)
+#' General 2-Phase Restricted Maximization Algorithm (rsmax2) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the General 2-Phase Restricted Maximization algorithm.
 #' @param df Dataset.
@@ -513,9 +513,9 @@ run.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tes
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.rsmax2(df)
+#' graph <- boot.rsmax2(df)
 
-run.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','gs','iamb','fast.iamb','inter.iamb','iamb.fdr','mmpc','si.hiton.pc','hpc'),
+boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','gs','iamb','fast.iamb','inter.iamb','iamb.fdr','mmpc','si.hiton.pc','hpc'),
                        maximize=c('hc','tabu'), restrict.args=list(), maximize.args=list(), version=c('rsmax2','mmhc','h2pc'),
                        R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
     restrict <- match.arg(restrict)
@@ -554,7 +554,7 @@ run.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable
     return(g)
 }
 
-#' Run Peter & Clark Algorithm (PC)
+#' Peter & Clark Algorithm (PC) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the Peter & Clark algorithm (stable version).
 #' @param df Dataset.
@@ -578,10 +578,10 @@ run.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.pc(df, implementation='pcalg')
-#' graph <- run.pc(df, implementation='bnlearn')
+#' graph <- boot.pc(df, implementation='pcalg')
+#' graph <- boot.pc(df, implementation='bnlearn')
 
-run.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, R=200, m=NULL, threshold=0.5,
+boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, R=200, m=NULL, threshold=0.5,
                    to='igraph', cluster=4, implementation=c('pcalg','bnlearn'),
                    pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
                    pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
@@ -633,7 +633,7 @@ run.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, R
     return(g)
 }
 
-#' Run Peter & Clark Skeleton Algorithm
+#' Peter & Clark Skeleton Algorithm With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the Peter & Clark skeleton algorithm (stable version).
 #' @param df Dataset.
@@ -653,10 +653,10 @@ run.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, R
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.skeleton(df, implementation='pcalg')
-#' graph <- run.skeleton(df, implementation='bnlearn')
+#' graph <- boot.skeleton(df, implementation='pcalg')
+#' graph <- boot.skeleton(df, implementation='bnlearn')
 
-run.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, R=200, m=NULL, threshold=0.5,
+boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, R=200, m=NULL, threshold=0.5,
                    to='igraph', cluster=4, implementation=c('pcalg','bnlearn'),
                    pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
                    pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
@@ -707,7 +707,7 @@ run.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=
     return(g)
 }
 
-#' Run Fast Causal Inference Algorithm (FCI)
+#' Fast Causal Inference Algorithm (FCI) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the Fast Causal Inference algorithm (stable version).
 #' @param df Dataset.
@@ -732,9 +732,9 @@ run.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.fci(df)
+#' graph <- boot.fci(df)
 
-run.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf, pdsep.max=Inf,
+boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf, pdsep.max=Inf,
                     conservative=FALSE, maj.rule=FALSE, version=c('fci','rfci','fci.plus'), type=c('normal','anytime','adaptive'),
                     rules=rep(TRUE,10), doPdsep=TRUE, biCC=FALSE,
                     R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
@@ -780,7 +780,7 @@ run.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussC
     return(g)
 }
 
-#' Run Greedy Equivalence Search Algorithm (GES)
+#' Greedy Equivalence Search Algorithm (GES) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the Greedy Equivalence Search (GES) algorithm of Chickering (2002).
 #' @param df Dataset.
@@ -795,9 +795,9 @@ run.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussC
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.ges(df)
+#' graph <- boot.ges(df)
 
-run.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
+boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
                     R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
 
     adaptive <- match.arg(adaptive)
@@ -828,7 +828,7 @@ run.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples
     return(g)
 }
 
-#' Run Adaptively Restricted Greedy Equivalence Search Algorithm (ARGES)
+#' Adaptively Restricted Greedy Equivalence Search Algorithm (ARGES) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the Adaptively Restricted Greedy Equivalence Search (ARGES) algorithm.
 #' @param df Dataset.
@@ -847,9 +847,9 @@ run.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- run.arges(df)
+#' graph <- boot.arges(df)
 
-run.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf,
+boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf,
                       adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
                       R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
 
@@ -891,10 +891,23 @@ run.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaus
     return(g)
 }
 
-# NO-TEARS Linear Algorithm (REIMPLEMENTED)
+#' Linear NO-TEARS Algorithm (REIMPLEMENTED)
+#'
+#' This function allows you to learn an adjacency matrix from a dataset using the Linear NO-TEARS algorithm.
+#' @param df Dataset.
+#' @param lambda1 L1 regularization parameter. Default: 0.1
+#' @param loss.type Type of loss function to be used: 'l2', 'logistic', or 'poisson'. Default: 'l2'
+#' @param max.iter Maximum number of dual ascent steps. Default: 100
+#' @param h.tol Minimum absolute value of h. Default: 1e-8
+#' @param rho.max Maximum value of rho. Default: 1e+16
+#' @param w.threshold Threshold of absolute value of weight. Default: 0.3
+#' @keywords learning adjacency
+#' @export
+#' @examples
+#' mtx <- notears(df)
 
-notears <- function(df, lambda1, loss.type=c('l2','logistic','poisson'),
-                        max.iter=100, h.tol=1e-8, rho.max=1e+16, w.threshold=0.3) {
+notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
+                    max.iter=100, h.tol=1e-8, rho.max=1e+16, w.threshold=0.3) {
     loss.type <- match.arg(loss.type)
     X <- df <- as.matrix(df)
 
@@ -961,14 +974,16 @@ notears <- function(df, lambda1, loss.type=c('l2','logistic','poisson'),
     gr <- function(w) {
         W <- adj(w)
         G.loss <- G.loss.func(W)
+        h.new <- h.func(W)
         G.h <- G.h.func(W)
-        G.smooth <- G.loss + (rho * h + alpha) * G.h
+        G.smooth <- G.loss + (rho * h.new + alpha) * G.h
         G.obj <- c(array(G.smooth + lambda1), array(-1 * G.smooth + lambda1))
         return(G.obj)
     }
 
     n <- nrow(df)
     d <- ncol(df)
+    nodes <- colnames(df)
     w.est <- replicate(2*d*d, 0)
     rho <- 1
     alpha <- 0
@@ -978,12 +993,9 @@ notears <- function(df, lambda1, loss.type=c('l2','logistic','poisson'),
         w.new <- NULL
         h.new <- NULL
         while (rho < rho.max) {
-            #w.new <- optim(w.est, fn, gr=gr, method='L-BFGS-B', lower=0, upper=Inf)$par
-            w.new <- optim(w.est, fn, method='L-BFGS-B', lower=0, upper=Inf)$par
+            w.new <- optim(w.est, fn, gr=gr, method='L-BFGS-B', lower=0, upper=Inf)$par
             h.new <- h.func(adj(w.new))
             if (h.new > (0.25*h)) {
-                message(h.new)
-                message(h)
                 rho = rho*10
             } else {
                 break
@@ -998,5 +1010,51 @@ notears <- function(df, lambda1, loss.type=c('l2','logistic','poisson'),
     }
     W.est <- adj(w.est)
     W.est[abs(W.est) < w.threshold] <- 0
+    colnames(W.est) <- rownames(W.est) <- nodes
     return(W.est)
+}
+
+#' Linear NO-TEARS Algorithm (REIMPLEMENTED) With Bootstrapping
+#'
+#' This function allows you to learn a directed graph from a dataset using the Linear NO-TEARS algorithm.
+#' @param df Dataset.
+#' @param lambda1 L1 regularization parameter. Default: 0.1
+#' @param loss.type Type of loss function to be used: 'l2', 'logistic', or 'poisson'. Default: 'l2'
+#' @param max.iter Maximum number of dual ascent steps. Default: 100
+#' @param h.tol Minimum absolute value of h. Default: 1e-8
+#' @param rho.max Maximum value of rho. Default: 1e+16
+#' @param w.threshold Threshold of absolute value of weight. Default: 0.3
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @keywords learning graph
+#' @export
+#' @examples
+#' graph <- boot.notears(df)
+
+boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
+                         max.iter=100, h.tol=1e-8, rho.max=1e+16, w.threshold=0.3,
+                         R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+    loss.type <- match.arg(loss.type)
+
+    library(foreach)
+    library(doParallel)
+
+    df <- drop.all.zeros(df)
+
+    registerDoParallel(cluster)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+        splitted.df <- dataframe.split(df, m=m)
+        g <- notears(splitted.df$train, lambda1=lambda1, loss.type=loss.type,
+                     max.iter=max.iter, h.tol=h.tol, rho.max=rho.max, w.threshold=w.threshold)
+        convert.format(g, to='adjacency')
+    }
+
+    stopImplicitCluster()
+
+    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    return(g)
 }
