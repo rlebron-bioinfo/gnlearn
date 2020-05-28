@@ -293,6 +293,14 @@ feature.plot <- function(x, genes, feature, from=NULL, feature.color=rgb(0.7,0.9
     g <- as.igraph(x, from='edges')
     igraph::V(g)$color <- ifelse(names(igraph::V(g)) %in% f_genes, feature.color, rgb(0.9,0.9,0.9,0.9))
 
+    layout <- switch(layout,
+        grid = igraph::layout_on_grid(g),
+        star = igraph::layout_as_star(g),
+        circle = igraph::layout_in_circle(g),
+        tree = igraph::layout_as_tree(g),
+        nicely = igraph::layout_nicely(g)
+    )
+
     if (interactive) {
         threejs::graphjs(g,
             edge.color=rgb(0.2,0.2,0.2,0.9)
