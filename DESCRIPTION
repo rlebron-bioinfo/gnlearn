@@ -24,7 +24,8 @@ Imports:
     foreach,
     doParallel,
     graph,
-    RBGL
+    RBGL,
+    matrixcalc
 Remotes:
     gherardovarando/gclm
 Suggests:

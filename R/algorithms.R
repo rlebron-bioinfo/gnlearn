@@ -890,3 +890,113 @@ run.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaus
     g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
     return(g)
 }
+
+# NO-TEARS Linear Algorithm (REIMPLEMENTED)
+
+notears <- function(df, lambda1, loss.type=c('l2','logistic','poisson'),
+                        max.iter=100, h.tol=1e-8, rho.max=1e+16, w.threshold=0.3) {
+    loss.type <- match.arg(loss.type)
+    X <- df <- as.matrix(df)
+
+    loss.func <- function(W) {
+        M <- X %*% W
+        if (loss.type=='l2') {
+            R <- X - M
+            loss <- 0.5 / dim(X)[1] * sum(R ** 2)
+        } else if (loss.type=='logistic') {
+            loss <- 1.0 / dim(X)[1] * sum(log(sum(exp(M)+1)) - X * M)
+        } else if (loss.type=='poisson') {
+            S <- exp(M)
+            loss <- 1.0 / dim(X)[1] * sum(S - X * M)
+        }
+        return(loss)
+    }
+
+    G.loss.func <- function(W) {
+        M <- X %*% W
+        if (loss.type=='l2') {
+            R <- X - M
+            G.loss <- -1.0 / dim(X)[1] * t(X) %*% R
+        } else if (loss.type=='logistic') {
+            G.loss <- 1.0 / dim(X)[1] * t(X) %*% (1.0 / (1 + exp(-1 * M)) - X)
+        } else if (loss.type=='poisson') {
+            S <- exp(M)
+            G.loss <- 1.0 / dim(X)[1] * t(X) %*% (S - X)
+        }
+        return(G.loss)
+    }
+
+    h.func <- function(W) {
+        M <- diag(1, d, d) + W * W / d
+        E <- matrixcalc::matrix.power(M, d-1)
+        h.new <- sum(t(E) * M) - d
+        return(h.new)
+    }
+
+    G.h.func <- function(W) {
+        M <- diag(1, d, d) + W * W / d
+        E <- matrixcalc::matrix.power(M, d-1)
+        G.h <- t(E) * W * 2
+        return(G.h)
+    }
+
+    adj <- function(w) {
+        w <- as.matrix(w)
+        w.pos <- w[1:(length(w)/2),]
+        w.neg <- w[((length(w)/2)+1):(length(w)),]
+        dim(w.pos) <- c(d,d)
+        dim(w.neg) <- c(d,d)
+        W <- w.pos - w.neg
+        return(W)
+    }
+
+    fn <- function(w) {
+        W <- adj(w)
+        loss <- loss.func(W)
+        h.new <- h.func(W)
+        obj <- loss + 0.5 * rho * h.new * h.new + alpha * h.new + lambda1 * sum(w)
+        return(obj)
+    }
+
+    gr <- function(w) {
+        W <- adj(w)
+        G.loss <- G.loss.func(W)
+        G.h <- G.h.func(W)
+        G.smooth <- G.loss + (rho * h + alpha) * G.h
+        G.obj <- c(array(G.smooth + lambda1), array(-1 * G.smooth + lambda1))
+        return(G.obj)
+    }
+
+    n <- nrow(df)
+    d <- ncol(df)
+    w.est <- replicate(2*d*d, 0)
+    rho <- 1
+    alpha <- 0
+    h <- Inf
+
+    for (i in 1:max.iter) {
+        w.new <- NULL
+        h.new <- NULL
+        while (rho < rho.max) {
+            #w.new <- optim(w.est, fn, gr=gr, method='L-BFGS-B', lower=0, upper=Inf)$par
+            w.new <- optim(w.est, fn, method='L-BFGS-B', lower=0, upper=Inf)$par
+            h.new <- h.func(adj(w.new))
+            if (h.new > (0.25*h)) {
+                message(h.new)
+                message(h)
+                rho = rho*10
+            } else {
+                break
+            }
+        }
+        w.est <- w.new
+        h <- h.new
+        alpha <- alpha + (rho*h)
+        if (h <= h.tol | rho >= rho.max) {
+            break
+        }
+    }
+    W.est <- adj(w.est)
+    W.est[abs(W.est) < w.threshold] <- 0
+    return(W.est)
+}
