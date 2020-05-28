@@ -4,7 +4,7 @@
 \alias{select.genes}
 \title{Select (automatically) the most appropriate gene columns of your dataset.}
 \usage{
-select.genes(
+\method{select}{genes}(
   df,
   genes = NULL,
   selected.genes = NULL,

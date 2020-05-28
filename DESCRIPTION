@@ -15,7 +15,8 @@ Authors@R:
 Description: Genetic Network Learning.
 Depends:
     foreach,
-    doParallel
+    doParallel,
+    dplyr
 biocViews:
 Imports:
     igraph,
