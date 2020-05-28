@@ -180,14 +180,19 @@ import.dataset <- function(path, log=FALSE, sep='\t', header=TRUE, index=FALSE, 
 #' @param features Features you want to select (optional).
 #' @param max.genes Maximum number of selected genes (optional).
 #' @param min.non.zeros Minimum number of non-zero values per gene (optional).
-#' @param glasso Using the GLASSO algorithm to exclude unconnected genes (optional).
+#' @param cor Using correlation to exclude unconnected genes (optional).
+#' @param cor.method Correlation method: 'spearman', 'kendall', or 'pearson'. Default: 'spearman'
+#' @param cor.threshold Correlation threshold. Default: 0.1
 #' @keywords select genes
 #' @export
 #' @examples
 #' df <- select.genes(df, max.genes=100, min.non.zeros=2)
-#' df <- select.genes(df, genes=genes, features=c('tumor.suppressor', 'breast.cancer'), glasso=TRUE, rho=0.5)
+#' df <- select.genes(df, genes=genes, features=c('tumor.suppressor', 'breast.cancer'), cor=TRUE, cor.threshold=0.7)
 
-select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max.genes=100, min.non.zeros=2, glasso=TRUE) {
+select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL,
+                         max.genes=100, min.non.zeros=2,
+                         cor=TRUE, cor.method=c('spearman','kendall','pearson'), cor.threshold=0.5) {
+    cor.method <- match.arg(cor.method)
     if (is.null(selected.genes)) {
         selected.genes <- colnames(df)
     }
@@ -201,9 +206,12 @@ select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max
         selected.genes <- f_genes
     }
     df <- subset(df, select=selected.genes)
-    if (glasso) {
-        g <- run.glasso(df, rho=0.1, R=10, m=NULL, threshold=0.5, unconnected.nodes=FALSE, cluster=4)
-        selected.genes <- names(igraph::V(g))
+    if (cor) {
+        A <- cor(df, method=cor.method)
+        diag(A) <- 0
+        A[abs(A) < cor.threshold] <- 0
+        A <- drop.all.zeros(A, square.matrix='all')
+        selected.genes <- colnames(A)
     }
     if (is.null(selected.genes)) {
         if (colnames(df) > max.genes) {

@@ -19,7 +19,7 @@ averaged.graph(graphs, names, threshold = 0.5, to = "igraph")
 This function allows you to calculate the averaged graph from a list of graphs.
 }
 \examples{
-graph <- run.aracne(df)
+graph <- averaged.graph(df)
 }
 \keyword{average}
 \keyword{graph}

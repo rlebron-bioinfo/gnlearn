@@ -11,7 +11,9 @@ select.genes(
   features = NULL,
   max.genes = 100,
   min.non.zeros = 2,
-  glasso = TRUE
+  cor = TRUE,
+  cor.method = c("spearman", "kendall", "pearson"),
+  cor.threshold = 0.5
 )
 }
 \arguments{
@@ -27,14 +29,18 @@ select.genes(
 
 \item{min.non.zeros}{Minimum number of non-zero values per gene (optional).}
 
-\item{glasso}{Using the GLASSO algorithm to exclude unconnected genes (optional).}
+\item{cor}{Using correlation to exclude unconnected genes (optional).}
+
+\item{cor.method}{Correlation method: 'spearman', 'kendall', or 'pearson'. Default: 'spearman'}
+
+\item{cor.threshold}{Correlation threshold. Default: 0.1}
 }
 \description{
 This function allows you to (automatically) select the most appropriate gene columns of your dataset.
 }
 \examples{
 df <- select.genes(df, max.genes=100, min.non.zeros=2)
-df <- select.genes(df, genes=genes, features=c('tumor.suppressor', 'breast.cancer'), glasso=TRUE, rho=0.5)
+df <- select.genes(df, genes=genes, features=c('tumor.suppressor', 'breast.cancer'), cor=TRUE, cor.threshold=0.7)
 }
 \keyword{genes}
 \keyword{select}

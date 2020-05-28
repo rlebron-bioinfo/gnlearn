@@ -634,7 +634,7 @@ drop.all.zeros <- function(mtx, rows=TRUE, columns=TRUE, square.matrix='none') {
 #' @keywords average graph
 #' @export
 #' @examples
-#' graph <- run.aracne(df)
+#' graph <- averaged.graph(df)
 
 averaged.graph <- function(graphs, names, threshold=0.5, to='igraph') {
     R <- length(graphs)
