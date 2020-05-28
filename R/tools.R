@@ -603,8 +603,8 @@ graph.communities <- function(g) {
     igraph::V(g)$community <- igraph::membership(igraph::optimal.community(g))
     node.community <- igraph::get.data.frame(g, what='vertices')
     edge.community <- igraph::get.data.frame(g, what='edges') %>%
-        inner_join(nodes %>% select(name, community), by=c('from'='name')) %>%
-        inner_join(nodes %>% select(name, community), by=c('to'='name')) %>%
+        inner_join(node.community %>% select(name, community), by=c('from'='name')) %>%
+        inner_join(node.community %>% select(name, community), by=c('to'='name')) %>%
         mutate(community = ifelse(community.x == community.y, community.x, NA) %>% factor())
     colnames(edge.community) <- c('from', 'to', 'weight', 'from.community', 'to.community', 'community')
     return(list(
