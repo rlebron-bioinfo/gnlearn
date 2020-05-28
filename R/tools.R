@@ -331,17 +331,6 @@ feature.plot <- function(x, genes, feature, from=NULL, feature.color=rgb(0.7,0.9
 #' @examples
 #' heatmap.adjacency(obj)
 
-adjacency.heatmap <- function(x, from=NULL, col=NULL) {
-    if (is.null(from)) {
-        from=detect.format(x)
-    }
-    mtx <- as.adjacency(x, from=from)
-    if (is.null(col)) {
-        col=colorRampPalette(c('white', 'dark blue'))(100)
-    }
-    stats::heatmap(mtx, col=col)
-}
-
 #' Graph Comparison
 #'
 #' This function allows you to compare two graphs, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
@@ -409,20 +398,6 @@ f1.score <- function(tp, fp, fn) {
     p <- precision(tp, fp)
     r <- recall(tp, fn)
     return((2*p*r)/(p+r))
-}
-
-common.edges <- function(learned, true) {
-    learned <- as.igraph(learned)
-    true <- as.igraph(true)
-    learned <- igraph::simplify(learned, remove.multiple=TRUE, remove.loops=TRUE)
-    true <- igraph::simplify(true, remove.multiple=TRUE, remove.loops=TRUE)
-    v1 <- names(igraph::V(learned))
-    v2 <- names(igraph::V(true))
-    r1 <- v1[!(v1 %in% v2)]
-    r2 <- v2[!(v2 %in% v1)]
-    learned <- igraph::delete_vertices(learned, r1)
-    true <- igraph::delete_vertices(true, r2)
-    return(list(learned=learned, true=true))
 }
 
 #' Feature Degree
@@ -614,4 +589,27 @@ averaged.graph <- function(graphs, names, threshold=0.5, to='igraph') {
     colnames(A) <- names
     g <- convert.format(A, to=to)
     return(g)
+}
+
+#' Graph Communities
+#'
+#' This function allows you to detect how many communities are in the graph and to which community each node and edge belongs.
+#' @param g Graph object.
+#' @keywords graph community
+#' @export
+#' @examples
+#' communities <- graph.communities(g)
+graph.communities <- function(g) {
+    igraph::V(g)$community <- igraph::membership(igraph::optimal.community(g))
+    node.community <- igraph::get.data.frame(g, what='vertices')
+    edge.community <- igraph::get.data.frame(g, what='edges') %>%
+        inner_join(nodes %>% select(name, community), by=c('from'='name')) %>%
+        inner_join(nodes %>% select(name, community), by=c('to'='name')) %>%
+        mutate(community = ifelse(community.x == community.y, community.x, NA) %>% factor())
+    colnames(edge.community) <- c('from', 'to', 'weight', 'from.community', 'to.community', 'community')
+    return(list(
+        communities = unique(igraph::V(g)$community),
+        node.community = node.community,
+        edge.community = edge.community
+    ))
 }
