@@ -51,8 +51,6 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
         blacklist <- blacklist > 0
     }
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -129,8 +127,6 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
         blacklist <- blacklist > 0
     }
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -202,8 +198,6 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
         blacklist <- blacklist > 0
     }
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -255,8 +249,6 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
                    R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
     test <- match.arg(test)
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -308,8 +300,6 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
         iamb.fdr = bnlearn::iamb.fdr
     )
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -360,8 +350,6 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
         hpc = bnlearn::hpc
     )
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -398,8 +386,6 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
 
 boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -436,8 +422,6 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
 boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
     mi <- match.arg(mi)
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -484,8 +468,6 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
     start <- convert.format(start, to='bn')
     score <- match.arg(score)
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -534,8 +516,6 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
         max.tabu <- tabu
     }
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -581,8 +561,6 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
         blacklist <- blacklist > 0
     }
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -750,8 +728,6 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
                          R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
     loss.type <- match.arg(loss.type)
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -812,8 +788,6 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
         h2pc = 'hc'
     )
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -869,8 +843,6 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
         blacklist <- blacklist > 0
     }
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -923,8 +895,6 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
         lower <- TRUE
     }
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -974,8 +944,6 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
 
 boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
 
@@ -1013,8 +981,6 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4
 
 boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.nodes=FALSE, to='igraph', cluster=4) {
 
-    library(foreach)
-    library(doParallel)
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)

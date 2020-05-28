@@ -13,6 +13,9 @@ Authors@R:
            email = "gherardo.varando@upm.es",
            comment = c(Google.Scholar = "ALjiTg0AAAAJ"))
 Description: Genetic Network Learning.
+Depends:
+    foreach,
+    doParallel
 biocViews:
 Imports:
     igraph,
@@ -21,8 +24,6 @@ Imports:
     bnlearn,
     pcalg,
     jsonlite,
-    foreach,
-    doParallel,
     graph,
     RBGL,
     matrixcalc
