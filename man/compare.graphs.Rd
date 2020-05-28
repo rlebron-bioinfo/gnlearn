@@ -4,20 +4,23 @@
 \alias{compare.graphs}
 \title{Graph Comparison}
 \usage{
-compare.graphs(learned, true, arcs = FALSE)
+compare.graphs(learned, true, arcs = FALSE, plot = TRUE)
 }
 \arguments{
 \item{learned}{Learned graph or graph 1.}
 
 \item{true}{Ground truth graph or graph 2 (reference).}
 
-\item{arcs}{Whether or not to list the arcs (optional). Default: FALSE.}
+\item{arcs}{Whether or not to list the arcs. Default: FALSE.}
+
+\item{plot}{Whether or not to plot the differences between the two graphs. Default: TRUE}
 }
 \description{
 This function allows you to compare two graphs, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
 }
 \examples{
-comparison <- compare.graphs(obj1, obj2)
+comparison <- compare.graphs(obj1, obj2, plot=TRUE)
+comparison <- compare.graphs(obj1, obj2, plot=FALSE)
 }
 \keyword{comparison}
 \keyword{graph}

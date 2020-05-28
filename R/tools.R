@@ -242,7 +242,7 @@ graph.plot <- function(x, from=NULL, layout=c('grid','star','circle','tree','nic
         nicely = igraph::layout_nicely(g)
     )
 
-    igraph::V(g)$color <- rgb(0.9,0.9,0.9,0.9)
+    igraph::V(g)$color <- rgb(0.9,0.9,0.9,0.7)
 
     if (interactive) {
         threejs::graphjs(g,
@@ -270,7 +270,7 @@ graph.plot <- function(x, from=NULL, layout=c('grid','star','circle','tree','nic
 #' @param genes Geneset with features.
 #' @param features Feature whose graph you want to plot.
 #' @param from Input format (optional).
-#' @param feature.color Color of the nodes with the feature (optional). Default: rgb(0.7,0.9,0.9,0.9)
+#' @param feature.color Color of the nodes with the feature (optional). Default: rgb(0.7,0.9,0.9,0.7)
 #' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'
 #' @param interactive Interactive plot (optional). Default: FALSE
 #' @keywords graph feature plot
@@ -279,7 +279,7 @@ graph.plot <- function(x, from=NULL, layout=c('grid','star','circle','tree','nic
 #' feature.plot(obj, genes, 'tf', interactive=FALSE)
 #' feature.plot(obj, genes, 'tumor.suppressor', interactive=TRUE)
 
-feature.plot <- function(x, genes, feature, from=NULL, feature.color=rgb(0.7,0.9,0.9,0.9),
+feature.plot <- function(x, genes, feature, from=NULL, feature.color=rgb(0.7,0.9,0.9,0.7),
                          layout=c('grid','star','circle','tree','nicely'), interactive=FALSE) {
     layout <- match.arg(layout)
 
@@ -291,7 +291,7 @@ feature.plot <- function(x, genes, feature, from=NULL, feature.color=rgb(0.7,0.9
     f_genes <- genes[genes[feature]==TRUE,]$name
     x <- x[x[,1] %in% f_genes | x[,2] %in% f_genes, ]
     g <- as.igraph(x, from='edges')
-    igraph::V(g)$color <- ifelse(names(igraph::V(g)) %in% f_genes, feature.color, rgb(0.9,0.9,0.9,0.9))
+    igraph::V(g)$color <- ifelse(names(igraph::V(g)) %in% f_genes, feature.color, rgb(0.9,0.9,0.9,0.7))
 
     layout <- switch(layout,
         grid = igraph::layout_on_grid(g),
@@ -367,7 +367,7 @@ community.plot <- function(x, algorithm=c('louvain','edge.betweenness','fast.gre
         nicely = igraph::layout_nicely(g)
     )
 
-    igraph::V(g)$color <- rgb(0.9,0.9,0.9,0.9)
+    igraph::V(g)$color <- rgb(0.9,0.9,0.9,0.7)
 
     if (interactive) {
         threejs::graphjs(g,
@@ -395,13 +395,15 @@ community.plot <- function(x, algorithm=c('louvain','edge.betweenness','fast.gre
 #' This function allows you to compare two graphs, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
 #' @param learned Learned graph or graph 1.
 #' @param true Ground truth graph or graph 2 (reference).
-#' @param arcs Whether or not to list the arcs (optional). Default: FALSE.
+#' @param arcs Whether or not to list the arcs. Default: FALSE.
+#' @param plot Whether or not to plot the differences between the two graphs. Default: TRUE
 #' @keywords graph comparison
 #' @export
 #' @examples
-#' comparison <- compare.graphs(obj1, obj2)
+#' comparison <- compare.graphs(obj1, obj2, plot=TRUE)
+#' comparison <- compare.graphs(obj1, obj2, plot=FALSE)
 
-compare.graphs <- function(learned, true, arcs=FALSE) {
+compare.graphs <- function(learned, true, arcs=FALSE, plot=TRUE) {
     learned <- as.igraph(learned)
     true <- as.igraph(true)
     learned <- igraph::simplify(learned, remove.multiple=TRUE, remove.loops=TRUE)
@@ -419,10 +421,62 @@ compare.graphs <- function(learned, true, arcs=FALSE) {
     p <- precision(igraph::ecount(tp), igraph::ecount(fp))
     r <- recall(igraph::ecount(tp), igraph::ecount(fn))
     f1 <- f1.score(igraph::ecount(tp), igraph::ecount(fp), igraph::ecount(fn))
+
+    if (plot) {
+        learned.x <- igraph::difference(learned, tp)
+        true.x <- igraph::difference(true, tp)
+        igraph::V(tp)$color <- rgb(0.9,0.9,0.9,0.7)
+        igraph::V(learned.x)$color <- rgb(0.9,0.9,0.9,0.7)
+        igraph::V(true.x)$color <- rgb(0.9,0.9,0.9,0.7)
+
+        igraph::E(tp)$color <- rgb(0.2,0.2,0.2,0.9)
+        igraph::E(tp)$lty <- 'solid'
+
+        igraph::E(learned.x)$color <- rgb(0.7,0.0,0.0,0.9)
+        igraph::E(learned.x)$lty <- 'dashed'
+
+        igraph::E(true.x)$color <- rgb(0.0,0.7,0.0,0.9)
+        igraph::E(true.x)$lty <- 'dashed'
+
+        igraph::plot.igraph(tp,
+            main='True Positive Arches',
+            vertex.label.color='black',
+            vertex.label.family='Helvetica',
+            vertex.frame.color='black',
+            vertex.shape='circle',
+            vertex.size=25,
+            edge.width=2,
+            edge.arrow.width=1,
+            layout=igraph::layout_on_grid(learned))
+
+        igraph::plot.igraph(learned.x,
+            main='False Positive Arches',
+            vertex.label.color='black',
+            vertex.label.family='Helvetica',
+            vertex.frame.color='black',
+            vertex.shape='circle',
+            vertex.size=25,
+            edge.width=2,
+            edge.arrow.width=1,
+            layout=igraph::layout_on_grid(true))
+
+        igraph::plot.igraph(true.x,
+            main='False Negative Arches',
+            vertex.label.color='black',
+            vertex.label.family='Helvetica',
+            vertex.frame.color='black',
+            vertex.shape='circle',
+            vertex.size=25,
+            edge.width=2,
+            edge.arrow.width=1,
+            layout=igraph::layout_on_grid(true))
+    }
+
     #bn_learned <- as.bn(learned)
     #bn_true <- as.bn(true)
     #shd <- bnlearn::shd(bn_learned, bn_true)
     #hamming <- bnlearn::hamming(bn_learned, bn_true)
+
     if (arcs) {
         tp <- igraph::as_edgelist(tp)
         fp <- igraph::as_edgelist(fp)
@@ -432,6 +486,7 @@ compare.graphs <- function(learned, true, arcs=FALSE) {
         fp <- igraph::ecount(fp)
         fn <- igraph::ecount(fn)
     }
+
     return(list(
         tp = tp,
         fp = fp,
@@ -690,18 +745,21 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
     g <- as.igraph(x, from=from)
     c <- algorithm(igraph::as.undirected(g))
 
-    if (dendrogram) {
-        igraph::plot_dendrogram(c, mode='phylo')
-    }
-
     igraph::V(g)$community <- igraph::membership(c)
     node.community <- igraph::get.data.frame(g, what='vertices')
+
+    palette <- rainbow(length(unique(igraph::V(g)$community)))
 
     edge.community <- igraph::get.data.frame(g, what='edges') %>%
         inner_join(node.community %>% select(name, community), by=c('from'='name')) %>%
         inner_join(node.community %>% select(name, community), by=c('to'='name')) %>%
         mutate(community = ifelse(community.x == community.y, community.x, NA) %>% factor())
     colnames(edge.community) <- c('from', 'to', 'weight', 'from.community', 'to.community', 'community')
+
+    if (dendrogram) {
+        igraph::plot_dendrogram(c, mode='phylo', palette=palette, type='radial',
+                                font=2, cex=1.5, edge.color='black', edge.width=3)
+    }
 
     return(list(
         communities = unique(igraph::V(g)$community),

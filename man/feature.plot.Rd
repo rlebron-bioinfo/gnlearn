@@ -9,7 +9,7 @@ feature.plot(
   genes,
   feature,
   from = NULL,
-  feature.color = rgb(0.7, 0.9, 0.9, 0.9),
+  feature.color = rgb(0.7, 0.9, 0.9, 0.7),
   layout = c("grid", "star", "circle", "tree", "nicely"),
   interactive = FALSE
 )
@@ -21,7 +21,7 @@ feature.plot(
 
 \item{from}{Input format (optional).}
 
-\item{feature.color}{Color of the nodes with the feature (optional). Default: rgb(0.7,0.9,0.9,0.9)}
+\item{feature.color}{Color of the nodes with the feature (optional). Default: rgb(0.7,0.9,0.9,0.7)}
 
 \item{layout}{igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'}
 
