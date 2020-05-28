@@ -184,10 +184,10 @@ import.dataset <- function(path, log=FALSE, sep='\t', header=TRUE, index=FALSE, 
 #' @keywords select genes
 #' @export
 #' @examples
-#' df <- select.genes(df, max.genes=100, min.non.zeros=2)
-#' df <- select.genes(df, genes=genes, features=c('tumor.suppressor', 'breast.cancer'), glasso=TRUE, rho=0.5)
+#' df <- gene.select(df, max.genes=100, min.non.zeros=2)
+#' df <- gene.select(df, genes=genes, features=c('tumor.suppressor', 'breast.cancer'), glasso=TRUE, rho=0.5)
 
-select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max.genes=100, min.non.zeros=2, glasso=TRUE) {
+gene.select <- function(df, genes=NULL, selected.genes=NULL, features=NULL, max.genes=100, min.non.zeros=2, glasso=TRUE) {
     if (is.null(selected.genes)) {
         selected.genes <- colnames(df)
     }
