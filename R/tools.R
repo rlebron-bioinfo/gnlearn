@@ -216,7 +216,7 @@ as.bn <- function(x, from=NULL) {
 #' This function allows you to plot a graph, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
 #' @param x Graph object.
 #' @param from Input format (optional).
-#' @param layout igraph plot layout (optional). It will be ignored if interactive=TRUE.
+#' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'
 #' @param interactive Interactive plot (optional). Default: FALSE
 #' @keywords graph plot
 #' @export
@@ -224,19 +224,42 @@ as.bn <- function(x, from=NULL) {
 #' plot.graph(obj, interactive=FALSE)
 #' plot.graph(obj, interactive=TRUE)
 
-graph.plot <- function(x, from=NULL, layout=NULL, interactive=FALSE) {
+graph.plot <- function(x, from=NULL, layout=c('grid','star','circle','tree','nicely'),
+                       interactive=FALSE) {
+    layout <- match.arg(layout)
+
     if (is.null(from)) {
         from=detect.format(x)
     }
+
     g <- as.igraph(x, from=from)
-    igraph::E(g)$color <- 'black'
-    if (is.null(layout)) {
-        layout=igraph::layout_nicely(g)
-    }
+
+    layout <- switch(layout,
+        grid = igraph::layout_on_grid(g),
+        star = igraph::layout_as_star(g),
+        circle = igraph::layout_in_circle(g),
+        tree = igraph::layout_as_tree(g),
+        nicely = igraph::layout_nicely(g)
+    )
+
+    igraph::V(g)$color <- rgb(0.9,0.9,0.9,0.9)
+
     if (interactive) {
-        threejs::graphjs(g)
+        threejs::graphjs(g,
+            edge.color=rgb(0.2,0.2,0.2,0.9)
+        )
     } else {
-        igraph::plot.igraph(g, layout=layout)
+        igraph::plot.igraph(g,
+            vertex.label.color='black',
+            vertex.label.family='Helvetica',
+            vertex.frame.color='black',
+            vertex.shape='circle',
+            vertex.size=25,
+            edge.lty='solid',
+            edge.width=2,
+            edge.arrow.width=1,
+            edge.color=rgb(0.2,0.2,0.2,0.9),
+            layout=layout)
     }
 }
 
@@ -247,9 +270,8 @@ graph.plot <- function(x, from=NULL, layout=NULL, interactive=FALSE) {
 #' @param genes Geneset with features.
 #' @param features Feature whose graph you want to plot.
 #' @param from Input format (optional).
-#' @param feature.color Color of the nodes with the feature (optional).
-#' @param other.color Color of the other nodes (optional).
-#' @param layout igraph plot layout (optional). It will be ignored if interactive=TRUE.
+#' @param feature.color Color of the nodes with the feature (optional). Default: rgb(0.7,0.9,0.9,0.9)
+#' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'
 #' @param interactive Interactive plot (optional). Default: FALSE
 #' @keywords graph feature plot
 #' @export
@@ -257,23 +279,36 @@ graph.plot <- function(x, from=NULL, layout=NULL, interactive=FALSE) {
 #' plot.feature.graph(obj, genes, 'tf', interactive=FALSE)
 #' plot.feature.graph(obj, genes, 'tumor.suppressor', interactive=TRUE)
 
-feature.plot <- function(x, genes, feature, from=NULL, feature.color='red', other.color='green', layout=NULL, interactive=FALSE) {
+feature.plot <- function(x, genes, feature, from=NULL, feature.color=rgb(0.7,0.9,0.9,0.9),
+                         layout=c('grid','star','circle','tree','nicely'), interactive=FALSE) {
+    layout <- match.arg(layout)
+
     if (is.null(from)) {
         from=detect.format(x)
     }
+
     x <- as.edges(x, from=from)
     f_genes <- genes[genes[feature]==TRUE,]$name
     x <- x[x[,1] %in% f_genes | x[,2] %in% f_genes, ]
     g <- as.igraph(x, from='edges')
-    igraph::E(g)$color <- 'black'
-    igraph::V(g)$color <- ifelse(names(igraph::V(g)) %in% f_genes, 'red', 'green')
-    if (is.null(layout)) {
-        layout=igraph::layout_nicely(g)
-    }
+    igraph::V(g)$color <- ifelse(names(igraph::V(g)) %in% f_genes, feature.color, rgb(0.9,0.9,0.9,0.9))
+
     if (interactive) {
-        threejs::graphjs(g)
+        threejs::graphjs(g,
+            edge.color=rgb(0.2,0.2,0.2,0.9)
+        )
     } else {
-        igraph::plot.igraph(g, layout=layout)
+        igraph::plot.igraph(g,
+            vertex.label.color='black',
+            vertex.label.family='Helvetica',
+            vertex.frame.color='black',
+            vertex.shape='circle',
+            vertex.size=25,
+            edge.lty='solid',
+            edge.width=2,
+            edge.arrow.width=1,
+            edge.color=rgb(0.2,0.2,0.2,0.9),
+            layout=layout)
     }
 }
 

@@ -4,14 +4,19 @@
 \alias{graph.plot}
 \title{Graph Plotting}
 \usage{
-graph.plot(x, from = NULL, layout = NULL, interactive = FALSE)
+graph.plot(
+  x,
+  from = NULL,
+  layout = c("grid", "star", "circle", "tree", "nicely"),
+  interactive = FALSE
+)
 }
 \arguments{
 \item{x}{Graph object.}
 
 \item{from}{Input format (optional).}
 
-\item{layout}{igraph plot layout (optional). It will be ignored if interactive=TRUE.}
+\item{layout}{igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'}
 
 \item{interactive}{Interactive plot (optional). Default: FALSE}
 }
