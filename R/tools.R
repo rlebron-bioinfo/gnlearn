@@ -229,6 +229,7 @@ graph.plot <- function(x, from=NULL, layout=NULL, interactive=FALSE) {
         from=detect.format(x)
     }
     g <- as.igraph(x, from=from)
+    igraph::E(g)$color <- 'black'
     if (is.null(layout)) {
         layout=igraph::layout_nicely(g)
     }
@@ -264,6 +265,7 @@ feature.plot <- function(x, genes, feature, from=NULL, feature.color='red', othe
     f_genes <- genes[genes[feature]==TRUE,]$name
     x <- x[x[,1] %in% f_genes | x[,2] %in% f_genes, ]
     g <- as.igraph(x, from='edges')
+    igraph::E(g)$color <- 'black'
     igraph::V(g)$color <- ifelse(names(igraph::V(g)) %in% f_genes, 'red', 'green')
     if (is.null(layout)) {
         layout=igraph::layout_nicely(g)
