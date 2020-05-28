@@ -27,7 +27,8 @@ Imports:
     graph,
     RBGL,
     matrixcalc,
-    dplyr
+    dplyr,
+    ape
 Remotes:
     gherardovarando/gclm
 Suggests:

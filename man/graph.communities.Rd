@@ -4,10 +4,20 @@
 \alias{graph.communities}
 \title{Graph Communities}
 \usage{
-graph.communities(x, from = NULL)
+graph.communities(
+  x,
+  algorithm = c("louvain", "edge.betweenness", "fast.greedy", "label.prop",
+    "leading.eigen", "optimal", "spinglass", "walktrap"),
+  dendrogram = TRUE,
+  from = NULL
+)
 }
 \arguments{
 \item{x}{Graph object.}
+
+\item{algorithm}{Algorithm for finding communities: 'louvain', 'edge.betweenness', 'fast.greedy', 'label.prop', 'leading.eigen', 'optimal', 'spinglass', or 'walktrap'. Default: 'louvain'}
+
+\item{dendrogram}{Whether or not to plot a dendrogram (when possible). Default: TRUE}
 
 \item{from}{Input format (optional).}
 }

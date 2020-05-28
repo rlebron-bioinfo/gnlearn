@@ -324,6 +324,7 @@ feature.plot <- function(x, genes, feature, from=NULL, feature.color=rgb(0.7,0.9
 #'
 #' This function allows you to plot a graph with each community in a different color.
 #' @param x Graph object.
+#' @param algorithm Algorithm for finding communities: 'louvain', 'edge.betweenness', 'fast.greedy', 'label.prop', 'leading.eigen', 'optimal', 'spinglass', or 'walktrap'. Default: 'louvain'
 #' @param from Input format (optional).
 #' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'
 #' @param interactive Interactive plot (optional). Default: FALSE
@@ -333,16 +334,29 @@ feature.plot <- function(x, genes, feature, from=NULL, feature.color=rgb(0.7,0.9
 #' community.plot(obj, interactive=FALSE)
 #' community.plot(obj, interactive=TRUE)
 
-community.plot <- function(x, from=NULL, layout=c('grid','star','circle','tree','nicely'),
+community.plot <- function(x, algorithm=c('louvain','edge.betweenness','fast.greedy','label.prop','leading.eigen','optimal','spinglass','walktrap'),
+                           from=NULL, layout=c('grid','star','circle','tree','nicely'),
                            interactive=FALSE) {
+    algorithm <- match.arg(algorithm)
     layout <- match.arg(layout)
+
+    algorithm <- switch(algorithm,
+        louvain = igraph::cluster_louvain,
+        edge.betweenness = igraph::cluster_edge_betweenness,
+        fast.greedy = igraph::cluster_fast_greedy,
+        label.prop = igraph::cluster_label_prop,
+        leading.eigen = igraph::cluster_leading_eigen,
+        optimal = igraph::cluster_optimal,
+        spinglass = igraph::cluster_spinglass,
+        walktrap = igraph::cluster_walktrap
+    )
 
     if (is.null(from)) {
         from=detect.format(x)
     }
 
     g <- as.igraph(x, from=from)
-    igraph::V(g)$community <- igraph::membership(igraph::optimal.community(g))
+    igraph::V(g)$community <- igraph::membership(algorithm(igraph::as.undirected(g)))
     palette <- rainbow(length(unique(igraph::V(g)$community)))
 
     layout <- switch(layout,
@@ -640,24 +654,55 @@ averaged.graph <- function(graphs, names, threshold=0.5, to='igraph') {
 #'
 #' This function allows you to detect how many communities are in the graph and to which community each node and edge belongs.
 #' @param x Graph object.
+#' @param algorithm Algorithm for finding communities: 'louvain', 'edge.betweenness', 'fast.greedy', 'label.prop', 'leading.eigen', 'optimal', 'spinglass', or 'walktrap'. Default: 'louvain'
+#' @param dendrogram Whether or not to plot a dendrogram (when possible). Default: TRUE
 #' @param from Input format (optional).
 #' @keywords graph community
 #' @export
 #' @examples
 #' communities <- graph.communities(g)
-graph.communities <- function(x, from=NULL) {
+
+graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.greedy','label.prop','leading.eigen','optimal','spinglass','walktrap'),
+                              dendrogram=TRUE, from=NULL) {
+    algorithm <- match.arg(algorithm)
+
+    if (algorithm %in% c('louvain','label.prop','optimal','spinglass')) {
+        dendrogram <- FALSE
+    }
+
+    algorithm <- switch(algorithm,
+        louvain = igraph::cluster_louvain,
+        edge.betweenness = igraph::cluster_edge_betweenness,
+        fast.greedy = igraph::cluster_fast_greedy,
+        label.prop = igraph::cluster_label_prop,
+        leading.eigen = igraph::cluster_leading_eigen,
+        optimal = igraph::cluster_optimal,
+        spinglass = igraph::cluster_spinglass,
+        walktrap = igraph::cluster_walktrap
+    )
+
     library(dplyr)
+
     if (is.null(from)) {
         from=detect.format(x)
     }
+
     g <- as.igraph(x, from=from)
-    igraph::V(g)$community <- igraph::membership(igraph::optimal.community(g))
+    c <- algorithm(igraph::as.undirected(g))
+
+    if (dendrogram) {
+        igraph::plot_dendrogram(c, mode='phylo')
+    }
+
+    igraph::V(g)$community <- igraph::membership(c)
     node.community <- igraph::get.data.frame(g, what='vertices')
+
     edge.community <- igraph::get.data.frame(g, what='edges') %>%
         inner_join(node.community %>% select(name, community), by=c('from'='name')) %>%
         inner_join(node.community %>% select(name, community), by=c('to'='name')) %>%
         mutate(community = ifelse(community.x == community.y, community.x, NA) %>% factor())
     colnames(edge.community) <- c('from', 'to', 'weight', 'from.community', 'to.community', 'community')
+
     return(list(
         communities = unique(igraph::V(g)$community),
         node.community = node.community,

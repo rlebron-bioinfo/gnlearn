@@ -6,6 +6,8 @@
 \usage{
 community.plot(
   x,
+  algorithm = c("louvain", "edge.betweenness", "fast.greedy", "label.prop",
+    "leading.eigen", "optimal", "spinglass", "walktrap"),
   from = NULL,
   layout = c("grid", "star", "circle", "tree", "nicely"),
   interactive = FALSE
@@ -13,6 +15,8 @@ community.plot(
 }
 \arguments{
 \item{x}{Graph object.}
+
+\item{algorithm}{Algorithm for finding communities: 'louvain', 'edge.betweenness', 'fast.greedy', 'label.prop', 'leading.eigen', 'optimal', 'spinglass', or 'walktrap'. Default: 'louvain'}
 
 \item{from}{Input format (optional).}
 
