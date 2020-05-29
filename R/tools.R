@@ -250,11 +250,12 @@ graph.plot <- function(x, from=NULL, layout=c('grid','star','circle','tree','nic
         )
     } else {
         igraph::plot.igraph(g,
+            vertex.label.font=2,
             vertex.label.color='black',
             vertex.label.family='Helvetica',
             vertex.frame.color='black',
             vertex.shape='circle',
-            vertex.size=25,
+            vertex.size=30,
             edge.lty='solid',
             edge.width=2,
             edge.arrow.width=1,
@@ -307,11 +308,12 @@ feature.plot <- function(x, genes, feature, from=NULL, feature.color=rgb(0.7,0.9
         )
     } else {
         igraph::plot.igraph(g,
+            vertex.label.font=2,
             vertex.label.color='black',
             vertex.label.family='Helvetica',
             vertex.frame.color='black',
             vertex.shape='circle',
-            vertex.size=25,
+            vertex.size=30,
             edge.lty='solid',
             edge.width=2,
             edge.arrow.width=1,
@@ -377,11 +379,12 @@ community.plot <- function(x, algorithm=c('louvain','edge.betweenness','fast.gre
     } else {
         igraph::plot.igraph(g,
             vertex.color = palette[as.numeric(as.factor(igraph::vertex_attr(g, 'community')))],
+            vertex.label.font=2,
             vertex.label.color='black',
             vertex.label.family='Helvetica',
             vertex.frame.color='black',
             vertex.shape='circle',
-            vertex.size=25,
+            vertex.size=30,
             edge.lty='solid',
             edge.width=2,
             edge.arrow.width=1,
@@ -440,33 +443,36 @@ compare.graphs <- function(learned, true, arcs=FALSE, plot=TRUE) {
 
         igraph::plot.igraph(tp,
             main='True Positive Arches',
+            vertex.label.font=2,
             vertex.label.color='black',
             vertex.label.family='Helvetica',
             vertex.frame.color='black',
             vertex.shape='circle',
-            vertex.size=25,
+            vertex.size=30,
             edge.width=2,
             edge.arrow.width=1,
             layout=igraph::layout_on_grid(learned))
 
         igraph::plot.igraph(learned.x,
             main='False Positive Arches',
+            vertex.label.font=2,
             vertex.label.color='black',
             vertex.label.family='Helvetica',
             vertex.frame.color='black',
             vertex.shape='circle',
-            vertex.size=25,
+            vertex.size=30,
             edge.width=2,
             edge.arrow.width=1,
             layout=igraph::layout_on_grid(true))
 
         igraph::plot.igraph(true.x,
             main='False Negative Arches',
+            vertex.label.font=2,
             vertex.label.color='black',
             vertex.label.family='Helvetica',
             vertex.frame.color='black',
             vertex.shape='circle',
-            vertex.size=25,
+            vertex.size=30,
             edge.width=2,
             edge.arrow.width=1,
             layout=igraph::layout_on_grid(true))
@@ -711,7 +717,7 @@ averaged.graph <- function(graphs, names, threshold=0.5, to='igraph') {
 #' @param x Graph object.
 #' @param algorithm Algorithm for finding communities: 'louvain', 'edge.betweenness', 'fast.greedy', 'label.prop', 'leading.eigen', 'optimal', 'spinglass', or 'walktrap'. Default: 'louvain'
 #' @param dendrogram Whether or not to plot a dendrogram (when possible). Default: TRUE
-#' @param dendrogram.tye Type of phylogeny to be drawn: 'radial', 'phylogram', 'cladogram', 'fan', or 'unrooted'. Default: 'radial'
+#' @param dendrogram.tye Type of phylogeny to be drawn: 'fan', 'phylogram', 'cladogram', 'unrooted', or 'radial'. Default: 'fan'
 #' @param from Input format (optional).
 #' @keywords graph community
 #' @export
@@ -721,7 +727,7 @@ averaged.graph <- function(graphs, names, threshold=0.5, to='igraph') {
 #' communities <- graph.communities(g, algorithm='walktrap', dendrogram.type='cladogram')
 
 graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.greedy','label.prop','leading.eigen','optimal','spinglass','walktrap'),
-                              dendrogram=TRUE, dendrogram.type=c('radial','phylogram','cladogram','fan','unrooted'),
+                              dendrogram=TRUE, dendrogram.type=c('fan','phylogram','cladogram','unrooted','radial'),
                               from=NULL) {
     algorithm <- match.arg(algorithm)
     dendrogram.type <- match.arg(dendrogram.type)
