@@ -16,7 +16,7 @@ scores <- c('pred-loglik-g', 'loglik-g', 'aic-g', 'bic-g', 'bge')
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param implementation Peter & Clark algorithm implementation: 'pcalg' or 'bnlearn'. Default: 'pcalg'
 #' @param pcalg.indep.test Conditional independence test to be used (pcalg implementation). Default: pcalg::gaussCItest
@@ -89,7 +89,7 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param implementation Peter & Clark algorithm implementation: 'pcalg' or 'bnlearn'. Default: 'pcalg'
 #' @param pcalg.indep.test Conditional independence test to be used (pcalg implementation). Default: pcalg::gaussCItest
@@ -176,7 +176,7 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -241,7 +241,7 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -285,7 +285,7 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -337,7 +337,7 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -383,7 +383,7 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -419,7 +419,7 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -464,7 +464,7 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -473,7 +473,7 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
 
 boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, restart=0, perturb=1, max.iter=Inf, maxp=Inf,
                    R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
-    start <- convert.format(start, to='bn')
+    start <- convert.format(start, to='bnlearn')
     score <- match.arg(score)
 
 
@@ -510,7 +510,7 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -519,7 +519,7 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
 
 boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, tabu=10, max.tabu=NULL, max.iter=Inf, maxp=Inf,
                      R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
-    start <- convert.format(start, to='bn')
+    start <- convert.format(start, to='bnlearn')
     score <- match.arg(score)
     if (is.null(max.tabu)) {
         max.tabu <- tabu
@@ -554,7 +554,7 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -727,7 +727,7 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -774,7 +774,7 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -833,7 +833,7 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -896,7 +896,7 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
 #' @param lower Whether or not to ignore the lower triangular adjacency matrix (optional).
 #' @param loops Whether or not to ignore the diagonal of the adjacency matrix (optional).
 #' @param unconnected.nodes Include unconnected nodes (optional). Default: FALSE
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -951,7 +951,7 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -989,7 +989,7 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
 #' @param loops Whether or not to ignore the diagonal of the adjacency matrix (optional). Default: FALSE
 #' @param unconnected.nodes Include unconnected nodes (optional). Default: FALSE
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -1068,7 +1068,7 @@ mll <- function(P, S) {
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
 #' @export
@@ -1112,7 +1112,7 @@ boot.nodag <- function(lib.path, df, lambda=0.5, R=200, m=NULL, threshold=0.5, t
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
 #' @param iter.R Number of bootstrap replicates. Default: 200
 #' @param iter.m Size of each bootstrap replicate. Default: nrow(df)/2
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn').
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn').
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param ... Other arguments for the specified algorithm.
 #' @keywords learning huge graph

@@ -28,7 +28,7 @@ boot.gclm(
 
 \item{unconnected.nodes}{Include unconnected nodes (optional). Default: FALSE}
 
-\item{to}{Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).}
+\item{to}{Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).}
 
 \item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: 4}
 }

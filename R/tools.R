@@ -789,3 +789,54 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
         edge.community = edge.community
     ))
 }
+
+#' Generate A Random Graph/DAG
+#'
+#' This function allows you to generate a random graph/DAG.
+#' @param nodes Number of nodes or vector of node names.
+#' @param exp.degree Number of expected degree per node.
+#' @param dag Whether the graph should be a DAG or not. Default: TRUE
+#' @param plot Whether or not to plot the graph. Default: TRUE
+#' @param algorithm Algorithm to be used to generate the graph: 'regular', 'watts', 'er', 'power', 'bipartite', 'barabasi', or 'geometric'. Default: 'regular'
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn').
+#' @keywords generate random graph
+#' @export
+#' @examples
+#' graph <- random.graph(LETTERS[1:15], 3, dag=TRUE)
+#' graph <- random.graph(LETTERS[1:15], 3, dag=FALSE)
+#' graph <- random.graph(15, 3, dag=TRUE)
+#' graph <- random.graph(15, 3, dag=FALSE)
+
+random.graph <- function(nodes, exp.degree, dag=TRUE, plot=TRUE,
+                       algorithm=c('regular','watts','er','power','bipartite','barabasi','geometric'), to='igraph', ...) {
+    algorithm <- match.arg(algorithm)
+
+    n <- ifelse(length(nodes) == 1, nodes, length(nodes))
+
+    if (dag) {
+        g <- pcalg::randDAG(n, exp.degree, method=algorithm, DAG=TRUE, ...)
+        g <- as.data.frame(as(g, 'matrix'))
+        if (length(nodes) > 1) {
+            rownames(g) <- colnames(g) <- nodes
+        }
+    } else {
+        g <- switch(algorithm,
+            regular = { igraph::sample_k_regular(n, exp.degree, directed=TRUE, multiple=FALSE) },
+            watts = { igraph::sample_smallworld(1, n, 1, exp.degree/(n-1), loops=FALSE, multiple=FALSE) },
+            er = { igraph::erdos.renyi.game(n, exp.degree*n, type='gnm', directed=TRUE, loops=FALSE, ...) },
+            power = { igraph::sample_fitness_pl(n, exp.degree*n, 2, exponent.in=2, loops=FALSE, multiple=FALSE, finite.size.correction=TRUE) },
+            bipartite = { igraph::make_full_bipartite_graph(round(n/2), n-round(n/2), directed=TRUE, mode='all', ...) },
+            barabasi = { igraph::sample_pa(n, 1, exp.degree, directed=TRUE, ...) },
+            geometric = { igraph::sample_grg(n, exp.degree/(n-1), ...) }
+        )
+        g <- as.data.frame(as.matrix(igraph::as_adjacency_matrix(g, type='both')))
+        if (length(nodes) > 1) {
+            rownames(g) <- colnames(g) <- nodes
+        }
+    }
+    if (plot) {
+        graph.plot(g)
+    }
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
+}
