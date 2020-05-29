@@ -646,7 +646,7 @@ averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
         g2.i <- g2[names.i, names.i]
         g1.x <- g1[names.xg1, names.xg1]
         g2.x <- g2[names.xg2, names.xg2]
-        g1 <- (g1.i + g2.i) / 2
+        g1 <- ((i-1) * g1.i / i) + (g2.i / i)
         g1 <- gtools::smartbind(g1, g1.x)
         rownames(g1) <- colnames(g1)
         g1 <- gtools::smartbind(g1, g2.x)
