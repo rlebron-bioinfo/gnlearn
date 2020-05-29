@@ -257,3 +257,44 @@ dataframe.split <- function(df, m=NULL) {
         test = test
     ))
 }
+
+#' Create a Ground Truth Graph
+#'
+#' This function allows you to create a ground truth graph from a geneset available via RESTful API or from a local list of edges.
+#' @param x Download Code (must be of type 'TF-Target Interactions') or list of edges (data.frame or matrix).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @keywords groundtruth graph
+#' @export
+#' @examples
+#' gt <- groundtruth.graph(2)
+
+groundtruth.graph <- function(x, to='igraph') {
+    if (class(x)=='numeric') {
+        genesets <- list.genesets()
+        type <- genesets[genesets$download.code==x,]$dataset
+        if (type=='TF-Target Interactions') {
+            geneset <- download.geneset(x)
+        } else {
+            return(NULL)
+        }
+    } else if (class(x) %in% c('data.frame','matrix')) {
+        fmt <- detect.format(x)
+        if (fmt=='adjacency') {
+            g <- convert.format(x, to=to)
+            return(g)
+        }
+    } else {
+        return(NULL)
+    }
+    mtx <- as.adjacency(subset(geneset, select=c('from', 'to')))
+    if (!is.null(geneset$type)) {
+        repression <- geneset[geneset$type=='Repression',]
+        for (i in 1:nrow(repression)) {
+            gene.from <- repression[i,'from']
+            gene.to <- repression[i,'to']
+            mtx[gene.from, gene.to] <- -1
+        }
+    }
+    g <- convert.format(mtx, to=to)
+    return(g)
+}
