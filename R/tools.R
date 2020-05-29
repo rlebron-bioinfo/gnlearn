@@ -674,6 +674,7 @@ rename.graphs <- function(graphs, names, to='igraph') {
   R <- length(graphs)
   for (i in 1:R) {
       graphs[[i]] <- convert.format(graphs[[i]], to='adjacency')
+      rownames(graphs[[i]]) <- names
       colnames(graphs[[i]]) <- names
       graphs[[i]] <- convert.format(graphs[[i]], to=to)
   }
