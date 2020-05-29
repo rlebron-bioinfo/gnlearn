@@ -215,10 +215,12 @@ select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL,
     }
     if (is.null(selected.genes)) {
         if (colnames(df) > max.genes) {
-            df <- df[,1:max.genes]
+            selected.genes <- sample(colnames(df), max.genes, replace=FALSE)
+            df <- subset(df, select=selected.genes)
         }
     } else if (length(selected.genes) > max.genes) {
-        df <- df[,1:max.genes]
+        selected.genes <- sample(colnames(df), max.genes, replace=FALSE)
+        df <- subset(df, select=selected.genes)
     } else {
         df <- subset(df, select=selected.genes)
     }

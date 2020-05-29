@@ -45,6 +45,7 @@ detect.format <- function(x) {
     fmt <- switch(fmt,
         matrix = { adjacency.or.edges(x) },
         data.frame = { adjacency.or.edges(x) },
+        bn = { 'bnlearn' },
         fmt
     )
     return(fmt)
@@ -671,14 +672,14 @@ averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
 #' graph <- rename.graphs(graphs, names)
 
 rename.graphs <- function(graphs, names, to='igraph') {
-  R <- length(graphs)
-  for (i in 1:R) {
-      graphs[[i]] <- convert.format(graphs[[i]], to='adjacency')
-      rownames(graphs[[i]]) <- names
-      colnames(graphs[[i]]) <- names
-      graphs[[i]] <- convert.format(graphs[[i]], to=to)
-  }
-  return(graphs)
+    R <- length(graphs)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], to='adjacency')
+        rownames(graphs[[i]]) <- names
+        colnames(graphs[[i]]) <- names
+        graphs[[i]] <- convert.format(graphs[[i]], to=to)
+    }
+    return(graphs)
 }
 
 #' Graph Communities
