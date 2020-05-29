@@ -73,7 +73,8 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -150,7 +151,8 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -221,7 +223,8 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -263,7 +266,8 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -314,7 +318,8 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -364,7 +369,8 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -399,7 +405,8 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -435,7 +442,8 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -482,7 +490,8 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -530,7 +539,8 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -576,7 +586,8 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -742,7 +753,8 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -802,7 +814,8 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -864,7 +877,8 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -910,7 +924,8 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
 
     stopImplicitCluster()
 
-    A <- averaged.graph(graphs, colnames(df), threshold=threshold, to='adjacency')
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    A <- averaged.graph(graphs, threshold=threshold, to='adjacency')
     if (!loops) {
         diag(A) <- 0
     }
@@ -958,7 +973,8 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -1025,7 +1041,8 @@ boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected
 
     stopImplicitCluster()
 
-    A <- averaged.graph(graphs, colnames(df), threshold=threshold, to='adjacency')
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    A <- averaged.graph(graphs, threshold=threshold, to='adjacency')
     if (!loops) {
         diag(A) <- 0
     }
@@ -1080,6 +1097,7 @@ boot.nodag <- function(lib.path, df, lambda=0.5, R=200, m=NULL, threshold=0.5, t
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }

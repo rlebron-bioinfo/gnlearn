@@ -8,7 +8,10 @@ graph.communities(
   x,
   algorithm = c("louvain", "edge.betweenness", "fast.greedy", "label.prop",
     "leading.eigen", "optimal", "spinglass", "walktrap"),
-  dendrogram = TRUE,
+  network = TRUE,
+  network.layout = c("grid", "star", "circle", "tree", "nicely"),
+  interactive.network = FALSE,
+  dendrogram = FALSE,
   dendrogram.type = c("fan", "phylogram", "cladogram", "unrooted", "radial"),
   from = NULL
 )
@@ -18,19 +21,26 @@ graph.communities(
 
 \item{algorithm}{Algorithm for finding communities: 'louvain', 'edge.betweenness', 'fast.greedy', 'label.prop', 'leading.eigen', 'optimal', 'spinglass', or 'walktrap'. Default: 'louvain'}
 
-\item{dendrogram}{Whether or not to plot a dendrogram (when possible). Default: TRUE}
+\item{network}{Whether or not to plot the network. Default: TRUE}
+
+\item{network.layout}{igraph network layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'}
+
+\item{interactive.network}{Interactive network (optional). Default: FALSE}
+
+\item{dendrogram}{Whether or not to plot a dendrogram (when possible). Default: FALSE}
+
+\item{dendrogram.type}{Type of phylogeny to be drawn: 'fan', 'phylogram', 'cladogram', 'unrooted', or 'radial'. Default: 'fan'}
 
 \item{from}{Input format (optional).}
-
-\item{dendrogram.tye}{Type of phylogeny to be drawn: 'fan', 'phylogram', 'cladogram', 'unrooted', or 'radial'. Default: 'fan'}
 }
 \description{
 This function allows you to detect how many communities are in the graph and to which community each node and edge belongs.
 }
 \examples{
 communities <- graph.communities(g)
-communities <- graph.communities(g, algorithm='walktrap')
-communities <- graph.communities(g, algorithm='walktrap', dendrogram.type='cladogram')
+communities <- graph.communities(g, algorithm='louvain', network=TRUE, dendrogram=FALSE)
+communities <- graph.communities(g, algorithm='walktrap', network=FALSE, dendrogram=TRUE, dendrogram.type='cladogram')
 }
 \keyword{community}
 \keyword{graph}
+\keyword{plot}

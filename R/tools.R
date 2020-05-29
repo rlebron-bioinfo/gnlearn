@@ -322,77 +322,6 @@ feature.plot <- function(x, genes, feature, from=NULL, feature.color=rgb(0.7,0.9
     }
 }
 
-#' Community Plotting
-#'
-#' This function allows you to plot a graph with each community in a different color.
-#' @param x Graph object.
-#' @param algorithm Algorithm for finding communities: 'louvain', 'edge.betweenness', 'fast.greedy', 'label.prop', 'leading.eigen', 'optimal', 'spinglass', or 'walktrap'. Default: 'louvain'
-#' @param from Input format (optional).
-#' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'
-#' @param interactive Interactive plot (optional). Default: FALSE
-#' @keywords graph community plot
-#' @export
-#' @examples
-#' community.plot(obj, interactive=FALSE)
-#' community.plot(obj, interactive=TRUE)
-
-community.plot <- function(x, algorithm=c('louvain','edge.betweenness','fast.greedy','label.prop','leading.eigen','optimal','spinglass','walktrap'),
-                           from=NULL, layout=c('grid','star','circle','tree','nicely'),
-                           interactive=FALSE) {
-    algorithm <- match.arg(algorithm)
-    layout <- match.arg(layout)
-
-    algorithm <- switch(algorithm,
-        louvain = igraph::cluster_louvain,
-        edge.betweenness = igraph::cluster_edge_betweenness,
-        fast.greedy = igraph::cluster_fast_greedy,
-        label.prop = igraph::cluster_label_prop,
-        leading.eigen = igraph::cluster_leading_eigen,
-        optimal = igraph::cluster_optimal,
-        spinglass = igraph::cluster_spinglass,
-        walktrap = igraph::cluster_walktrap
-    )
-
-    if (is.null(from)) {
-        from=detect.format(x)
-    }
-
-    g <- as.igraph(x, from=from)
-    igraph::V(g)$community <- igraph::membership(algorithm(igraph::as.undirected(g)))
-    palette <- rainbow(length(unique(igraph::V(g)$community)))
-
-    layout <- switch(layout,
-        grid = igraph::layout_on_grid(g),
-        star = igraph::layout_as_star(g),
-        circle = igraph::layout_in_circle(g),
-        tree = igraph::layout_as_tree(g),
-        nicely = igraph::layout_nicely(g)
-    )
-
-    igraph::V(g)$color <- rgb(0.9,0.9,0.9,0.7)
-
-    if (interactive) {
-        threejs::graphjs(g,
-            vertex.color = palette[as.numeric(as.factor(igraph::vertex_attr(g, 'community')))],
-            edge.color=rgb(0.2,0.2,0.2,0.9)
-        )
-    } else {
-        igraph::plot.igraph(g,
-            vertex.color = palette[as.numeric(as.factor(igraph::vertex_attr(g, 'community')))],
-            vertex.label.font=2,
-            vertex.label.color='black',
-            vertex.label.family='Helvetica',
-            vertex.frame.color='black',
-            vertex.shape='circle',
-            vertex.size=30,
-            edge.lty='solid',
-            edge.width=2,
-            edge.arrow.width=1,
-            edge.color=rgb(0.2,0.2,0.2,0.9),
-            layout=layout)
-    }
-}
-
 #' Graph Comparison
 #'
 #' This function allows you to compare two graphs, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
@@ -688,8 +617,7 @@ drop.all.zeros <- function(mtx, rows=TRUE, columns=TRUE, square.matrix='none') {
 #' Calculate The Averaged Graph
 #'
 #' This function allows you to calculate the averaged graph from a list of graphs.
-#' @param graphs List of graphs (with the same genes and in the same order).
-#' @param names Vector with gene names (in order).
+#' @param graphs List of graphs.
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged graph (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
 #' @keywords average graph
@@ -697,18 +625,59 @@ drop.all.zeros <- function(mtx, rows=TRUE, columns=TRUE, square.matrix='none') {
 #' @examples
 #' graph <- averaged.graph(df)
 
-averaged.graph <- function(graphs, names, threshold=0.5, to='igraph') {
+averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
     R <- length(graphs)
     A <- array(data=NA, dim=c(dim(graphs[[1]]), R))
     for (i in 1:R) {
-        A[, , i] <- graphs[[i]]
+        A[,,i] <- graphs[[i]]
     }
-    A <- apply(sign(abs(A)), c(1,2), mean)
+    g1 <- sign(abs(graphs[[1]]))
+    for (i in 2:R) {
+        g1 <- as.adjacency(g1)
+        g1 <- g1[order(colnames(g1)), order(colnames(g1))]
+        g2 <- as.adjacency(sign(abs(graphs[[i]])))
+        g2 <- g2[order(colnames(g2)), order(colnames(g2))]
+        names1 <- colnames(g1)
+        names2 <- colnames(g2)
+        names.i <- intersect(names1, names2)
+        names.xg1 <- setdiff(names1, names.i)
+        names.xg2 <- setdiff(names2, names.i)
+        g1.i <- g1[names.i, names.i]
+        g2.i <- g2[names.i, names.i]
+        g1.x <- g1[names.xg1, names.xg1]
+        g2.x <- g2[names.xg2, names.xg2]
+        g1 <- (g1.i + g2.i) / 2
+        g1 <- gtools::smartbind(g1, g1.x)
+        rownames(g1) <- colnames(g1)
+        g1 <- gtools::smartbind(g1, g2.x)
+        rownames(g1) <- colnames(g1)
+        g1[is.na(g1)] <- 0
+    }
+    A <- g1[order(colnames(g1)), order(colnames(g1))]
     A[A < threshold] <- 0
-    rownames(A) <- names
-    colnames(A) <- names
     g <- convert.format(A, to=to)
     return(g)
+}
+
+#' Rename Vertices Of A List Of Graphs
+#'
+#' This function allows you to rename nodes of a list of graphs.
+#' @param graphs List of graphs.
+#' @param names Vector with the new vertex names (in order).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @keywords rename graph
+#' @export
+#' @examples
+#' graph <- rename.graphs(graphs, names)
+
+rename.graphs <- function(graphs, names, to='igraph') {
+  R <- length(graphs)
+  for (i in 1:R) {
+      graphs[[i]] <- convert.format(graphs[[i]], to='adjacency')
+      colnames(graphs[[i]]) <- names
+      graphs[[i]] <- convert.format(graphs[[i]], to=to)
+  }
+  return(graphs)
 }
 
 #' Graph Communities
@@ -716,20 +685,25 @@ averaged.graph <- function(graphs, names, threshold=0.5, to='igraph') {
 #' This function allows you to detect how many communities are in the graph and to which community each node and edge belongs.
 #' @param x Graph object.
 #' @param algorithm Algorithm for finding communities: 'louvain', 'edge.betweenness', 'fast.greedy', 'label.prop', 'leading.eigen', 'optimal', 'spinglass', or 'walktrap'. Default: 'louvain'
-#' @param dendrogram Whether or not to plot a dendrogram (when possible). Default: TRUE
-#' @param dendrogram.tye Type of phylogeny to be drawn: 'fan', 'phylogram', 'cladogram', 'unrooted', or 'radial'. Default: 'fan'
+#' @param network Whether or not to plot the network. Default: TRUE
+#' @param network.layout igraph network layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'
+#' @param interactive.network Interactive network (optional). Default: FALSE
+#' @param dendrogram Whether or not to plot a dendrogram (when possible). Default: FALSE
+#' @param dendrogram.type Type of phylogeny to be drawn: 'fan', 'phylogram', 'cladogram', 'unrooted', or 'radial'. Default: 'fan'
 #' @param from Input format (optional).
-#' @keywords graph community
+#' @keywords graph community plot
 #' @export
 #' @examples
 #' communities <- graph.communities(g)
-#' communities <- graph.communities(g, algorithm='walktrap')
-#' communities <- graph.communities(g, algorithm='walktrap', dendrogram.type='cladogram')
+#' communities <- graph.communities(g, algorithm='louvain', network=TRUE, dendrogram=FALSE)
+#' communities <- graph.communities(g, algorithm='walktrap', network=FALSE, dendrogram=TRUE, dendrogram.type='cladogram')
 
 graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.greedy','label.prop','leading.eigen','optimal','spinglass','walktrap'),
-                              dendrogram=TRUE, dendrogram.type=c('fan','phylogram','cladogram','unrooted','radial'),
+                              network=TRUE, network.layout=c('grid','star','circle','tree','nicely'), interactive.network=FALSE,
+                              dendrogram=FALSE, dendrogram.type=c('fan','phylogram','cladogram','unrooted','radial'),
                               from=NULL) {
     algorithm <- match.arg(algorithm)
+    network.layout <- match.arg(network.layout)
     dendrogram.type <- match.arg(dendrogram.type)
 
     if (algorithm %in% c('louvain','label.prop','optimal','spinglass')) {
@@ -747,25 +721,60 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
         walktrap = igraph::cluster_walktrap
     )
 
-    library(dplyr)
-
     if (is.null(from)) {
         from=detect.format(x)
     }
 
+    library(dplyr)
+
     g <- as.igraph(x, from=from)
     c <- algorithm(igraph::as.undirected(g))
-
     igraph::V(g)$community <- igraph::membership(c)
-    node.community <- igraph::get.data.frame(g, what='vertices')
 
     palette <- rainbow(length(unique(igraph::V(g)$community)))
+
+    node.community <- igraph::get.data.frame(g, what='vertices')
 
     edge.community <- igraph::get.data.frame(g, what='edges') %>%
         inner_join(node.community %>% select(name, community), by=c('from'='name')) %>%
         inner_join(node.community %>% select(name, community), by=c('to'='name')) %>%
         mutate(community = ifelse(community.x == community.y, community.x, NA) %>% factor())
     colnames(edge.community) <- c('from', 'to', 'weight', 'from.community', 'to.community', 'community')
+
+    if (network & interactive.network) {
+
+        threejs::graphjs(g,
+            vertex.color = palette[as.numeric(as.factor(igraph::vertex_attr(g, 'community')))],
+            edge.color=rgb(0.2,0.2,0.2,0.9)
+        )
+
+    } else if (network & !interactive.network) {
+
+        network.layout <- switch(network.layout,
+            grid = igraph::layout_on_grid(g),
+            star = igraph::layout_as_star(g),
+            circle = igraph::layout_in_circle(g),
+            tree = igraph::layout_as_tree(g),
+            nicely = igraph::layout_nicely(g)
+        )
+
+        igraph::V(g)$color <- rgb(0.9,0.9,0.9,0.7)
+
+        igraph::plot.igraph(g,
+            vertex.color = palette[as.numeric(as.factor(igraph::vertex_attr(g, 'community')))],
+            vertex.label.font=2,
+            vertex.label.color='black',
+            vertex.label.family='Helvetica',
+            vertex.frame.color='black',
+            vertex.shape='circle',
+            vertex.size=30,
+            edge.lty='solid',
+            edge.width=2,
+            edge.arrow.width=1,
+            edge.color=rgb(0.2,0.2,0.2,0.9),
+            layout=network.layout)
+
+    }
 
     if (dendrogram) {
         igraph::plot_dendrogram(c, mode='phylo', palette=palette, type=dendrogram.type,

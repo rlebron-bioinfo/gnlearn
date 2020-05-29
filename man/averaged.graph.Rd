@@ -4,12 +4,10 @@
 \alias{averaged.graph}
 \title{Calculate The Averaged Graph}
 \usage{
-averaged.graph(graphs, names, threshold = 0.5, to = "igraph")
+averaged.graph(graphs, threshold = 0.5, to = "igraph")
 }
 \arguments{
-\item{graphs}{List of graphs (with the same genes and in the same order).}
-
-\item{names}{Vector with gene names (in order).}
+\item{graphs}{List of graphs.}
 
 \item{threshold}{Minimum strength required for a coefficient to be included in the averaged graph (optional). Default: 0.5}
 
