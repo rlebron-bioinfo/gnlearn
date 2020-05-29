@@ -16,7 +16,7 @@ compare.graphs(learned, true, arcs = FALSE, plot = TRUE)
 \item{plot}{Whether or not to plot the differences between the two graphs. Default: TRUE}
 }
 \description{
-This function allows you to compare two graphs, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
+This function allows you to compare two graphs, regardless of the format (adjacency matrix, list of edges, igraph, or bnlearn).
 }
 \examples{
 comparison <- compare.graphs(obj1, obj2, plot=TRUE)

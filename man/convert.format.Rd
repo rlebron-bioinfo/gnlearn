@@ -9,12 +9,12 @@ convert.format(x, to, from = NULL)
 \arguments{
 \item{x}{Graph object.}
 
-\item{to}{Output format ('adjacency', 'edges', 'igraph', or 'bn').}
+\item{to}{Output format ('adjacency', 'edges', 'igraph', or 'bnlearn').}
 
 \item{from}{Input format (optional).}
 }
 \description{
-This function allows you to convert graph between different formats: adjacency matrix, list of edges, igraph and bn (bnlearn).
+This function allows you to convert graph between different formats: adjacency matrix, list of edges, igraph and bnlearn (bnlearn).
 }
 \examples{
 graph <- convert.format(mtx, 'igraph')

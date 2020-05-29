@@ -21,7 +21,7 @@ graph.plot(
 \item{interactive}{Interactive plot (optional). Default: FALSE}
 }
 \description{
-This function allows you to plot a graph, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
+This function allows you to plot a graph, regardless of the format (adjacency matrix, list of edges, igraph, or bnlearn).
 }
 \examples{
 graph.plot(obj, interactive=FALSE)

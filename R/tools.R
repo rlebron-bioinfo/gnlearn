@@ -1,8 +1,8 @@
 #' Graph Format Conversion
 #'
-#' This function allows you to convert graph between different formats: adjacency matrix, list of edges, igraph and bn (bnlearn).
+#' This function allows you to convert graph between different formats: adjacency matrix, list of edges, igraph and bnlearn (bnlearn).
 #' @param x Graph object.
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn').
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn').
 #' @param from Input format (optional).
 #' @keywords graph adjacency edges format
 #' @export
@@ -23,8 +23,8 @@ convert.format <- function(x, to, from=NULL) {
         igraph = {
             obj <- as.igraph(x, from=from)
         },
-        bn = {
-            obj <- as.bn(x, from=from)
+        bnlearn = {
+            obj <- as.bnlearn(x, from=from)
         },
         NULL
     )
@@ -83,7 +83,7 @@ as.edges <- function(x, from=NULL) {
         igraph = {
             mtx <- igraph::as_edgelist(x, names=TRUE)
         },
-        bn = {
+        bnlearn = {
             g <- as.igraph(as.matrix(bnlearn::arcs(x)), from='edges')
             mtx <- igraph::as_edgelist(g, names=TRUE)
         },
@@ -116,7 +116,7 @@ as.adjacency <- function(x, from=NULL) {
         igraph = {
             mtx <- as.matrix(igraph::as_adjacency_matrix(x, type='both'))
         },
-        bn = {
+        bnlearn = {
             g <- as.igraph(as.matrix(bnlearn::arcs(x)), from='edges')
             mtx <- as.matrix(igraph::as_adjacency_matrix(g, type='both'))
         },
@@ -148,7 +148,7 @@ as.igraph <- function(x, from=NULL) {
         igraph = {
             g <- x
         },
-        bn = {
+        bnlearn = {
             g <- as.igraph(as.matrix(bnlearn::arcs(x)), from='edges')
         },
         NULL
@@ -156,16 +156,16 @@ as.igraph <- function(x, from=NULL) {
     return(g)
 }
 
-#' Convert Graph To bn Format
+#' Convert Graph To bnlearn Format
 #'
-#' This function allows you to convert your graph to bn format (bnlearn).
+#' This function allows you to convert your graph to bnlearn format (bnlearn).
 #' @param x Graph object.
 #' @param from Input format (optional).
 #' @export
 #' @examples
-#' g <- as.bn(obj)
+#' g <- as.bnlearn(obj)
 
-as.bn <- function(x, from=NULL) {
+as.bnlearn <- function(x, from=NULL) {
     if (is.null(from)) {
         from=detect.format(x)
     }
@@ -203,7 +203,7 @@ as.bn <- function(x, from=NULL) {
             bnlearn::arcs(g, check.cycles=FALSE, check.illegal=FALSE) <- mtx
             g
         },
-        bn = {
+        bnlearn = {
             g <- x
         },
         NULL
@@ -213,7 +213,7 @@ as.bn <- function(x, from=NULL) {
 
 #' Graph Plotting
 #'
-#' This function allows you to plot a graph, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
+#' This function allows you to plot a graph, regardless of the format (adjacency matrix, list of edges, igraph, or bnlearn).
 #' @param x Graph object.
 #' @param from Input format (optional).
 #' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'
@@ -324,7 +324,7 @@ feature.plot <- function(x, genes, feature, from=NULL, feature.color=rgb(0.7,0.9
 
 #' Graph Comparison
 #'
-#' This function allows you to compare two graphs, regardless of the format (adjacency matrix, list of edges, igraph, or bn).
+#' This function allows you to compare two graphs, regardless of the format (adjacency matrix, list of edges, igraph, or bnlearn).
 #' @param learned Learned graph or graph 1.
 #' @param true Ground truth graph or graph 2 (reference).
 #' @param arcs Whether or not to list the arcs. Default: FALSE.
@@ -407,10 +407,10 @@ compare.graphs <- function(learned, true, arcs=FALSE, plot=TRUE) {
             layout=igraph::layout_on_grid(true))
     }
 
-    #bn_learned <- as.bn(learned)
-    #bn_true <- as.bn(true)
-    #shd <- bnlearn::shd(bn_learned, bn_true)
-    #hamming <- bnlearn::hamming(bn_learned, bn_true)
+    #bnlearn_learned <- as.bnlearn(learned)
+    #bnlearn_true <- as.bnlearn(true)
+    #shd <- bnlearn::shd(bnlearn_learned, bnlearn_true)
+    #hamming <- bnlearn::hamming(bnlearn_learned, bnlearn_true)
 
     if (arcs) {
         tp <- igraph::as_edgelist(tp)
@@ -619,7 +619,7 @@ drop.all.zeros <- function(mtx, rows=TRUE, columns=TRUE, square.matrix='none') {
 #' This function allows you to calculate the averaged graph from a list of graphs.
 #' @param graphs List of graphs.
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged graph (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @keywords average graph
 #' @export
 #' @examples
@@ -664,7 +664,7 @@ averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
 #' This function allows you to rename nodes of a list of graphs.
 #' @param graphs List of graphs.
 #' @param names Vector with the new vertex names (in order).
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @keywords rename graph
 #' @export
 #' @examples
