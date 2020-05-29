@@ -1039,3 +1039,47 @@ boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected
 mll <- function(P, S) {
     -determinant(P, logarithm=TRUE)$modulus + sum(S*P)
 }
+
+## NODAG
+
+#' NODAG Algorithm With Bootstrapping
+#'
+#' This function allows you to learn a directed graph from a dataset using the NODAG algorithm.
+#' @param lib.path Path of 'nodag.so' file.
+#' @param df Dataset.
+#' @param lambda Lambda regularization parameter. Default: 0.5
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @keywords learning graph
+#' @export
+#' @examples
+#' graph <- boot.nodag('nodag.so', df)
+
+boot.nodag <- function(lib.path, df, lambda=0.5, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+    dyn.load(lib.path)
+
+    df <- drop.all.zeros(df)
+    df <- as.matrix(df)
+
+    registerDoParallel(cluster)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+        splitted.df <- dataframe.split(df, m=m)
+        p <- ncol(splitted.df$train)
+        out <- .Fortran('NODAG', as.integer(p),
+                as.double(cor(splitted.df$train)),
+                as.double(diag(p)), as.double(lambda),
+                as.double(1e-5), as.double(0.5), as.integer(1e+3))
+        A <- matrix(ncol=p, nrow=p, data=out[[3]])
+        diag(A) <- 0
+        ifelse(A != 0, 1, 0)
+    }
+
+    stopImplicitCluster()
+
+    g <- averaged.graph(graphs, colnames(df), threshold=threshold, to=to)
+    return(g)
+}
