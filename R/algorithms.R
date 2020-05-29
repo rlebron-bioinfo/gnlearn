@@ -1101,3 +1101,42 @@ boot.nodag <- function(lib.path, df, lambda=0.5, R=200, m=NULL, threshold=0.5, t
     g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
+
+#' Learn Huge Graph (With Random Gene Selection + Cells Bootstrapping)
+#'
+#' This function allows you to learn a directed graph from a high-dimensional dataset.
+#' @param df Dataset.
+#' @param algorithm Algorithm to be used (any of the gnlearn 'boot.x' algorithms, such as boot.pc or boot.hc). Default: boot.pc
+#' @param n.genes Number of random genes per iteration. Default: 15
+#' @param R Number of iterations. Defaults: 200
+#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param iter.R Number of bootstrap replicates. Default: 200
+#' @param iter.m Size of each bootstrap replicate. Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bn').
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param ... Other arguments for the specified algorithm.
+#' @keywords learning huge graph
+#' @export
+#' @examples
+#' graph <- huge.graph(df, algorithm=boot.tabu)
+#' graph <- huge.graph(df, algorithm=boot.lingam)
+#' graph <- huge.graph(df, algorithm=boot.iamb, n.genes=20, R=100, threshold=0.9, iter.R=10)
+
+huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, iter.R=4, iter.m=NULL, to='igraph', cluster=4, ...) {
+
+    df <- drop.all.zeros(df)
+    registerDoParallel(cluster)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+
+        sel.genes <- sample(colnames(df), n.genes, replace=FALSE)
+        sel.df <- subset(df, select=sel.genes)
+        algorithm(df=sel.df, R=iter.R, m=iter.m, threshold=0, to='adjacency', cluster=1, ...)
+
+    }
+
+    stopImplicitCluster()
+    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    return(g)
+
+}
