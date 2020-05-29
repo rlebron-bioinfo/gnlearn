@@ -711,15 +711,20 @@ averaged.graph <- function(graphs, names, threshold=0.5, to='igraph') {
 #' @param x Graph object.
 #' @param algorithm Algorithm for finding communities: 'louvain', 'edge.betweenness', 'fast.greedy', 'label.prop', 'leading.eigen', 'optimal', 'spinglass', or 'walktrap'. Default: 'louvain'
 #' @param dendrogram Whether or not to plot a dendrogram (when possible). Default: TRUE
+#' @param dendrogram.tye Type of phylogeny to be drawn: 'radial', 'phylogram', 'cladogram', 'fan', or 'unrooted'. Default: 'radial'
 #' @param from Input format (optional).
 #' @keywords graph community
 #' @export
 #' @examples
 #' communities <- graph.communities(g)
+#' communities <- graph.communities(g, algorithm='walktrap')
+#' communities <- graph.communities(g, algorithm='walktrap', dendrogram.type='cladogram')
 
 graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.greedy','label.prop','leading.eigen','optimal','spinglass','walktrap'),
-                              dendrogram=TRUE, from=NULL) {
+                              dendrogram=TRUE, dendrogram.type=c('radial','phylogram','cladogram','fan','unrooted'),
+                              from=NULL) {
     algorithm <- match.arg(algorithm)
+    dendrogram.type <- match.arg(dendrogram.type)
 
     if (algorithm %in% c('louvain','label.prop','optimal','spinglass')) {
         dendrogram <- FALSE
@@ -757,7 +762,7 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
     colnames(edge.community) <- c('from', 'to', 'weight', 'from.community', 'to.community', 'community')
 
     if (dendrogram) {
-        igraph::plot_dendrogram(c, mode='phylo', palette=palette, type='radial',
+        igraph::plot_dendrogram(c, mode='phylo', palette=palette, type=dendrogram.type,
                                 font=2, cex=1.5, edge.color='black', edge.width=3)
     }
 

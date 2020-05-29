@@ -9,6 +9,7 @@ graph.communities(
   algorithm = c("louvain", "edge.betweenness", "fast.greedy", "label.prop",
     "leading.eigen", "optimal", "spinglass", "walktrap"),
   dendrogram = TRUE,
+  dendrogram.type = c("radial", "phylogram", "cladogram", "fan", "unrooted"),
   from = NULL
 )
 }
@@ -20,12 +21,16 @@ graph.communities(
 \item{dendrogram}{Whether or not to plot a dendrogram (when possible). Default: TRUE}
 
 \item{from}{Input format (optional).}
+
+\item{dendrogram.tye}{Type of phylogeny to be drawn: 'radial', 'phylogram', 'cladogram', 'fan', or 'unrooted'. Default: 'radial'}
 }
 \description{
 This function allows you to detect how many communities are in the graph and to which community each node and edge belongs.
 }
 \examples{
 communities <- graph.communities(g)
+communities <- graph.communities(g, algorithm='walktrap')
+communities <- graph.communities(g, algorithm='walktrap', dendrogram.type='cladogram')
 }
 \keyword{community}
 \keyword{graph}
