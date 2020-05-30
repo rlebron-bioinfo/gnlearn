@@ -4,12 +4,15 @@
 \alias{as.edges}
 \title{Convert Graph To Edge List}
 \usage{
-as.edges(g, from = c(NULL, "adjacency", "edges", "graph", "igraph", "bnlearn"))
+as.edges(
+  g,
+  from = c("auto", "adjacency", "edges", "graph", "igraph", "bnlearn")
+)
 }
 \arguments{
 \item{g}{Graph object.}
 
-\item{from}{Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect}
+\item{from}{Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'}
 }
 \description{
 This function allows you to convert your graph to edge list format.

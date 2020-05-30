@@ -3,18 +3,18 @@
 #' This function allows you to convert graph between different formats: adjacency matrix, list of edges, igraph and bnlearn (bnlearn).
 #' @param g Graph object.
 #' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
-#' @param from Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
 #' @keywords graph adjacency edges format
 #' @export
 #' @examples
 #' g <- convert.format(g, to='igraph')
 
 convert.format <- function(g, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
-                           from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn') ) {
+                           from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn') ) {
     to <- match.arg(to)
     from <- match.arg(from)
-    if (is.null(from)) {
-        from=detect.format(g)
+    if (from=='auto') {
+        from <- detect.format(g)
     }
     g <- switch(to,
         adjacency = {
@@ -72,15 +72,15 @@ adjacency.or.edges <- function(g) {
 #'
 #' This function allows you to convert your graph to adjacency matrix format.
 #' @param g Graph object.
-#' @param from Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
 #' @export
 #' @examples
 #' g <- as.adjacency(g)
 
-as.adjacency <- function(g, from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+as.adjacency <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
     from <- match.arg(from)
-    if (is.null(from)) {
-        from=detect.format(g)
+    if (from=='auto') {
+        from <- detect.format(g)
     }
     g <- switch(from,
         adjacency = {
@@ -115,15 +115,15 @@ as.adjacency <- function(g, from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph'
 #'
 #' This function allows you to convert your graph to edge list format.
 #' @param g Graph object.
-#' @param from Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
 #' @export
 #' @examples
 #' g <- as.edges(g)
 
-as.edges <- function(g, from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+as.edges <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
     from <- match.arg(from)
-    if (is.null(from)) {
-        from=detect.format(g)
+    if (from=='auto') {
+        from <- detect.format(g)
     }
     g <- switch(from,
         adjacency = {
@@ -152,15 +152,15 @@ as.edges <- function(g, from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', 'b
 #'
 #' This function allows you to convert your graph to graph format.
 #' @param g Graph object.
-#' @param from Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
 #' @export
 #' @examples
 #' g <- as.graph(g)
 
-as.graph <- function(g, from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+as.graph <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
     from <- match.arg(from)
-    if (is.null(from)) {
-        from=detect.format(g)
+    if (from=='auto') {
+        from <- detect.format(g)
     }
     g <- switch(from,
         adjacency = {
@@ -202,15 +202,15 @@ as.graph <- function(g, from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', 'b
 #'
 #' This function allows you to convert your graph to igraph format.
 #' @param g Graph object.
-#' @param from Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
 #' @export
 #' @examples
 #' g <- as.igraph(g)
 
-as.igraph <- function(g, from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+as.igraph <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
     from <- match.arg(from)
-    if (is.null(from)) {
-        from=detect.format(g)
+    if (from=='auto') {
+        from <- detect.format(g)
     }
     g <- switch(from,
         adjacency = {
@@ -238,15 +238,15 @@ as.igraph <- function(g, from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', '
 #'
 #' This function allows you to convert your graph to bnlearn format.
 #' @param g Graph object.
-#' @param from Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
 #' @export
 #' @examples
 #' g <- as.bnlearn(g)
 
-as.bnlearn <- function(g, from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+as.bnlearn <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
     from <- match.arg(from)
-    if (is.null(from)) {
-        from=detect.format(g)
+    if (from=='auto') {
+        from <- detect.format(g)
     }
     g <- switch(from,
         adjacency = {

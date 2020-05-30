@@ -6,13 +6,13 @@
 \usage{
 as.adjacency(
   g,
-  from = c(NULL, "adjacency", "edges", "graph", "igraph", "bnlearn")
+  from = c("auto", "adjacency", "edges", "graph", "igraph", "bnlearn")
 )
 }
 \arguments{
 \item{g}{Graph object.}
 
-\item{from}{Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect}
+\item{from}{Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'}
 }
 \description{
 This function allows you to convert your graph to adjacency matrix format.

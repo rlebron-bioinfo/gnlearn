@@ -7,7 +7,7 @@
 convert.format(
   g,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
-  from = c(NULL, "adjacency", "edges", "graph", "igraph", "bnlearn")
+  from = c("auto", "adjacency", "edges", "graph", "igraph", "bnlearn")
 )
 }
 \arguments{
@@ -15,7 +15,7 @@ convert.format(
 
 \item{to}{Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'}
 
-\item{from}{Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect}
+\item{from}{Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'}
 }
 \description{
 This function allows you to convert graph between different formats: adjacency matrix, list of edges, igraph and bnlearn (bnlearn).
