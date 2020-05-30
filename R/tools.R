@@ -300,11 +300,11 @@ as.bnlearn <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
 #' graph.plot(obj, interactive=FALSE)
 #' graph.plot(obj, interactive=TRUE)
 
-graph.plot <- function(x, from=NULL, layout=c('grid','star','circle','tree','nicely'),
+graph.plot <- function(x, from='auto', layout=c('grid','star','circle','tree','nicely'),
                        interactive=FALSE) {
     layout <- match.arg(layout)
 
-    if (is.null(from)) {
+    if (from=='auto') {
         from=detect.format(x)
     }
 
@@ -356,11 +356,11 @@ graph.plot <- function(x, from=NULL, layout=c('grid','star','circle','tree','nic
 #' feature.plot(obj, genes, 'tf', interactive=FALSE)
 #' feature.plot(obj, genes, 'tumor.suppressor', interactive=TRUE)
 
-feature.plot <- function(x, genes, feature, from=NULL, feature.color=rgb(0.7,0.9,0.9,0.7),
+feature.plot <- function(x, genes, feature, from='auto', feature.color=rgb(0.7,0.9,0.9,0.7),
                          layout=c('grid','star','circle','tree','nicely'), interactive=FALSE) {
     layout <- match.arg(layout)
 
-    if (is.null(from)) {
+    if (from=='auto') {
         from=detect.format(x)
     }
 
@@ -778,7 +778,7 @@ rename.graphs <- function(graphs, names, to='igraph') {
 graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.greedy','label.prop','leading.eigen','optimal','spinglass','walktrap'),
                               network=TRUE, network.layout=c('grid','star','circle','tree','nicely'), interactive.network=FALSE,
                               dendrogram=FALSE, dendrogram.type=c('fan','phylogram','cladogram','unrooted','radial'),
-                              from=NULL) {
+                              from='auto') {
     algorithm <- match.arg(algorithm)
     network.layout <- match.arg(network.layout)
     dendrogram.type <- match.arg(dendrogram.type)
@@ -798,7 +798,7 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
         walktrap = igraph::cluster_walktrap
     )
 
-    if (is.null(from)) {
+    if (from=='auto') {
         from=detect.format(x)
     }
 

@@ -11,7 +11,7 @@ boot.gclm(
   threshold = 0.5,
   loops = FALSE,
   unconnected.nodes = FALSE,
-  to = "igraph",
+  to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
   cluster = 4
 )
 }

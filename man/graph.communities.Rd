@@ -13,7 +13,7 @@ graph.communities(
   interactive.network = FALSE,
   dendrogram = FALSE,
   dendrogram.type = c("fan", "phylogram", "cladogram", "unrooted", "radial"),
-  from = NULL
+  from = "auto"
 )
 }
 \arguments{

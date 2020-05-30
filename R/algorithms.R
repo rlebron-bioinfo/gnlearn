@@ -29,10 +29,12 @@ scores <- c('pred-loglik-g', 'loglik-g', 'aic-g', 'bic-g', 'bge')
 #' graph <- boot.skeleton(df, implementation='bnlearn')
 
 boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, R=200, m=NULL, threshold=0.5,
-                   to='igraph', cluster=4, implementation=c('pcalg','bnlearn'),
+                   to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                   cluster=4, implementation=c('pcalg','bnlearn'),
                    pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
                    pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
                    bnlearn.test=ci.tests, bnlearn.B=NULL) {
+    to <- match.arg(to)
     implementation <- match.arg(implementation)
     pcalg.u2pd <- match.arg(pcalg.u2pd)
     bnlearn.test <- match.arg(bnlearn.test)
@@ -50,7 +52,6 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
         blacklist <- convert.format(blacklist, 'adjacency')
         blacklist <- blacklist > 0
     }
-
 
     df <- drop.all.zeros(df)
 
@@ -106,10 +107,12 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
 #' graph <- boot.pc(df, implementation='bnlearn')
 
 boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, R=200, m=NULL, threshold=0.5,
-                   to='igraph', cluster=4, implementation=c('pcalg','bnlearn'),
+                   to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                   cluster=4, implementation=c('pcalg','bnlearn'),
                    pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
                    pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
                    bnlearn.test=ci.tests, bnlearn.B=NULL) {
+    to <- match.arg(to)
     implementation <- match.arg(implementation)
     pcalg.u2pd <- match.arg(pcalg.u2pd)
     bnlearn.test <- match.arg(bnlearn.test)
@@ -128,6 +131,13 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
         blacklist <- blacklist > 0
     }
 
+    if (!is.null(whitelist) & implementation=='bnlearn') {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist) & implementation=='bnlearn') {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
 
     df <- drop.all.zeros(df)
 
@@ -186,9 +196,10 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
 boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf, pdsep.max=Inf,
                     conservative=FALSE, maj.rule=FALSE, version=c('fci','rfci','fci.plus'), type=c('normal','anytime','adaptive'),
                     rules=rep(TRUE,10), doPdsep=TRUE, biCC=FALSE,
-                    R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+                    R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
     version <- match.arg(version)
     type <- match.arg(type)
+    to <- match.arg(to)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'adjacency')
@@ -249,9 +260,17 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
 #' graph <- boot.gs(df)
 
 boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL,
-                   R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+                   R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
     test <- match.arg(test)
+    to <- match.arg(to)
 
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
 
     df <- drop.all.zeros(df)
 
@@ -293,9 +312,10 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
 #' graph <- boot.iamb(df)
 
 boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('iamb','fast.iamb','inter.iamb','iamb.fdr'),
-                     R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
     test <- match.arg(test)
     version <- match.arg(version)
+    to <- match.arg(to)
 
     algorithm <- switch(version,
         iamb = bnlearn::iamb,
@@ -304,6 +324,13 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
         iamb.fdr = bnlearn::iamb.fdr
     )
 
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
 
     df <- drop.all.zeros(df)
 
@@ -345,9 +372,10 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
 #' graph <- boot.parents.children(df)
 
 boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('mmpc','si.hiton.pc','hpc'),
-                                 R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+                                 R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
     test <- match.arg(test)
     version <- match.arg(version)
+    to <- match.arg(to)
 
     algorithm <- switch(version,
         mmpc = bnlearn::mmpc,
@@ -355,6 +383,13 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
         hpc = bnlearn::hpc
     )
 
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
 
     df <- drop.all.zeros(df)
 
@@ -390,8 +425,16 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
 #' @examples
 #' graph <- boot.chowliu(df)
 
-boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
+    to <- match.arg(to)
 
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
 
     df <- drop.all.zeros(df)
 
@@ -426,9 +469,16 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
 #' @examples
 #' graph <- boot.aracne(df)
 
-boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
-    mi <- match.arg(mi)
+boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
+    to <- match.arg(to)
 
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
 
     df <- drop.all.zeros(df)
 
@@ -472,10 +522,21 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
 #' graph <- boot.hc(df)
 
 boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, restart=0, perturb=1, max.iter=Inf, maxp=Inf,
-                   R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
-    start <- convert.format(start, to='bnlearn')
+                   R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
+    to <- match.arg(to)
+
+    if (!is.null(start)) {
+        start <- convert.format(start, to='bnlearn')
+    }
     score <- match.arg(score)
 
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
 
     df <- drop.all.zeros(df)
 
@@ -518,13 +579,24 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
 #' graph <- boot.tabu(df)
 
 boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, tabu=10, max.tabu=NULL, max.iter=Inf, maxp=Inf,
-                     R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
-    start <- convert.format(start, to='bnlearn')
+                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
+    to <- match.arg(to)
+
+    if (!is.null(start)) {
+         start <- convert.format(start, to='bnlearn')
+     }
     score <- match.arg(score)
     if (is.null(max.tabu)) {
         max.tabu <- tabu
     }
 
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
 
     df <- drop.all.zeros(df)
 
@@ -562,15 +634,15 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
 #' graph <- boot.ges(df)
 
 boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
-                    R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+                    R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
     adaptive <- match.arg(adaptive)
+    to <- match.arg(to)
     library(pcalg)
 
     if (!is.null(blacklist)) {
         blacklist <- convert.format(blacklist, 'adjacency')
         blacklist <- blacklist > 0
     }
-
 
     df <- drop.all.zeros(df)
 
@@ -736,9 +808,9 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
 
 boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
                          max.iter=100, h.tol=1e-8, rho.max=1e+16, w.threshold=0.3,
-                         R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+                         R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
     loss.type <- match.arg(loss.type)
-
+    to <- match.arg(to)
 
     df <- drop.all.zeros(df)
 
@@ -783,10 +855,11 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
 
 boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','gs','iamb','fast.iamb','inter.iamb','iamb.fdr','mmpc','si.hiton.pc','hpc'),
                        maximize=c('hc','tabu'), restrict.args=list(), maximize.args=list(), version=c('rsmax2','mmhc','h2pc'),
-                       R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+                       R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
     restrict <- match.arg(restrict)
     maximize <- match.arg(maximize)
     version <- match.arg(version)
+    to <- match.arg(to)
 
     restrict <- switch(version,
         rsmax2 = restrict,
@@ -800,6 +873,13 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
         h2pc = 'hc'
     )
 
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
 
     df <- drop.all.zeros(df)
 
@@ -842,9 +922,10 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
 
 boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf,
                       adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
-                      R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+                      R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
 
     adaptive <- match.arg(adaptive)
+    to <- match.arg(to)
     library(pcalg)
 
     if (!is.null(whitelist)) {
@@ -856,7 +937,6 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
         blacklist <- convert.format(blacklist, 'adjacency')
         blacklist <- blacklist > 0
     }
-
 
     df <- drop.all.zeros(df)
 
@@ -903,13 +983,14 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
 #' @examples
 #' graph <- boot.glasso(df, rho=0.1)
 
-boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, lower=TRUE, loops=FALSE, unconnected.nodes=FALSE, to='igraph', cluster=4) {
+boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, lower=TRUE, loops=FALSE, unconnected.nodes=FALSE, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
+    to <- match.arg(to)
+
     k <- sum(c(upper, lower))
     if (k==0) {
         upper <- TRUE
         lower <- TRUE
     }
-
 
     df <- drop.all.zeros(df)
 
@@ -958,8 +1039,8 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
 #' @examples
 #' graph <- boot.lingam(df)
 
-boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
-
+boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
+    to <- match.arg(to)
 
     df <- drop.all.zeros(df)
 
@@ -996,8 +1077,8 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4
 #' @examples
 #' graph <- boot.gclm(df)
 
-boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.nodes=FALSE, to='igraph', cluster=4) {
-
+boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.nodes=FALSE, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
+    to <- match.arg(to)
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
@@ -1075,8 +1156,9 @@ mll <- function(P, S) {
 #' @examples
 #' graph <- boot.nodag('nodag.so', df)
 
-boot.nodag <- function(lib.path, df, lambda=0.5, R=200, m=NULL, threshold=0.5, to='igraph', cluster=4) {
+boot.nodag <- function(lib.path, df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
     dyn.load(lib.path)
+    to <- match.arg(to)
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
@@ -1122,7 +1204,8 @@ boot.nodag <- function(lib.path, df, lambda=0.5, R=200, m=NULL, threshold=0.5, t
 #' graph <- huge.graph(df, algorithm=boot.lingam)
 #' graph <- huge.graph(df, algorithm=boot.iamb, n.genes=20, R=100, threshold=0.9, iter.R=10)
 
-huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, iter.R=4, iter.m=NULL, to='igraph', cluster=4, ...) {
+huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, iter.R=4, iter.m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, ...) {
+    to <- match.arg(to)
 
     df <- drop.all.zeros(df)
     registerDoParallel(cluster)

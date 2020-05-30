@@ -4,7 +4,14 @@
 \alias{boot.lingam}
 \title{LINGAM Algorithm With Bootstrapping}
 \usage{
-boot.lingam(df, R = 200, m = NULL, threshold = 0.5, to = "igraph", cluster = 4)
+boot.lingam(
+  df,
+  R = 200,
+  m = NULL,
+  threshold = 0.5,
+  to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
+  cluster = 4
+)
 }
 \arguments{
 \item{df}{Dataset.}

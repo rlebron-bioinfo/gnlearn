@@ -12,7 +12,7 @@ huge.graph(
   threshold = 0.5,
   iter.R = 4,
   iter.m = NULL,
-  to = "igraph",
+  to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
   cluster = 4,
   ...
 )

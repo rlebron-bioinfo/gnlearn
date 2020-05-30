@@ -6,7 +6,7 @@
 \usage{
 graph.plot(
   x,
-  from = NULL,
+  from = "auto",
   layout = c("grid", "star", "circle", "tree", "nicely"),
   interactive = FALSE
 )

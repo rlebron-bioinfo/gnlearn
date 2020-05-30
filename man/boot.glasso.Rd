@@ -14,7 +14,7 @@ boot.glasso(
   lower = TRUE,
   loops = FALSE,
   unconnected.nodes = FALSE,
-  to = "igraph",
+  to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
   cluster = 4
 )
 }

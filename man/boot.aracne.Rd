@@ -11,7 +11,7 @@ boot.aracne(
   R = 200,
   m = NULL,
   threshold = 0.5,
-  to = "igraph",
+  to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
   cluster = 4
 )
 }
