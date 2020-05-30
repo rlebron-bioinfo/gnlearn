@@ -915,3 +915,40 @@ random.graph <- function(nodes, exp.degree, dag=TRUE, plot=TRUE,
     g <- convert.format(g, from='adjacency', to=to)
     return(g)
 }
+
+#' Select (automatically) the most appropriate gene columns of your dataset.
+#'
+#' This function allows you to (automatically) select the most appropriate gene columns of your dataset.
+#' @param genes Geneset with features.
+#' @param from.features The edges will go from genes with some of these features.
+#' @param to.features The edges will go to genes with some of these features.
+#' @param selected.genes User-selected genes (optional).
+#' @keywords whitelist blacklist genes
+#' @export
+#' @examples
+#' blacklist <- wb.edgelist(genes, from.features='target', to.features='tf')
+
+wb.edgelist <- function(genes, from.features, to.features, selected.genes=NULL) {
+    if (is.null(selected.genes)) {
+        selected.genes <- genes$name
+    }
+    from.genes <- c()
+    to.genes <- c()
+    for (i in 1:length(from.features)) {
+        feature <- from.features[i]
+        from.genes <- c(from.genes, genes[genes[genes$name %in% selected.genes,feature],]$name)
+    }
+    for (i in 1:length(to.features)) {
+        feature <- to.features[i]
+        to.genes <- c(to.genes, genes[genes[genes$name %in% selected.genes,feature],]$name)
+    }
+    from.genes <- unique(from.genes)
+    to.genes <- unique(to.genes)
+    edge.list <- expand.grid(from.genes, to.genes)
+    colnames(edge.list) <- c('from', 'to')
+    edge.list$from <- as.character(edge.list$from)
+    edge.list$to <- as.character(edge.list$to)
+    edge.list <- edge.list[edge.list$from != edge.list$to,]
+    rownames(edge.list) <- NULL
+    return(edge.list)
+} 
