@@ -483,10 +483,10 @@ compare.graphs <- function(learned, true, arcs=FALSE, plot=TRUE) {
             layout=igraph::layout_on_grid(true))
     }
 
-    #bnlearn_learned <- as.bnlearn(learned)
-    #bnlearn_true <- as.bnlearn(true)
-    #shd <- bnlearn::shd(bnlearn_learned, bnlearn_true)
-    #hamming <- bnlearn::hamming(bnlearn_learned, bnlearn_true)
+    bnlearn_learned <- as.bnlearn(learned)
+    bnlearn_true <- as.bnlearn(true)
+    shd <- bnlearn::shd(bnlearn_learned, bnlearn_true)
+    hamming <- bnlearn::hamming(bnlearn_learned, bnlearn_true)
 
     if (arcs) {
         tp <- igraph::as_edgelist(tp)
@@ -504,9 +504,9 @@ compare.graphs <- function(learned, true, arcs=FALSE, plot=TRUE) {
         fn = fn,
         precision = p,
         recall = r,
-        f1.score = f1 #,
-        #shd = shd,
-        #hamming = hamming
+        f1.score = f1,
+        shd = shd,
+        hamming = hamming
     ))
 
 }
