@@ -1,213 +1,288 @@
 #' Graph Format Conversion
 #'
 #' This function allows you to convert graph between different formats: adjacency matrix, list of edges, igraph and bnlearn (bnlearn).
-#' @param x Graph object.
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn').
-#' @param from Input format (optional).
+#' @param g Graph object.
+#' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
+#' @param from Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect
 #' @keywords graph adjacency edges format
 #' @export
 #' @examples
-#' graph <- convert.format(mtx, 'igraph')
+#' g <- convert.format(g, to='igraph')
 
-convert.format <- function(x, to, from=NULL) {
+convert.format <- function(g, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                           from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn') ) {
+    to <- match.arg(to)
+    from <- match.arg(from)
     if (is.null(from)) {
-        from=detect.format(x)
+        from=detect.format(g)
     }
-    obj <- switch(to,
+    g <- switch(to,
         adjacency = {
-            obj <- as.adjacency(x, from=from)
+            g <- as.adjacency(g, from=from)
         },
         edges = {
-            obj <- as.edges(x, from=from)
+            g <- as.edges(g, from=from)
+        },
+        graph = {
+            g <- as.graph(g, from=from)
         },
         igraph = {
-            obj <- as.igraph(x, from=from)
+            g <- as.igraph(g, from=from)
         },
         bnlearn = {
-            obj <- as.bnlearn(x, from=from)
-        },
-        NULL
+            g <- as.bnlearn(g, from=from)
+        }
     )
-    return(obj)
+    return(g)
 }
 
 #' Graph Format Detection
 #'
 #' This function allows you to detect graph format.
-#' @param x Graph object.
+#' @param g Graph object.
 #' @keywords graph format
 #' @export
 #' @examples
-#' detect.format(obj)
+#' detect.format(g)
 
-detect.format <- function(x) {
-    fmt <- class(x)[1]
+detect.format <- function(g) {
+    fmt <- class(g)[1]
     fmt <- switch(fmt,
-        matrix = { adjacency.or.edges(x) },
-        data.frame = { adjacency.or.edges(x) },
+        matrix = { adjacency.or.edges(g) },
+        data.frame = { adjacency.or.edges(g) },
+        graphNEL = { 'graph' },
+        graphAM = { 'graph' },
         bn = { 'bnlearn' },
+        bn.fit = { 'bnlearn' },
         fmt
     )
     return(fmt)
 }
 
-adjacency.or.edges <- function(x) {
-    dims = dim(x)
-    if (dims[1] == dims[2] & dims[2] != 2) {
+adjacency.or.edges <- function(g) {
+    dims = dim(g)
+    if (dims[1] == dims[2]) {
         return('adjacency')
     } else {
         return('edges')
     }
 }
 
-#' Convert Graph To Edge List
-#'
-#' This function allows you to convert your graph to edge list format.
-#' @param x Graph object.
-#' @param from Input format (optional).
-#' @export
-#' @examples
-#' mtx <- as.edges(obj)
-
-as.edges <- function(x, from=NULL) {
-    if (is.null(from)) {
-        from=detect.format(x)
-    }
-    mtx <- switch(from,
-        adjacency = {
-            g <- igraph::graph_from_adjacency_matrix(as.matrix(x), mode='directed', weighted=TRUE, diag=TRUE)
-            mtx <- igraph::as_edgelist(g, names=TRUE)
-        },
-        edges = {
-            mtx <- as.matrix(x)
-        },
-        igraph = {
-            mtx <- igraph::as_edgelist(x, names=TRUE)
-        },
-        bnlearn = {
-            g <- as.igraph(as.matrix(bnlearn::arcs(x)), from='edges')
-            mtx <- igraph::as_edgelist(g, names=TRUE)
-        },
-        NULL
-    )
-    return(mtx)
-}
-
 #' Convert Graph To Adjacency Matrix
 #'
 #' This function allows you to convert your graph to adjacency matrix format.
-#' @param x Graph object.
-#' @param from Input format (optional).
+#' @param g Graph object.
+#' @param from Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect
 #' @export
 #' @examples
-#' mtx <- as.adjacency(obj)
+#' g <- as.adjacency(g)
 
-as.adjacency <- function(x, from=NULL) {
+as.adjacency <- function(g, from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    from <- match.arg(from)
     if (is.null(from)) {
-        from=detect.format(x)
+        from=detect.format(g)
     }
-    mtx <- switch(from,
+    g <- switch(from,
         adjacency = {
-            mtx <- as.matrix(x)
+            g <- as.matrix(g)
         },
         edges = {
-            g <- igraph::graph_from_edgelist(as.matrix(x), directed=TRUE)
-            mtx <- as.matrix(igraph::as_adjacency_matrix(g, type='both'))
+            g <- igraph::graph_from_data_frame(as.data.frame(g))
+            attr <- NULL
+            if ('weight' %in% igraph::list.edge.attributes(g)) {
+                attr <- 'weight'
+            }
+            g <- as.matrix(igraph::as_adjacency_matrix(g, type='both', attr=attr))
+        },
+        graph = {
+            g <- as(g, 'matrix')
         },
         igraph = {
-            mtx <- as.matrix(igraph::as_adjacency_matrix(x, type='both'))
+            attr <- NULL
+            if ('weight' %in% igraph::list.edge.attributes(g)) {
+                attr <- 'weight'
+            }
+            g <- as.matrix(igraph::as_adjacency_matrix(g, type='both', attr=attr))
         },
         bnlearn = {
-            g <- as.igraph(as.matrix(bnlearn::arcs(x)), from='edges')
-            mtx <- as.matrix(igraph::as_adjacency_matrix(g, type='both'))
-        },
-        NULL
+            g <- bnlearn::amat(g)
+        }
     )
-    return(mtx)
+    return(g)
+}
+
+#' Convert Graph To Edge List
+#'
+#' This function allows you to convert your graph to edge list format.
+#' @param g Graph object.
+#' @param from Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect
+#' @export
+#' @examples
+#' g <- as.edges(g)
+
+as.edges <- function(g, from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    from <- match.arg(from)
+    if (is.null(from)) {
+        from=detect.format(g)
+    }
+    g <- switch(from,
+        adjacency = {
+            g <- igraph::graph_from_adjacency_matrix(as.matrix(g), mode='directed', weighted=TRUE, diag=TRUE)
+            g <- igraph::as_data_frame(g, what='edges')
+        },
+        edges = {
+            g <- as.data.frame(g)
+        },
+        graph = {
+            g <- as(g, 'matrix')
+            g <- igraph::graph_from_adjacency_matrix(as.matrix(g), mode='directed', weighted=TRUE, diag=TRUE)
+            g <- igraph::as_data_frame(g, what='edges')
+        },
+        igraph = {
+            g <- igraph::as_data_frame(g, what='edges')
+        },
+        bnlearn = {
+            g <- as.data.frame(bnlearn::arcs(g))
+        }
+    )
+    return(g)
+}
+
+#' Convert Graph To graph Format
+#'
+#' This function allows you to convert your graph to graph format.
+#' @param g Graph object.
+#' @param from Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect
+#' @export
+#' @examples
+#' g <- as.graph(g)
+
+as.graph <- function(g, from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    from <- match.arg(from)
+    if (is.null(from)) {
+        from=detect.format(g)
+    }
+    g <- switch(from,
+        adjacency = {
+            g <- igraph::graph_from_adjacency_matrix(as.matrix(g), mode='directed', weighted=TRUE, diag=TRUE)
+            V <- names(igraph::V(g))
+            W <- NULL
+            if ('weight' %in% igraph::list.edge.attributes(g)) {
+                W <- g$weight
+            }
+            g <- igraph::as_data_frame(g, what='edges')
+            g <- as.matrix(subset(g, select=c('from', 'to')))
+            g <- graph::ftM2graphNEL(g, W=W, V=V, edgemode='directed')
+        },
+        edges = {
+            g <- igraph::graph_from_data_frame(as.data.frame(g))
+            V <- names(igraph::V(g))
+            W <- NULL
+            if ('weight' %in% igraph::list.edge.attributes(g)) {
+                W <- g$weight
+            }
+            g <- igraph::as_data_frame(g, what='edges')
+            g <- as.matrix(subset(g, select=c('from', 'to')))
+            g <- graph::ftM2graphNEL(g, W=W, V=V, edgemode='directed')
+        },
+        graph = {
+            g <- g
+        },
+        igraph = {
+            g <- igraph::as_graphnel(g)
+        },
+        bnlearn = {
+            g <- bnlearn::as.graphNEL(g)
+        }
+    )
+    return(g)
 }
 
 #' Convert Graph To igraph Format
 #'
 #' This function allows you to convert your graph to igraph format.
-#' @param x Graph object.
-#' @param from Input format (optional).
+#' @param g Graph object.
+#' @param from Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect
 #' @export
 #' @examples
-#' g <- as.igraph(obj)
+#' g <- as.igraph(g)
 
-as.igraph <- function(x, from=NULL) {
+as.igraph <- function(g, from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    from <- match.arg(from)
     if (is.null(from)) {
-        from=detect.format(x)
+        from=detect.format(g)
     }
     g <- switch(from,
         adjacency = {
-            g <- igraph::graph_from_adjacency_matrix(as.matrix(x), mode='directed', weighted=TRUE, diag=TRUE)
+            g <- igraph::graph_from_adjacency_matrix(as.matrix(g), mode='directed', weighted=TRUE, diag=TRUE)
         },
         edges = {
-            g <- igraph::graph_from_edgelist(as.matrix(x), directed=TRUE)
+            g <- igraph::graph_from_data_frame(as.data.frame(g))
+        },
+        graph = {
+            g <- as(g, 'matrix')
+            g <- igraph::graph_from_adjacency_matrix(as.matrix(g), mode='directed', weighted=TRUE, diag=TRUE)
         },
         igraph = {
-            g <- x
+            g <- g
         },
         bnlearn = {
-            g <- as.igraph(as.matrix(bnlearn::arcs(x)), from='edges')
-        },
-        NULL
+            g <- bnlearn::amat(g)
+            g <- igraph::graph_from_adjacency_matrix(as.matrix(g), mode='directed', weighted=TRUE, diag=TRUE)
+        }
     )
     return(g)
 }
 
 #' Convert Graph To bnlearn Format
 #'
-#' This function allows you to convert your graph to bnlearn format (bnlearn).
-#' @param x Graph object.
-#' @param from Input format (optional).
+#' This function allows you to convert your graph to bnlearn format.
+#' @param g Graph object.
+#' @param from Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect
 #' @export
 #' @examples
-#' g <- as.bnlearn(obj)
+#' g <- as.bnlearn(g)
 
-as.bnlearn <- function(x, from=NULL) {
+as.bnlearn <- function(g, from=c(NULL, 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    from <- match.arg(from)
     if (is.null(from)) {
-        from=detect.format(x)
+        from=detect.format(g)
     }
     g <- switch(from,
         adjacency = {
-            mtx <- subset(as.data.frame(as.edges(x, from='adjacency')), select=c(1,2))
-            colnames(mtx) <- c('from', 'to')
-            mtx$from <- as.character(mtx$from)
-            mtx$to <- as.character(mtx$to)
-            nodes <- union(mtx[[1]], mtx[[2]])
-            nodes <- nodes[!duplicated(nodes)]
-            g <- bnlearn::empty.graph(nodes)
-            bnlearn::arcs(g, check.cycles=FALSE, check.illegal=FALSE) <- mtx
-            g
+            g <- igraph::graph_from_adjacency_matrix(as.matrix(g), mode='directed', weighted=TRUE, diag=TRUE)
+            V <- names(igraph::V(g))
+            W <- NULL
+            if ('weight' %in% igraph::list.edge.attributes(g)) {
+                W <- g$weight
+            }
+            g <- igraph::as_data_frame(g, what='edges')
+            g <- as.matrix(subset(g, select=c('from', 'to')))
+            g <- graph::ftM2graphNEL(g, W=W, V=V, edgemode='directed')
+            g <- bnlearn::as.bn(g)
         },
         edges = {
-            mtx <- subset(as.data.frame(x), select=c(1,2))
-            colnames(mtx) <- c('from', 'to')
-            mtx$from <- as.character(mtx$from)
-            mtx$to <- as.character(mtx$to)
-            nodes <- union(mtx[[1]], mtx[[2]])
-            nodes <- nodes[!duplicated(nodes)]
-            g <- bnlearn::empty.graph(nodes)
-            bnlearn::arcs(g, check.cycles=FALSE, check.illegal=FALSE) <- mtx
-            g
+            g <- igraph::graph_from_data_frame(as.data.frame(g))
+            V <- names(igraph::V(g))
+            W <- NULL
+            if ('weight' %in% igraph::list.edge.attributes(g)) {
+                W <- g$weight
+            }
+            g <- igraph::as_data_frame(g, what='edges')
+            g <- as.matrix(subset(g, select=c('from', 'to')))
+            g <- graph::ftM2graphNEL(g, W=W, V=V, edgemode='directed')
+            g <- bnlearn::as.bn(g)
+        },
+        graph = {
+            g <- bnlearn::as.bn(g)
         },
         igraph = {
-            mtx <- subset(as.data.frame(as.edges(x, from='igraph')), select=c(1,2))
-            colnames(mtx) <- c('from', 'to')
-            mtx$from <- as.character(mtx$from)
-            mtx$to <- as.character(mtx$to)
-            nodes <- union(mtx[[1]], mtx[[2]])
-            nodes <- nodes[!duplicated(nodes)]
-            g <- bnlearn::empty.graph(nodes)
-            bnlearn::arcs(g, check.cycles=FALSE, check.illegal=FALSE) <- mtx
-            g
+            g <- igraph::as_graphnel(g)
+            g <- bnlearn::as.bn(g)
         },
         bnlearn = {
-            g <- x
-        },
-        NULL
+            g <- g
+        }
     )
     return(g)
 }

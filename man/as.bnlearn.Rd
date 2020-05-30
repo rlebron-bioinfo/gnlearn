@@ -4,16 +4,19 @@
 \alias{as.bnlearn}
 \title{Convert Graph To bnlearn Format}
 \usage{
-as.bnlearn(x, from = NULL)
+as.bnlearn(
+  g,
+  from = c(NULL, "adjacency", "edges", "graph", "igraph", "bnlearn")
+)
 }
 \arguments{
-\item{x}{Graph object.}
+\item{g}{Graph object.}
 
-\item{from}{Input format (optional).}
+\item{from}{Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect}
 }
 \description{
-This function allows you to convert your graph to bnlearn format (bnlearn).
+This function allows you to convert your graph to bnlearn format.
 }
 \examples{
-g <- as.bnlearn(obj)
+g <- as.bnlearn(g)
 }

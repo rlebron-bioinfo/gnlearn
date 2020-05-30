@@ -4,20 +4,24 @@
 \alias{convert.format}
 \title{Graph Format Conversion}
 \usage{
-convert.format(x, to, from = NULL)
+convert.format(
+  g,
+  to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
+  from = c(NULL, "adjacency", "edges", "graph", "igraph", "bnlearn")
+)
 }
 \arguments{
-\item{x}{Graph object.}
+\item{g}{Graph object.}
 
-\item{to}{Output format ('adjacency', 'edges', 'igraph', or 'bnlearn').}
+\item{to}{Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'}
 
-\item{from}{Input format (optional).}
+\item{from}{Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect}
 }
 \description{
 This function allows you to convert graph between different formats: adjacency matrix, list of edges, igraph and bnlearn (bnlearn).
 }
 \examples{
-graph <- convert.format(mtx, 'igraph')
+g <- convert.format(g, to='igraph')
 }
 \keyword{adjacency}
 \keyword{edges}

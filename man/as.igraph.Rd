@@ -4,16 +4,19 @@
 \alias{as.igraph}
 \title{Convert Graph To igraph Format}
 \usage{
-as.igraph(x, from = NULL)
+as.igraph(
+  g,
+  from = c(NULL, "adjacency", "edges", "graph", "igraph", "bnlearn")
+)
 }
 \arguments{
-\item{x}{Graph object.}
+\item{g}{Graph object.}
 
-\item{from}{Input format (optional).}
+\item{from}{Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect}
 }
 \description{
 This function allows you to convert your graph to igraph format.
 }
 \examples{
-g <- as.igraph(obj)
+g <- as.igraph(g)
 }

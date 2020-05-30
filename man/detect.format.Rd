@@ -4,16 +4,16 @@
 \alias{detect.format}
 \title{Graph Format Detection}
 \usage{
-detect.format(x)
+detect.format(g)
 }
 \arguments{
-\item{x}{Graph object.}
+\item{g}{Graph object.}
 }
 \description{
 This function allows you to detect graph format.
 }
 \examples{
-detect.format(obj)
+detect.format(g)
 }
 \keyword{format}
 \keyword{graph}

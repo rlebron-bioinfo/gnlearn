@@ -4,16 +4,16 @@
 \alias{as.edges}
 \title{Convert Graph To Edge List}
 \usage{
-as.edges(x, from = NULL)
+as.edges(g, from = c(NULL, "adjacency", "edges", "graph", "igraph", "bnlearn"))
 }
 \arguments{
-\item{x}{Graph object.}
+\item{g}{Graph object.}
 
-\item{from}{Input format (optional).}
+\item{from}{Input format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: autodetect}
 }
 \description{
 This function allows you to convert your graph to edge list format.
 }
 \examples{
-mtx <- as.edges(obj)
+g <- as.edges(g)
 }
