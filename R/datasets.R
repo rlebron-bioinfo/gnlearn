@@ -209,6 +209,36 @@ download.graph <- function(code, to=c('igraph', 'adjacency', 'edges', 'graph', '
     }
 }
 
+#' Import A Local Geneset
+#'
+#' This function allows you to import a local geneset.
+#' @param path Path to local geneset.
+#' @param sep Separator / delimiter character (optional). Default: TAB
+#' @param header Whether or not the file has a header (optional). Default: TRUE
+#' @param index Whether or not the file has an index column (optional). Default: FALSE
+#' @keywords genesets
+#' @export
+#' @examples
+#' df <- import.geneset('mygeneset.tsv')
+
+import.geneset <- function(path, sep='\t', header=TRUE, index=FALSE) {
+    ext <- tools::file_ext(path)
+    if (ext == 'gz') {
+        file <- gzfile(path, 'rt')
+    } else if (ext %in% c('bz', 'bz2')) {
+        file <- bzfile(path, 'rt')
+    } else if (ext == 'xz') {
+        file <- xzfile(path, 'rt')
+    }
+    if (index) {
+        df <- read.table(file, sep=sep, header=header, row.names=1, check.names=FALSE)
+    } else {
+        df <- read.table(file, sep=sep, header=header, check.names=FALSE)
+    }
+    df <- as.data.frame(df)
+    return(df)
+}
+
 #' Import A Local Dataset
 #'
 #' This function allows you to import a local dataset.
@@ -246,6 +276,42 @@ import.dataset <- function(path, log=FALSE, sep='\t', header=TRUE, index=FALSE, 
         df <- log(df+1)
     }
     return(df)
+}
+
+#' Import A Local Graph
+#'
+#' This function allows you to import a local graph.
+#' @param path Path to local graph.
+#' @param sep Separator / delimiter character (optional). Default: TAB
+#' @param header Whether or not the file has a header (optional). Default: TRUE
+#' @param index Whether or not the file has an index column (optional). Default: TRUE
+#' @param from Input format (optional): 'adjacency' or 'edges'. Default: 'adjacency'
+#' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
+#' @keywords graphs
+#' @export
+#' @examples
+#' g <- import.graph('mygraph.tsv')
+
+import.graph <- function(path, sep='\t', header=TRUE, index=TRUE, from=c('adjacency','edges'),
+                         to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn')) {
+    from <- match.arg(from)
+    to <- match.args(to)
+    ext <- tools::file_ext(path)
+    if (ext == 'gz') {
+        file <- gzfile(path, 'rt')
+    } else if (ext %in% c('bz', 'bz2')) {
+        file <- bzfile(path, 'rt')
+    } else if (ext == 'xz') {
+        file <- xzfile(path, 'rt')
+    }
+    if (index) {
+        df <- read.table(file, sep=sep, header=header, row.names=1, check.names=FALSE)
+    } else {
+        df <- read.table(file, sep=sep, header=header, check.names=FALSE)
+    }
+    df <- as.data.frame(df)
+    g <- convert.format(df, from=from, to=to)
+    return(g)
 }
 
 #' Select (automatically) the most appropriate gene columns of your dataset.
