@@ -28,7 +28,7 @@ boot.nodag(
 
 \item{threshold}{Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5}
 
-\item{to}{Output format (('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn')) (optional).}
+\item{to}{Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).}
 
 \item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: 4}
 }

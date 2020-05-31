@@ -32,7 +32,7 @@ huge.graph(
 
 \item{iter.m}{Size of each bootstrap replicate. Default: nrow(df)/2}
 
-\item{to}{Output format (('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn')).}
+\item{to}{Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn').}
 
 \item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: 4}
 

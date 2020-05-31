@@ -229,6 +229,8 @@ import.geneset <- function(path, sep='\t', header=TRUE, index=FALSE) {
         file <- bzfile(path, 'rt')
     } else if (ext == 'xz') {
         file <- xzfile(path, 'rt')
+    } else {
+        file <- file(path, 'rt')
     }
     if (index) {
         df <- read.table(file, sep=sep, header=header, row.names=1, check.names=FALSE)
@@ -236,6 +238,7 @@ import.geneset <- function(path, sep='\t', header=TRUE, index=FALSE) {
         df <- read.table(file, sep=sep, header=header, check.names=FALSE)
     }
     df <- as.data.frame(df)
+    close(file)
     return(df)
 }
 
@@ -261,6 +264,8 @@ import.dataset <- function(path, log=FALSE, sep='\t', header=TRUE, index=FALSE, 
         file <- bzfile(path, 'rt')
     } else if (ext == 'xz') {
         file <- xzfile(path, 'rt')
+    } else {
+        file <- file(path, 'rt')
     }
     if (index) {
         df <- read.table(file, sep=sep, header=header, row.names=1, check.names=FALSE)
@@ -275,6 +280,7 @@ import.dataset <- function(path, log=FALSE, sep='\t', header=TRUE, index=FALSE, 
     if (log) {
         df <- log(df+1)
     }
+    close(file)
     return(df)
 }
 
@@ -303,6 +309,8 @@ import.graph <- function(path, sep='\t', header=TRUE, index=TRUE, from=c('adjace
         file <- bzfile(path, 'rt')
     } else if (ext == 'xz') {
         file <- xzfile(path, 'rt')
+    } else {
+        file <- file(path, 'rt')
     }
     if (index) {
         df <- read.table(file, sep=sep, header=header, row.names=1, check.names=FALSE)
@@ -310,8 +318,112 @@ import.graph <- function(path, sep='\t', header=TRUE, index=TRUE, from=c('adjace
         df <- read.table(file, sep=sep, header=header, check.names=FALSE)
     }
     df <- as.data.frame(df)
+    if (header & !index & from=='adjacency') {
+        rownames(df) <- colnames(df)
+    }
+    if (!header & index & from=='adjacency') {
+        colnames(df) <- rownames(df)
+    }
     g <- convert.format(df, from=from, to=to)
+    close(file)
     return(g)
+}
+
+#' Export A Geneset To A File
+#'
+#' This function allows you to export a geneset to a file.
+#' @param df Geneset to export.
+#' @param path Output file path.
+#' @param sep Separator / delimiter character (optional). Default: TAB
+#' @param header Whether or not to include a header (optional). Default: TRUE
+#' @param index Whether or not to include an index column (optional). Default: FALSE
+#' @keywords genesets
+#' @export
+#' @examples
+#' export.geneset(df, 'mygeneset.tsv')
+
+export.geneset <- function(df, path, sep='\t', header=TRUE, index=FALSE) {
+    ext <- tools::file_ext(path)
+    if (ext == 'gz') {
+        file <- gzfile(path, 'wt')
+    } else if (ext %in% c('bz', 'bz2')) {
+        file <- bzfile(path, 'wt')
+    } else if (ext == 'xz') {
+        file <- xzfile(path, 'wt')
+    } else {
+        file <- file(path, 'wt')
+    }
+    write.table(df, file, append=FALSE, quote=FALSE, sep=sep, col.names=header, row.names=index)
+    close(file)
+}
+
+#' Export A Dataset To A File
+#'
+#' This function allows you to export a dataset to a file.
+#' @param df Dataset to export.
+#' @param path Output file path.
+#' @param sep Separator / delimiter character (optional). Default: TAB
+#' @param header Whether or not to include a header (optional). Default: TRUE
+#' @param index Whether or not to include an index column (optional). Default: FALSE
+#' @param transpose Whether or not to transpose the data matrix (optional). IMPORTANT NOTE: gnlearn works with cell x gene matrices. Default: FALSE
+#' @keywords datasets
+#' @export
+#' @examples
+#' export.dataset(df, 'mydataset.tsv')
+
+export.dataset <- function(df, path, sep='\t', header=TRUE, index=FALSE, transpose=FALSE) {
+    if (transpose) {
+        df <- as.data.frame(t(as.matrix(df)))
+    }
+    ext <- tools::file_ext(path)
+    if (ext == 'gz') {
+        file <- gzfile(path, 'wt')
+    } else if (ext %in% c('bz', 'bz2')) {
+        file <- bzfile(path, 'wt')
+    } else if (ext == 'xz') {
+        file <- xzfile(path, 'wt')
+    } else {
+        file <- file(path, 'wt')
+    }
+    write.table(df, file, append=FALSE, quote=FALSE, sep=sep, col.names=header, row.names=index)
+    close(file)
+}
+
+#' Export A Graph To A File
+#'
+#' This function allows you to graph a geneset to a file.
+#' @param g Graph to export.
+#' @param path Output file path.
+#' @param sep Separator / delimiter character (optional). Default: TAB
+#' @param header Whether or not to include a header (optional). Default: TRUE
+#' @param index Whether or not to include an index column (optional). Default: FALSE
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
+#' @param from Output format (optional): 'adjacency' or 'edges'. Default: 'adjacency'
+#' @keywords graphs
+#' @export
+#' @examples
+#' export.graph(g, 'mygraph.tsv')
+
+export.graph <- function(g, path, sep='\t', header=TRUE, index=TRUE,
+                         from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn'), to=c('adjacency','edges')) {
+    to <- match.arg(to)
+    from <- match.arg(from)
+    if (from=='auto') {
+        from <- detect.format(g)
+    }
+    df <- convert.format(g, from=from, to=to)
+    ext <- tools::file_ext(path)
+    if (ext == 'gz') {
+        file <- gzfile(path, 'wt')
+    } else if (ext %in% c('bz', 'bz2')) {
+        file <- bzfile(path, 'wt')
+    } else if (ext == 'xz') {
+        file <- xzfile(path, 'wt')
+    } else {
+        file <- file(path, 'wt')
+    }
+    write.table(df, file, append=FALSE, quote=FALSE, sep=sep, col.names=header, row.names=index)
+    close(file)
 }
 
 #' Select (automatically) the most appropriate gene columns of your dataset.
