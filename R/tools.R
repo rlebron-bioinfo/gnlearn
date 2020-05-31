@@ -916,39 +916,51 @@ random.graph <- function(nodes, exp.degree, dag=TRUE, plot=TRUE,
     return(g)
 }
 
-#' Select (automatically) the most appropriate gene columns of your dataset.
+#' Make an edgelist from some genes to anothers.
 #'
-#' This function allows you to (automatically) select the most appropriate gene columns of your dataset.
+#' This function allows you to make an edgelist from some genes to anothers.
 #' @param genes Geneset with features.
+#' @param from.genes User-selected 'from' genes.
+#' @param to.genes User-selected 'to' genes.
 #' @param from.features The edges will go from genes with some of these features.
 #' @param to.features The edges will go to genes with some of these features.
-#' @param selected.genes User-selected genes (optional).
 #' @keywords whitelist blacklist genes
 #' @export
 #' @examples
-#' blacklist <- wb.edgelist(genes, from.features='target', to.features='tf')
+#' blacklist <- make.edgelist(genes, from.features='target', to.features='tf')
 
-wb.edgelist <- function(genes, from.features, to.features, selected.genes=NULL) {
-    if (is.null(selected.genes)) {
-        selected.genes <- genes$name
+make.edgelist <- function(genes, from.genes=NULL, to.genes=NULL, from.features=NULL, to.features=NULL) {
+    if (is.null(from.genes)) {
+        from.genes <- genes$name
     }
-    from.genes <- c()
-    to.genes <- c()
-    for (i in 1:length(from.features)) {
-        feature <- from.features[i]
-        from.genes <- c(from.genes, genes[genes[genes$name %in% selected.genes,feature],]$name)
+    if (is.null(to.genes)) {
+        to.genes <- genes$name
     }
-    for (i in 1:length(to.features)) {
-        feature <- to.features[i]
-        to.genes <- c(to.genes, genes[genes[genes$name %in% selected.genes,feature],]$name)
+    from <- c()
+    to <- c()
+    if (!is.null(from.features)) {
+      for (i in 1:length(from.features)) {
+          feature <- from.features[i]
+          from <- c(from, genes[genes[genes$name %in% from.genes,feature],]$name)
+      }
+    } else {
+      from <- c(from, genes[genes[genes$name %in% from.genes,],]$name)
     }
-    from.genes <- unique(from.genes)
-    to.genes <- unique(to.genes)
-    edge.list <- expand.grid(from.genes, to.genes)
+    if (!is.null(to.features)) {
+      for (i in 1:length(to.features)) {
+          feature <- to.features[i]
+          to <- c(to, genes[genes[genes$name %in% to.genes,feature],]$name)
+      }
+    } else {
+      to <- c(to, genes[genes[genes$name %in% to.genes,],]$name)
+    }
+    from <- unique(from)
+    to <- unique(to)
+    edge.list <- expand.grid(from, to)
     colnames(edge.list) <- c('from', 'to')
     edge.list$from <- as.character(edge.list$from)
     edge.list$to <- as.character(edge.list$to)
     edge.list <- edge.list[edge.list$from != edge.list$to,]
     rownames(edge.list) <- NULL
     return(edge.list)
-} 
+}
