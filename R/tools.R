@@ -278,7 +278,7 @@ as.bnlearn <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
         },
         igraph = {
             g <- igraph::as_graphnel(g)
-            g <- bnlearn::as.bn(g)
+            g <- bnlearn::as.bn(g, check.cycles=FALSE)
         },
         bnlearn = {
             g <- g
@@ -413,7 +413,7 @@ feature.plot <- function(x, genes, feature, from='auto', feature.color=rgb(0.7,0
 #' This function allows you to compare two graphs, regardless of the format (adjacency matrix, list of edges, igraph, or bnlearn).
 #' @param learned Learned graph or graph 1.
 #' @param true Ground truth graph or graph 2 (reference).
-#' @param marginalize Whether or not to marginalize: 'both', 'learned', 'true', or 'none'. Default: 'both'
+#' @param marginalize Whether or not to marginalize: 'none', 'learned', 'true', or 'both'. Default: 'none'
 #' @param arcs Whether or not to list the arcs. Default: FALSE.
 #' @param plot Whether or not to plot the differences between the two graphs. Default: TRUE
 #' @keywords graph comparison
@@ -422,7 +422,7 @@ feature.plot <- function(x, genes, feature, from='auto', feature.color=rgb(0.7,0
 #' comparison <- compare.graphs(obj1, obj2, plot=TRUE)
 #' comparison <- compare.graphs(obj1, obj2, plot=FALSE)
 
-compare.graphs <- function(learned, true, marginalize=c('both','learned','true','none'),
+compare.graphs <- function(learned, true, marginalize=c('none','learned','true','both'),
                            arcs=FALSE, plot=TRUE) {
     marginalize <- match.arg(marginalize)
     learned <- as.igraph(learned)
@@ -445,12 +445,12 @@ compare.graphs <- function(learned, true, marginalize=c('both','learned','true',
         true <- graph.marginalization(true, v2[(v2 %in% v1)], to='igraph')
     }
 
-    if (marginalize == 'none') {
-        r1 <- v1[!(v1 %in% v2)]
-        r2 <- v2[!(v2 %in% v1)]
-        learned <- igraph::delete_vertices(learned, r1)
-        true <- igraph::delete_vertices(true, r2)
-    }
+    v1 <- names(igraph::V(learned))
+    v2 <- names(igraph::V(true))
+    r1 <- v1[!(v1 %in% v2)]
+    r2 <- v2[!(v2 %in% v1)]
+    learned <- igraph::delete_vertices(learned, r1)
+    true <- igraph::delete_vertices(true, r2)
 
     u <- igraph::union(learned, true)
     tp <- igraph::intersection(learned, true)
