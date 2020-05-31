@@ -4,7 +4,10 @@
 \alias{groundtruth.graph}
 \title{Create a Ground Truth Graph}
 \usage{
-groundtruth.graph(x, to = "igraph")
+groundtruth.graph(
+  x,
+  to = c("igraph", "adjacency", "edges", "graph", "bnlearn")
+)
 }
 \arguments{
 \item{x}{Download Code (must be of type 'TF-Target Interactions') or list of edges (data.frame or matrix).}

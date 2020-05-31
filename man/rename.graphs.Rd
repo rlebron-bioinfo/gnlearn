@@ -11,7 +11,7 @@ rename.graphs(graphs, names, to = "igraph")
 
 \item{names}{Vector with the new vertex names (in order).}
 
-\item{to}{Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).}
+\item{to}{Output format (('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn')) (optional).}
 }
 \description{
 This function allows you to rename nodes of a list of graphs.

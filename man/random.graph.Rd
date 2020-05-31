@@ -26,7 +26,7 @@ random.graph(
 
 \item{algorithm}{Algorithm to be used to generate the graph: 'regular', 'watts', 'er', 'power', 'bipartite', 'barabasi', or 'geometric'. Default: 'regular'}
 
-\item{to}{Output format ('adjacency', 'edges', 'igraph', or 'bnlearn').}
+\item{to}{Output format (('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn')).}
 }
 \description{
 This function allows you to generate a random graph/DAG.

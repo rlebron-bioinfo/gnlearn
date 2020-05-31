@@ -31,7 +31,7 @@ boot.glasso(
 
 \item{lower}{Whether or not to ignore the lower triangular adjacency matrix (optional).}
 
-\item{to}{Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).}
+\item{to}{Output format (('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn')) (optional).}
 
 \item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: 4}
 }

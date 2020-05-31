@@ -11,7 +11,7 @@ averaged.graph(graphs, threshold = 0.5, to = "igraph")
 
 \item{threshold}{Minimum strength required for a coefficient to be included in the averaged graph (optional). Default: 0.5}
 
-\item{to}{Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).}
+\item{to}{Output format (('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn')) (optional).}
 }
 \description{
 This function allows you to calculate the averaged graph from a list of graphs.

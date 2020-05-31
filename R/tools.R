@@ -726,7 +726,7 @@ drop.all.zeros <- function(mtx, rows=TRUE, columns=TRUE, square.matrix='none') {
 #' This function allows you to calculate the averaged graph from a list of graphs.
 #' @param graphs List of graphs.
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged graph (optional). Default: 0.5
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
+#' @param to Output format (('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn')) (optional).
 #' @keywords average graph
 #' @export
 #' @examples
@@ -783,7 +783,7 @@ averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
 #' This function allows you to rename nodes of a list of graphs.
 #' @param graphs List of graphs.
 #' @param names Vector with the new vertex names (in order).
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
+#' @param to Output format (('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn')) (optional).
 #' @keywords rename graph
 #' @export
 #' @examples
@@ -920,7 +920,7 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
 #' @param dag Whether the graph should be a DAG or not. Default: TRUE
 #' @param plot Whether or not to plot the graph. Default: TRUE
 #' @param algorithm Algorithm to be used to generate the graph: 'regular', 'watts', 'er', 'power', 'bipartite', 'barabasi', or 'geometric'. Default: 'regular'
-#' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn').
+#' @param to Output format (('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn')).
 #' @keywords generate random graph
 #' @export
 #' @examples

@@ -74,8 +74,60 @@ list.datasets <- function(sp.scientific=NULL, sp.common=NULL, bio.layer=NULL, se
         regex <- cell.identity
         df <- df[with(df, grepl(regex, cell.identity, ignore.case=TRUE)), ]
     }
-    df <- df[df$n.genes > min.genes & df$n.genes < max.genes, ]
-    df <- df[df$n.cells > min.cells & df$n.cells < max.cells, ]
+    df <- df[df$n.genes >= min.genes & df$n.genes <= max.genes, ]
+    df <- df[df$n.cells >= min.cells & df$n.cells <= max.cells, ]
+    return(df)
+}
+
+#' List Graphs Available Via RESTful API
+#'
+#' This function allows you to list graphs available via RESTful API.
+#' @param sp.scientific Species (Scientific Name) (regex) (optional).
+#' @param sp.common Species (Common Name) (regex) (optional).
+#' @param dataset Dataset used as input to learn the graph (Dataset Download Code) (optional).
+#' @param bio.layer Biological Information Layer (regex) (optional).
+#' @param cell.identity Biological Cell Identity (regex) (optional).
+#' @param algorithm Algorithm used to learn the graph (regex) (optional).
+#' @param min.nodes Minimum Number of Nodes (optional).
+#' @param max.nodes Maximum Number of Nodes (optional).
+#' @param min.edges Minimum Number of Edges (optional).
+#' @param max.edges Maximum Number of Edges (optional).
+#' @keywords graphs api
+#' @export
+#' @examples
+#' graphs <- list.graphs()
+#' graphs <- list.graphs(sp.common='human')
+#' graphs <- list.graphs(sp.common='mouse')
+
+list.graphs <- function(sp.scientific=NULL, sp.common=NULL, dataset=NULL, bio.layer=NULL, cell.identity=NULL, algorithm=NULL,
+                        min.nodes=0, max.nodes=Inf, min.edges=0, max.edges=Inf, host=HOST) {
+    uri <- file.path(host, 'graphs')
+    df <- jsonlite::fromJSON(uri)
+    if (!is.null(sp.scientific)) {
+        regex <- sp.scientific
+        df <- df[with(df, grepl(regex, sp.scientific, ignore.case=TRUE)), ]
+    }
+    if (!is.null(sp.common)) {
+        regex <- sp.common
+        df <- df[with(df, grepl(regex, sp.common, ignore.case=TRUE)), ]
+    }
+    if (!is.null(dataset)) {
+        df <- df[df$dataset == dataset, ]
+    }
+    if (!is.null(bio.layer)) {
+        regex <- bio.layer
+        df <- df[with(df, grepl(regex, bio.layer, ignore.case=TRUE)), ]
+    }
+    if (!is.null(cell.identity)) {
+        regex <- cell.identity
+        df <- df[with(df, grepl(regex, cell.identity, ignore.case=TRUE)), ]
+    }
+    if (!is.null(algorithm)) {
+        regex <- algorithm
+        df <- df[with(df, grepl(regex, algorithm, ignore.case=TRUE)), ]
+    }
+    df <- df[df$n.nodes >= min.nodes & df$n.nodes <= max.nodes, ]
+    df <- df[df$n.edges >= min.edges & df$n.edges <= max.edges, ]
     return(df)
 }
 
@@ -127,6 +179,31 @@ download.dataset  <- function(code, log=TRUE, host=HOST) {
             df <- log(df+1)
         }
         return(df)
+    } else {
+        return(NULL)
+    }
+}
+
+#' Download A Graph Via RESTful API
+#'
+#' This function allows you to download a graph available via RESTful API.
+#' @param code Download Code (indicated by list.graphs() output).
+#' @keywords graphs api
+#' @export
+#' @examples
+#' g <- download.graph(1)
+
+download.graph <- function(code, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), host=HOST) {
+    to <- match.arg(to)
+    uri <- file.path(host, 'graphs', code)
+    df <- jsonlite::fromJSON(uri)
+    url <- df$url
+    if (!is.null(url)) {
+        tmp <- fs::file_temp(ext='.txt')
+        utils::download.file(url, destfile=tmp, quiet=TRUE, mode='wt')
+        df <- read.table(tmp, sep='\t', header=TRUE, check.names=FALSE)
+        g <- convert.format(df, from='adjacency', to=to)
+        return(g)
     } else {
         return(NULL)
     }
@@ -270,7 +347,8 @@ dataframe.split <- function(df, m=NULL) {
 #' @examples
 #' gt <- groundtruth.graph(2)
 
-groundtruth.graph <- function(x, to='igraph') {
+groundtruth.graph <- function(x, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn')) {
+    to <- match.arg(to)
     if (class(x)=='numeric') {
         genesets <- list.genesets()
         type <- genesets[genesets$download.code==x,]$dataset
