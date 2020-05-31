@@ -310,20 +310,23 @@ graph.plot <- function(x, from='auto', layout=c('grid','star','circle','tree','n
 
     g <- as.igraph(x, from=from)
 
-    layout <- switch(layout,
-        grid = igraph::layout_on_grid(g),
-        star = igraph::layout_as_star(g),
-        circle = igraph::layout_in_circle(g),
-        tree = igraph::layout_as_tree(g),
-        nicely = igraph::layout_nicely(g)
-    )
-
     igraph::V(g)$color <- rgb(0.9,0.9,0.9,0.7)
     if ('weight' %in% igraph::list.edge.attributes(g)) {
         igraph::E(g)$color <- ifelse(igraph::E(g)$weight > 0, rgb(0.0,0.7,0.0,0.9), rgb(0.7,0.0,0.0,0.9))
+        t <- as.igraph(as.adjacency(g))
+        igraph::E(t)$weight <- abs(igraph::E(t)$weight)
     } else {
         igraph::E(g)$color <- rgb(0.2,0.2,0.2,0.9)
+        t <- as.igraph(as.adjacency(g))
     }
+
+    layout <- switch(layout,
+        grid = igraph::layout_on_grid(t),
+        star = igraph::layout_as_star(t),
+        circle = igraph::layout_in_circle(t),
+        tree = igraph::layout_as_tree(t),
+        nicely = igraph::layout_nicely(t)
+    )
 
     if (interactive) {
         threejs::graphjs(g)
@@ -373,16 +376,19 @@ feature.plot <- function(x, genes, feature, from='auto', feature.color=rgb(0.7,0
     igraph::V(g)$color <- ifelse(names(igraph::V(g)) %in% f_genes, feature.color, rgb(0.9,0.9,0.9,0.7))
     if ('weight' %in% igraph::list.edge.attributes(g)) {
         igraph::E(g)$color <- ifelse(igraph::E(g)$weight > 0, rgb(0.0,0.7,0.0,0.9), rgb(0.7,0.0,0.0,0.9))
+        t <- as.igraph(as.adjacency(g))
+        igraph::E(t)$weight <- abs(igraph::E(t)$weight)
     } else {
         igraph::E(g)$color <- rgb(0.2,0.2,0.2,0.9)
+        t <- as.igraph(as.adjacency(g))
     }
 
     layout <- switch(layout,
-        grid = igraph::layout_on_grid(g),
-        star = igraph::layout_as_star(g),
-        circle = igraph::layout_in_circle(g),
-        tree = igraph::layout_as_tree(g),
-        nicely = igraph::layout_nicely(g)
+        grid = igraph::layout_on_grid(t),
+        star = igraph::layout_as_star(t),
+        circle = igraph::layout_in_circle(t),
+        tree = igraph::layout_as_tree(t),
+        nicely = igraph::layout_nicely(t)
     )
 
     if (interactive) {
@@ -821,7 +827,15 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
     library(dplyr)
 
     g <- as.igraph(x, from=from)
-    c <- algorithm(igraph::as.undirected(g))
+    if ('weight' %in% igraph::list.edge.attributes(g)) {
+        igraph::E(g)$color <- ifelse(igraph::E(g)$weight > 0, rgb(0.0,0.7,0.0,0.9), rgb(0.7,0.0,0.0,0.9))
+        t <- as.igraph(as.adjacency(g))
+        igraph::E(t)$weight <- abs(igraph::E(t)$weight)
+    } else {
+        igraph::E(g)$color <- rgb(0.2,0.2,0.2,0.9)
+        t <- as.igraph(as.adjacency(g))
+    }
+    c <- algorithm(igraph::as.undirected(t))
     igraph::V(g)$community <- igraph::membership(c)
 
     palette <- rainbow(length(unique(igraph::V(g)$community)))
@@ -834,12 +848,6 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
         mutate(community = ifelse(community.x == community.y, community.x, NA) %>% factor())
     colnames(edge.community) <- c('from', 'to', 'weight', 'from.community', 'to.community', 'community')
 
-    if ('weight' %in% igraph::list.edge.attributes(g)) {
-        igraph::E(g)$color <- ifelse(igraph::E(g)$weight > 0, rgb(0.0,0.7,0.0,0.9), rgb(0.7,0.0,0.0,0.9))
-    } else {
-        igraph::E(g)$color <- rgb(0.2,0.2,0.2,0.9)
-    }
-
     if (network & interactive.network) {
 
         threejs::graphjs(g,
@@ -849,11 +857,11 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
     } else if (network & !interactive.network) {
 
         network.layout <- switch(network.layout,
-            grid = igraph::layout_on_grid(g),
-            star = igraph::layout_as_star(g),
-            circle = igraph::layout_in_circle(g),
-            tree = igraph::layout_as_tree(g),
-            nicely = igraph::layout_nicely(g)
+            grid = igraph::layout_on_grid(t),
+            star = igraph::layout_as_star(t),
+            circle = igraph::layout_in_circle(t),
+            tree = igraph::layout_as_tree(t),
+            nicely = igraph::layout_nicely(t)
         )
 
         igraph::plot.igraph(g,
