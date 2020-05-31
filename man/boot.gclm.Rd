@@ -9,8 +9,6 @@ boot.gclm(
   R = 200,
   m = NULL,
   threshold = 0.5,
-  loops = FALSE,
-  unconnected.nodes = FALSE,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
   cluster = 4
 )
@@ -23,10 +21,6 @@ boot.gclm(
 \item{m}{Size of each bootstrap replicate (optional). Default: nrow(df)/2}
 
 \item{threshold}{Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5}
-
-\item{loops}{Whether or not to ignore the diagonal of the adjacency matrix (optional). Default: FALSE}
-
-\item{unconnected.nodes}{Include unconnected nodes (optional). Default: FALSE}
 
 \item{to}{Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).}
 

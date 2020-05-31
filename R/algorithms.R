@@ -974,8 +974,6 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
 #' @param upper Whether or not to ignore the upper triangular adjacency matrix (optional).
 #' @param lower Whether or not to ignore the lower triangular adjacency matrix (optional).
-#' @param loops Whether or not to ignore the diagonal of the adjacency matrix (optional).
-#' @param unconnected.nodes Include unconnected nodes (optional). Default: FALSE
 #' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
@@ -983,7 +981,7 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
 #' @examples
 #' graph <- boot.glasso(df, rho=0.1)
 
-boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, lower=TRUE, loops=FALSE, unconnected.nodes=FALSE, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
+boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, lower=TRUE, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
     to <- match.arg(to)
 
     k <- sum(c(upper, lower))
@@ -1007,17 +1005,12 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     A <- averaged.graph(graphs, threshold=threshold, to='adjacency')
-    if (!loops) {
-        diag(A) <- 0
-    }
+    diag(A) <- 0
     if (!upper) {
         A[upper.tri(A)] <- 0
     }
     if (!lower) {
         A[lower.tri(A)] <- 0
-    }
-    if (!unconnected.nodes) {
-        A <- drop.all.zeros(A, square.matrix='all')
     }
     g <- convert.format(A, to=to)
     return(g)
@@ -1068,8 +1061,6 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
-#' @param loops Whether or not to ignore the diagonal of the adjacency matrix (optional). Default: FALSE
-#' @param unconnected.nodes Include unconnected nodes (optional). Default: FALSE
 #' @param to Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @keywords learning graph
@@ -1077,7 +1068,7 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 #' @examples
 #' graph <- boot.gclm(df)
 
-boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected.nodes=FALSE, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
+boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
     to <- match.arg(to)
 
     df <- drop.all.zeros(df)
@@ -1124,12 +1115,7 @@ boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, loops=FALSE, unconnected
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     A <- averaged.graph(graphs, threshold=threshold, to='adjacency')
-    if (!loops) {
-        diag(A) <- 0
-    }
-    if (!unconnected.nodes) {
-        A <- drop.all.zeros(A, square.matrix='all')
-    }
+    diag(A) <- 0
     g <- convert.format(A, to=to)
     return(g)
 }

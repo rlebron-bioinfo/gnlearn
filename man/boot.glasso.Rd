@@ -12,8 +12,6 @@ boot.glasso(
   threshold = 0.5,
   upper = FALSE,
   lower = TRUE,
-  loops = FALSE,
-  unconnected.nodes = FALSE,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
   cluster = 4
 )
@@ -32,10 +30,6 @@ boot.glasso(
 \item{upper}{Whether or not to ignore the upper triangular adjacency matrix (optional).}
 
 \item{lower}{Whether or not to ignore the lower triangular adjacency matrix (optional).}
-
-\item{loops}{Whether or not to ignore the diagonal of the adjacency matrix (optional).}
-
-\item{unconnected.nodes}{Include unconnected nodes (optional). Default: FALSE}
 
 \item{to}{Output format ('adjacency', 'edges', 'igraph', or 'bnlearn') (optional).}
 
