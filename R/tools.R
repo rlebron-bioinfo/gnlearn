@@ -703,10 +703,6 @@ drop.all.zeros <- function(mtx, rows=TRUE, columns=TRUE, square.matrix='none') {
 
 averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
     R <- length(graphs)
-    #A <- array(data=NA, dim=c(dim(graphs[[1]]), R))
-    #for (i in 1:R) {
-    #    A[,,i] <- graphs[[i]]
-    #}
     g1 <- graphs[[1]]
     a1 <- sign(abs(graphs[[1]]))
     for (i in 2:R) {
