@@ -699,38 +699,54 @@ drop.all.zeros <- function(mtx, rows=TRUE, columns=TRUE, square.matrix='none') {
 #' @keywords average graph
 #' @export
 #' @examples
-#' graph <- averaged.graph(df)
+#' graph <- averaged.graph(graphs)
 
 averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
     R <- length(graphs)
-    A <- array(data=NA, dim=c(dim(graphs[[1]]), R))
-    for (i in 1:R) {
-        A[,,i] <- graphs[[i]]
-    }
-    g1 <- sign(abs(graphs[[1]]))
+    #A <- array(data=NA, dim=c(dim(graphs[[1]]), R))
+    #for (i in 1:R) {
+    #    A[,,i] <- graphs[[i]]
+    #}
+    g1 <- graphs[[1]]
+    a1 <- sign(abs(graphs[[1]]))
     for (i in 2:R) {
         g1 <- as.adjacency(g1)
+        a1 <- as.adjacency(a1)
         g1 <- g1[order(colnames(g1)), order(colnames(g1))]
-        g2 <- as.adjacency(sign(abs(graphs[[i]])))
+        a1 <- a1[order(colnames(a1)), order(colnames(a1))]
+        g2 <- as.adjacency(graphs[[i]])
+        a2 <- as.adjacency(sign(abs(graphs[[i]])))
         g2 <- g2[order(colnames(g2)), order(colnames(g2))]
-        names1 <- colnames(g1)
-        names2 <- colnames(g2)
+        a2 <- a2[order(colnames(a2)), order(colnames(a2))]
+        names1 <- colnames(a1)
+        names2 <- colnames(a2)
         names.i <- intersect(names1, names2)
-        names.xg1 <- setdiff(names1, names.i)
-        names.xg2 <- setdiff(names2, names.i)
+        names.xa1 <- setdiff(names1, names.i)
+        names.xa2 <- setdiff(names2, names.i)
         g1.i <- g1[names.i, names.i]
+        a1.i <- a1[names.i, names.i]
         g2.i <- g2[names.i, names.i]
-        g1.x <- g1[names.xg1, names.xg1]
-        g2.x <- g2[names.xg2, names.xg2]
+        a2.i <- a2[names.i, names.i]
+        g1.x <- g1[names.xa1, names.xa1]
+        a1.x <- a1[names.xa1, names.xa1]
+        g2.x <- g2[names.xa2, names.xa2]
+        a2.x <- a2[names.xa2, names.xa2]
         g1 <- ((i-1) * g1.i / i) + (g2.i / i)
+        a1 <- ((i-1) * a1.i / i) + (a2.i / i)
         g1 <- gtools::smartbind(g1, g1.x)
+        a1 <- gtools::smartbind(a1, a1.x)
         rownames(g1) <- colnames(g1)
+        rownames(a1) <- colnames(a1)
         g1 <- gtools::smartbind(g1, g2.x)
+        a1 <- gtools::smartbind(a1, a2.x)
         rownames(g1) <- colnames(g1)
-        g1[is.na(g1)] <- 0
+        rownames(a1) <- colnames(a1)
+        a1[is.na(g1)] <- 0
+        a1[is.na(a1)] <- 0
     }
     A <- g1[order(colnames(g1)), order(colnames(g1))]
-    A[A < threshold] <- 0
+    X <- a1[order(colnames(a1)), order(colnames(a1))]
+    A[X < threshold] <- 0
     g <- convert.format(A, to=to)
     return(g)
 }
