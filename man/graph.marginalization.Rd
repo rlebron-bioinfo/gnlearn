@@ -7,6 +7,7 @@
 graph.marginalization(
   g,
   obs.genes,
+  max.steps = Inf,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn")
 )
 }
@@ -14,6 +15,8 @@ graph.marginalization(
 \item{g}{Graph object.}
 
 \item{obs.genes}{Vector of observed genes.}
+
+\item{max.steps}{Maximum number of steps in the path. Default: Inf}
 
 \item{to}{Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'}
 }

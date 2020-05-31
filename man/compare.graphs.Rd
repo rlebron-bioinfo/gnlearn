@@ -8,6 +8,7 @@ compare.graphs(
   learned,
   true,
   marginalize = c("none", "learned", "true", "both"),
+  max.steps = Inf,
   arcs = FALSE,
   plot = TRUE
 )
@@ -18,6 +19,8 @@ compare.graphs(
 \item{true}{Ground truth graph or graph 2 (reference).}
 
 \item{marginalize}{Whether or not to marginalize: 'none', 'learned', 'true', or 'both'. Default: 'none'}
+
+\item{max.steps}{Maximum number of steps in the path during marginalization. Default: Inf}
 
 \item{arcs}{Whether or not to list the arcs. Default: FALSE.}
 

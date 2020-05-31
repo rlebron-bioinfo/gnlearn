@@ -414,6 +414,7 @@ feature.plot <- function(x, genes, feature, from='auto', feature.color=rgb(0.7,0
 #' @param learned Learned graph or graph 1.
 #' @param true Ground truth graph or graph 2 (reference).
 #' @param marginalize Whether or not to marginalize: 'none', 'learned', 'true', or 'both'. Default: 'none'
+#' @param max.steps Maximum number of steps in the path during marginalization. Default: Inf
 #' @param arcs Whether or not to list the arcs. Default: FALSE.
 #' @param plot Whether or not to plot the differences between the two graphs. Default: TRUE
 #' @keywords graph comparison
@@ -423,7 +424,7 @@ feature.plot <- function(x, genes, feature, from='auto', feature.color=rgb(0.7,0
 #' comparison <- compare.graphs(obj1, obj2, plot=FALSE)
 
 compare.graphs <- function(learned, true, marginalize=c('none','learned','true','both'),
-                           arcs=FALSE, plot=TRUE) {
+                           max.steps=Inf, arcs=FALSE, plot=TRUE) {
     marginalize <- match.arg(marginalize)
     learned <- as.igraph(learned)
     true <- as.igraph(true)
@@ -1016,13 +1017,14 @@ make.edgelist <- function(genes, from.genes=NULL, to.genes=NULL, from.features=N
 #' This function allows you to marginalize a graph over observed genes.
 #' @param g Graph object.
 #' @param obs.genes Vector of observed genes.
+#' @param max.steps Maximum number of steps in the path. Default: Inf
 #' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
 #' @keywords graph genes marginalization
 #' @export
 #' @examples
 #' g <- graph.marginalization(g, obs.genes)
 
-graph.marginalization <- function(g, obs.genes, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn')) {
+graph.marginalization <- function(g, obs.genes, max.steps=Inf, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn')) {
     to <- match.arg(to)
     t <- as.igraph(as.adjacency(g))
     igraph::E(t)$weight <- abs(igraph::E(t)$weight)
@@ -1040,7 +1042,7 @@ graph.marginalization <- function(g, obs.genes, to=c('igraph', 'adjacency', 'edg
                 if (length(sh.paths) > 0) {
                     for (sh.path in sh.paths) {
                         sh.path <- names(sh.path)
-                        if (length(sh.path) > 2) {
+                        if (length(sh.path) > 2 & (length(sh.path)-2) <= max.steps) {
                             sh.path <- sh.path[2:(length(sh.path)-1)]
                             for (gene.3 in sh.path) {
                                 if (gene.3 %in% obs.genes) {
