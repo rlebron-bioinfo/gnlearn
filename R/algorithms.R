@@ -997,7 +997,13 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
         splitted.df <- dataframe.split(df, m=m)
         S <- cov(as.matrix(splitted.df$train))
         g <- glasso::glasso(S, rho=rho)
-        g$wi
+        A <- g$wi
+        p <- ncol(splitted.df$train)
+        W <- diag(p) - diag(1/diag(A)) %*% A
+        A <- sign(abs(A))
+        A <- W * A
+        diag(A) <- 0
+        A
     }
 
     stopImplicitCluster()
