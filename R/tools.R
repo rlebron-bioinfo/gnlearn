@@ -319,11 +319,14 @@ graph.plot <- function(x, from='auto', layout=c('grid','star','circle','tree','n
     )
 
     igraph::V(g)$color <- rgb(0.9,0.9,0.9,0.7)
+    if ('weight' %in% igraph::list.edge.attributes(g)) {
+        igraph::E(g)$color <- ifelse(igraph::E(g)$weight > 0, rgb(0.0,0.7,0.0,0.9), rgb(0.7,0.0,0.0,0.9))
+    } else {
+        igraph::E(g)$color <- rgb(0.2,0.2,0.2,0.9)
+    }
 
     if (interactive) {
-        threejs::graphjs(g,
-            edge.color=rgb(0.2,0.2,0.2,0.9)
-        )
+        threejs::graphjs(g)
     } else {
         igraph::plot.igraph(g,
             vertex.label.font=2,
@@ -335,7 +338,6 @@ graph.plot <- function(x, from='auto', layout=c('grid','star','circle','tree','n
             edge.lty='solid',
             edge.width=2,
             edge.arrow.width=1,
-            edge.color=rgb(0.2,0.2,0.2,0.9),
             layout=layout)
     }
 }
@@ -369,6 +371,11 @@ feature.plot <- function(x, genes, feature, from='auto', feature.color=rgb(0.7,0
     x <- x[x[,1] %in% f_genes | x[,2] %in% f_genes, ]
     g <- as.igraph(x, from='edges')
     igraph::V(g)$color <- ifelse(names(igraph::V(g)) %in% f_genes, feature.color, rgb(0.9,0.9,0.9,0.7))
+    if ('weight' %in% igraph::list.edge.attributes(g)) {
+        igraph::E(g)$color <- ifelse(igraph::E(g)$weight > 0, rgb(0.0,0.7,0.0,0.9), rgb(0.7,0.0,0.0,0.9))
+    } else {
+        igraph::E(g)$color <- rgb(0.2,0.2,0.2,0.9)
+    }
 
     layout <- switch(layout,
         grid = igraph::layout_on_grid(g),
@@ -379,9 +386,7 @@ feature.plot <- function(x, genes, feature, from='auto', feature.color=rgb(0.7,0
     )
 
     if (interactive) {
-        threejs::graphjs(g,
-            edge.color=rgb(0.2,0.2,0.2,0.9)
-        )
+        threejs::graphjs(g)
     } else {
         igraph::plot.igraph(g,
             vertex.label.font=2,
@@ -393,7 +398,6 @@ feature.plot <- function(x, genes, feature, from='auto', feature.color=rgb(0.7,0
             edge.lty='solid',
             edge.width=2,
             edge.arrow.width=1,
-            edge.color=rgb(0.2,0.2,0.2,0.9),
             layout=layout)
     }
 }
@@ -437,13 +441,13 @@ compare.graphs <- function(learned, true, arcs=FALSE, plot=TRUE) {
         igraph::V(learned.x)$color <- rgb(0.9,0.9,0.9,0.7)
         igraph::V(true.x)$color <- rgb(0.9,0.9,0.9,0.7)
 
-        igraph::E(tp)$color <- rgb(0.2,0.2,0.2,0.9)
+        igraph::E(tp)$color <- rgb(0.0,0.0,0.7,0.9)
         igraph::E(tp)$lty <- 'solid'
 
-        igraph::E(learned.x)$color <- rgb(0.7,0.0,0.0,0.9)
+        igraph::E(learned.x)$color <- rgb(0.0,0.0,0.7,0.9)
         igraph::E(learned.x)$lty <- 'dashed'
 
-        igraph::E(true.x)$color <- rgb(0.0,0.7,0.0,0.9)
+        igraph::E(true.x)$color <- rgb(0.0,0.0,0.7,0.9)
         igraph::E(true.x)$lty <- 'dashed'
 
         igraph::plot.igraph(tp,
@@ -830,11 +834,16 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
         mutate(community = ifelse(community.x == community.y, community.x, NA) %>% factor())
     colnames(edge.community) <- c('from', 'to', 'weight', 'from.community', 'to.community', 'community')
 
+    if ('weight' %in% igraph::list.edge.attributes(g)) {
+        igraph::E(g)$color <- ifelse(igraph::E(g)$weight > 0, rgb(0.0,0.7,0.0,0.9), rgb(0.7,0.0,0.0,0.9))
+    } else {
+        igraph::E(g)$color <- rgb(0.2,0.2,0.2,0.9)
+    }
+
     if (network & interactive.network) {
 
         threejs::graphjs(g,
-            vertex.color = palette[as.numeric(as.factor(igraph::vertex_attr(g, 'community')))],
-            edge.color=rgb(0.2,0.2,0.2,0.9)
+            vertex.color = palette[as.numeric(as.factor(igraph::vertex_attr(g, 'community')))]
         )
 
     } else if (network & !interactive.network) {
@@ -847,8 +856,6 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
             nicely = igraph::layout_nicely(g)
         )
 
-        igraph::V(g)$color <- rgb(0.9,0.9,0.9,0.7)
-
         igraph::plot.igraph(g,
             vertex.color = palette[as.numeric(as.factor(igraph::vertex_attr(g, 'community')))],
             vertex.label.font=2,
@@ -860,7 +867,6 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
             edge.lty='solid',
             edge.width=2,
             edge.arrow.width=1,
-            edge.color=rgb(0.2,0.2,0.2,0.9),
             layout=network.layout)
 
     }

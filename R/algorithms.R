@@ -1158,7 +1158,9 @@ boot.nodag <- function(lib.path, df, lambda=0.5, R=200, m=NULL, threshold=0.5, t
                 as.double(diag(p)), as.double(lambda),
                 as.double(1e-5), as.double(0.5), as.integer(1e+3))
         A <- matrix(ncol=p, nrow=p, data=out[[3]])
-        A <- diag(p) - diag(1/diag(A)) %*% A
+        W <- diag(p) - diag(1/diag(A)) %*% A
+        A <- sign(abs(A))
+        A <- W * A
         diag(A) <- 0
         A
     }
