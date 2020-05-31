@@ -682,7 +682,7 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
     loss.type <- match.arg(loss.type)
     X <- df <- as.matrix(df)
 
-    loss.func <- function(W) {
+    loss.func <- function(W) { # ?
         M <- X %*% W
         if (loss.type=='l2') {
             R <- X - M
@@ -696,7 +696,7 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
         return(loss)
     }
 
-    G.loss.func <- function(W) {
+    G.loss.func <- function(W) { # ?
         M <- X %*% W
         if (loss.type=='l2') {
             R <- X - M
@@ -710,21 +710,21 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
         return(G.loss)
     }
 
-    h.func <- function(W) {
+    h.func <- function(W) { # ?
         M <- diag(1, d, d) + W * W / d
         E <- matrixcalc::matrix.power(M, d-1)
         h.new <- sum(t(E) * M) - d
         return(h.new)
     }
 
-    G.h.func <- function(W) {
+    G.h.func <- function(W) { # ?
         M <- diag(1, d, d) + W * W / d
         E <- matrixcalc::matrix.power(M, d-1)
         G.h <- t(E) * W * 2
         return(G.h)
     }
 
-    adj <- function(w) {
+    adj <- function(w) { # ?
         w <- as.matrix(w)
         w.pos <- w[1:(length(w)/2),]
         w.neg <- w[((length(w)/2)+1):(length(w)),]
@@ -734,7 +734,7 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
         return(W)
     }
 
-    fn <- function(w) {
+    fn <- function(w) { # ?
         W <- adj(w)
         loss <- loss.func(W)
         h.new <- h.func(W)
@@ -742,7 +742,7 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
         return(obj)
     }
 
-    gr <- function(w) {
+    gr <- function(w) { # ?
         W <- adj(w)
         G.loss <- G.loss.func(W)
         h.new <- h.func(W)
@@ -764,7 +764,7 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
         w.new <- NULL
         h.new <- NULL
         while (rho < rho.max) {
-            w.new <- optim(w.est, fn, gr=gr, method='L-BFGS-B', lower=0, upper=Inf)$par
+            w.new <- optim(w.est, fn, gr=gr, method='L-BFGS-B', lower=0, upper=Inf)$par # ?
             h.new <- h.func(adj(w.new))
             if (h.new > (0.25*h)) {
                 rho = rho*10
@@ -998,10 +998,10 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
         S <- cov(as.matrix(splitted.df$train))
         g <- glasso::glasso(S, rho=rho)
         A <- g$wi
-        p <- ncol(splitted.df$train)
-        W <- diag(p) - diag(1/diag(A)) %*% A
-        A <- sign(abs(A))
-        A <- W * A
+        p <- ncol(splitted.df$train) # ?
+        W <- diag(p) - diag(1/diag(A)) %*% A # ?
+        A <- sign(abs(A)) # ?
+        A <- W * A # ?
         diag(A) <- 0
         A
     }
@@ -1164,9 +1164,9 @@ boot.nodag <- function(lib.path, df, lambda=0.5, R=200, m=NULL, threshold=0.5, t
                 as.double(diag(p)), as.double(lambda),
                 as.double(1e-5), as.double(0.5), as.integer(1e+3))
         A <- matrix(ncol=p, nrow=p, data=out[[3]])
-        W <- diag(p) - diag(1/diag(A)) %*% A
-        A <- sign(abs(A))
-        A <- W * A
+        W <- diag(p) - diag(1/diag(A)) %*% A # ?
+        A <- sign(abs(A)) # ?
+        A <- W * A # ?
         diag(A) <- 0
         A
     }

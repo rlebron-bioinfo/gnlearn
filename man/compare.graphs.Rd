@@ -4,12 +4,20 @@
 \alias{compare.graphs}
 \title{Graph Comparison}
 \usage{
-compare.graphs(learned, true, arcs = FALSE, plot = TRUE)
+compare.graphs(
+  learned,
+  true,
+  marginalize = c("both", "learned", "true", "none"),
+  arcs = FALSE,
+  plot = TRUE
+)
 }
 \arguments{
 \item{learned}{Learned graph or graph 1.}
 
 \item{true}{Ground truth graph or graph 2 (reference).}
+
+\item{marginalize}{Whether or not to marginalize: 'both', 'learned', 'true', or 'none'. Default: 'both'}
 
 \item{arcs}{Whether or not to list the arcs. Default: FALSE.}
 
