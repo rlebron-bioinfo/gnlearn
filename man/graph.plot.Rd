@@ -7,7 +7,7 @@
 graph.plot(
   x,
   from = c("auto", "adjacency", "edges", "graph", "igraph", "bnlearn"),
-  layout = c("grid", "star", "circle", "tree", "nicely"),
+  layout = c("grid", "star", "circle", "sphere", "nicely"),
   interactive = FALSE,
   isolated.genes = FALSE
 )
@@ -17,7 +17,7 @@ graph.plot(
 
 \item{from}{Input format (optional).}
 
-\item{layout}{igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'}
+\item{layout}{igraph plot layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'grid'}
 
 \item{interactive}{Interactive plot (optional). Default: FALSE}
 

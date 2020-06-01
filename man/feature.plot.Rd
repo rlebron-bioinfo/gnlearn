@@ -10,7 +10,7 @@ feature.plot(
   feature,
   from = c("auto", "adjacency", "edges", "graph", "igraph", "bnlearn"),
   feature.color = rgb(0.7, 0.9, 0.9, 0.7),
-  layout = c("grid", "star", "circle", "tree", "nicely"),
+  layout = c("grid", "star", "circle", "sphere", "nicely"),
   interactive = FALSE
 )
 }
@@ -23,7 +23,7 @@ feature.plot(
 
 \item{feature.color}{Color of the nodes with the feature (optional). Default: rgb(0.7,0.9,0.9,0.7)}
 
-\item{layout}{igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'}
+\item{layout}{igraph plot layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'grid'}
 
 \item{interactive}{Interactive plot (optional). Default: FALSE}
 

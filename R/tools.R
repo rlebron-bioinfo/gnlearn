@@ -292,7 +292,7 @@ as.bnlearn <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
 #' This function allows you to plot a graph.
 #' @param x Graph object.
 #' @param from Input format (optional).
-#' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'
+#' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'grid'
 #' @param interactive Interactive plot (optional). Default: FALSE
 #' @param isolated.genes Whether or not to include isolated nodes in the plot (optional). Default: FALSE
 #' @keywords graph plot
@@ -303,7 +303,7 @@ as.bnlearn <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
 #' graph.plot(obj, interactive=TRUE)
 
 graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn'),
-                       layout=c('grid','star','circle','tree','nicely'),
+                       layout=c('grid','star','circle','sphere','nicely'),
                        interactive=FALSE, isolated.genes=FALSE) {
     from <- match.arg(from)
     layout <- match.arg(layout)
@@ -332,12 +332,13 @@ graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
         grid = igraph::layout_on_grid(t),
         star = igraph::layout_as_star(t),
         circle = igraph::layout_in_circle(t),
-        tree = igraph::layout_as_tree(t),
+        sphere = igraph::layout_on_sphere(t),
         nicely = igraph::layout_nicely(t)
     )
 
     if (interactive) {
-        threejs::graphjs(g)
+        threejs::graphjs(g,
+            layout=layout)
     } else {
         igraph::plot.igraph(g,
             vertex.label.font=2,
@@ -361,7 +362,7 @@ graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
 #' @param features Feature whose graph you want to plot.
 #' @param from Input format (optional).
 #' @param feature.color Color of the nodes with the feature (optional). Default: rgb(0.7,0.9,0.9,0.7)
-#' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'
+#' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'grid'
 #' @param interactive Interactive plot (optional). Default: FALSE
 #' @keywords graph feature plot
 #' @export
@@ -370,7 +371,7 @@ graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
 #' feature.plot(obj, genes, 'tumor.suppressor', interactive=TRUE)
 
 feature.plot <- function(x, genes, feature, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn'),
-                         feature.color=rgb(0.7,0.9,0.9,0.7), layout=c('grid','star','circle','tree','nicely'),
+                         feature.color=rgb(0.7,0.9,0.9,0.7), layout=c('grid','star','circle','sphere','nicely'),
                          interactive=FALSE) {
     from <- match.arg(from)
     layout <- match.arg(layout)
@@ -397,12 +398,13 @@ feature.plot <- function(x, genes, feature, from=c('auto', 'adjacency', 'edges',
         grid = igraph::layout_on_grid(t),
         star = igraph::layout_as_star(t),
         circle = igraph::layout_in_circle(t),
-        tree = igraph::layout_as_tree(t),
+        sphere = igraph::layout_on_sphere(t),
         nicely = igraph::layout_nicely(t)
     )
 
     if (interactive) {
-        threejs::graphjs(g)
+        threejs::graphjs(g,
+            layout=layout)
     } else {
         igraph::plot.igraph(g,
             vertex.label.font=2,
@@ -816,7 +818,7 @@ rename.graphs <- function(graphs, names, to='igraph') {
 #' @param x Graph object.
 #' @param algorithm Algorithm for finding communities: 'louvain', 'edge.betweenness', 'fast.greedy', 'label.prop', 'leading.eigen', 'optimal', 'spinglass', or 'walktrap'. Default: 'louvain'
 #' @param network Whether or not to plot the network. Default: TRUE
-#' @param network.layout igraph network layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'
+#' @param network.layout igraph network layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'grid'
 #' @param interactive.network Interactive network (optional). Default: FALSE
 #' @param network.isolated Whether or not to include isolated nodes in the plot (optional). Default: TRUE
 #' @param dendrogram Whether or not to plot a dendrogram (when possible). Default: FALSE
@@ -830,7 +832,7 @@ rename.graphs <- function(graphs, names, to='igraph') {
 #' communities <- graph.communities(g, algorithm='walktrap', network=FALSE, dendrogram=TRUE, dendrogram.type='cladogram')
 
 graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.greedy','label.prop','leading.eigen','optimal','spinglass','walktrap'),
-                              network=TRUE, network.layout=c('grid','star','circle','tree','nicely'), interactive.network=FALSE, network.isolated=TRUE,
+                              network=TRUE, network.layout=c('grid','star','circle','sphere','nicely'), interactive.network=FALSE, network.isolated=TRUE,
                               dendrogram=FALSE, dendrogram.type=c('fan','phylogram','cladogram','unrooted','radial'),
                               from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
     algorithm <- match.arg(algorithm)
@@ -890,8 +892,8 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
     if (network & interactive.network) {
 
         threejs::graphjs(g,
-            vertex.color = palette[as.numeric(as.factor(igraph::vertex_attr(g, 'community')))]
-        )
+            vertex.color = palette[as.numeric(as.factor(igraph::vertex_attr(g, 'community')))],
+            layout=network.layout)
 
     } else if (network & !interactive.network) {
 
@@ -899,7 +901,7 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
             grid = igraph::layout_on_grid(t),
             star = igraph::layout_as_star(t),
             circle = igraph::layout_in_circle(t),
-            tree = igraph::layout_as_tree(t),
+            sphere = igraph::layout_on_sphere(t),
             nicely = igraph::layout_nicely(t)
         )
 
