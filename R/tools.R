@@ -766,73 +766,24 @@ drop.all.zeros <- function(mtx, rows=TRUE, columns=TRUE, square.matrix='none') {
 
 averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
     R <- length(graphs)
-    g1 <- graphs[[1]]
-    a1 <- sign(abs(graphs[[1]]))
+    coeff.1 <- as.data.frame(as.adjacency(graphs[[1]]))
+    adj.1 <- sign(abs(coeff.1))
     for (i in 2:R) {
-        g1 <- as.adjacency(g1)
-        a1 <- as.adjacency(a1)
-        g1 <- g1[order(colnames(g1)), order(colnames(g1))]
-        a1 <- a1[order(colnames(a1)), order(colnames(a1))]
-        g2 <- as.adjacency(graphs[[i]])
-        a2 <- as.adjacency(sign(abs(graphs[[i]])))
-        g2 <- g2[order(colnames(g2)), order(colnames(g2))]
-        a2 <- a2[order(colnames(a2)), order(colnames(a2))]
-        names1 <- colnames(a1)
-        names2 <- colnames(a2)
-        names.i <- intersect(names1, names2)
-        names.xa1 <- setdiff(names1, names.i)
-        names.xa2 <- setdiff(names2, names.i)
-        g1.i <- g1[names.i, names.i]
-        a1.i <- a1[names.i, names.i]
-        g2.i <- g2[names.i, names.i]
-        a2.i <- a2[names.i, names.i]
-        g1.x <- g1[names.xa1, names.xa1]
-        a1.x <- a1[names.xa1, names.xa1]
-        g2.x <- g2[names.xa2, names.xa2]
-        a2.x <- a2[names.xa2, names.xa2]
-        g1 <- ((i-1) * g1.i / i) + (g2.i / i)
-        a1 <- ((i-1) * a1.i / i) + (a2.i / i)
-        if (length(names.xa1)==0) {
-            g1 <- g1
-            a1 <- a1
-        } else if (length(names.xa1)==1) {
-            g1 <- as.data.frame(g1)
-            a1 <- as.data.frame(a1)
-            gene <- names.xa1[1]
-            g1[gene, gene] <- g1.x[gene, gene]
-            a1[gene, gene] <- a1.x[gene, gene]
-            g1 <- as.matrix(g1)
-            a1 <- as.matrix(a1)
-        } else {
-            g1 <- gtools::smartbind(g1, g1.x)
-            a1 <- gtools::smartbind(a1, a1.x)
-        }
-        rownames(g1) <- colnames(g1)
-        rownames(a1) <- colnames(a1)
-        if (length(names.xa2)==0) {
-            g1 <- g1
-            a1 <- a1
-        } else if (length(names.xa2)==1) {
-            g1 <- as.data.frame(g1)
-            a1 <- as.data.frame(a1)
-            gene <- names.xa2[1]
-            g1[gene, gene] <- g2.x[gene, gene]
-            a1[gene, gene] <- a2.x[gene, gene]
-            g1 <- as.matrix(g1)
-            a1 <- as.matrix(a1)
-        } else {
-            g1 <- gtools::smartbind(g1, g2.x)
-            a1 <- gtools::smartbind(a1, a2.x)
-        }
-        rownames(g1) <- colnames(g1)
-        rownames(a1) <- colnames(a1)
-        a1[is.na(g1)] <- 0
-        a1[is.na(a1)] <- 0
+        coeff.2 <- as.data.frame(as.adjacency(graphs[[i]]))
+        adj.2 <- sign(abs(coeff.2))
+        cols.1 <- rownames(adj.1) <- colnames(adj.1) <- rownames(coeff.1) <- colnames(coeff.1)
+        cols.2 <- rownames(adj.2) <- colnames(adj.2) <- rownames(coeff.2) <- colnames(coeff.2)
+        int.1 <- colnames(coeff.1) %in% colnames(coeff.2)
+        int.2 <- colnames(coeff.2) %in% colnames(coeff.1)
+        coeff.int <- ((i-1) * coeff.1[int.1, int.1] / i) + (coeff.2[int.2, int.2] / i)
+        adj.int <- ((i-1) * adj.1[int.1, int.1] / i) + (adj.2[int.2, int.2] / i)
+        coeff.1 <- gtools::smartbind(coeff.int, coeff.1[!int.1, !int.1], coeff.2[!int.2, !int.2], fill=0)
+        adj.1 <- gtools::smartbind(adj.int, adj.1[!int.1, !int.1], adj.2[!int.2, !int.2], fill=0)
     }
-    A <- g1[order(colnames(g1)), order(colnames(g1))]
-    X <- a1[order(colnames(a1)), order(colnames(a1))]
-    A[X < threshold] <- 0
-    g <- convert.format(A, to=to)
+    coeff.1 <- coeff.1[order(colnames(coeff.1)), order(colnames(coeff.1))]
+    adj.1 <- adj.1[order(colnames(adj.1)), order(colnames(adj.1))]
+    coeff.1[adj.1 < threshold] <- 0
+    g <- convert.format(coeff.1, to=to)
     return(g)
 }
 

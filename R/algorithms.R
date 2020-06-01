@@ -1205,15 +1205,13 @@ huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, 
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-
         sel.genes <- sample(colnames(df), n.genes, replace=FALSE)
         sel.df <- subset(df, select=sel.genes)
         algorithm(df=sel.df, R=iter.R, m=iter.m, threshold=0, to='adjacency', cluster=1, ...)
-
     }
 
     stopImplicitCluster()
+
     g <- averaged.graph(graphs, threshold=threshold, to=to)
     return(g)
-
 }
