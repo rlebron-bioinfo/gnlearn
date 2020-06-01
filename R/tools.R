@@ -642,7 +642,7 @@ feature.degree <- function(x, genes, features=NULL, vertices=NULL, in.degree=TRU
         vertices <- colnames(x)
         n.vertices <- length(vertices)
     }
-    mtx = matrix(NA, n.vertices, k+n.features*k)
+    mtx = matrix(0, n.vertices, k+n.features*k)
     rownames(mtx) <- vertices
     colnames(mtx) <- feature.colnames(features, in.degree, out.degree)
     for (v in vertices) {

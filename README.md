@@ -92,12 +92,7 @@ dim(df)
 ```
 
 
-<style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>4367</li><li>535</li></ol>
+<ol style='list-style: none; margin:0; padding: 0'><li>4367</li><li>535</li></ol>
 
 
 
@@ -108,12 +103,7 @@ dim(sel.df)
 ```
 
 
-<style>
-.list-inline {list-style: none; margin:0; padding: 0}
-.list-inline>li {display: inline-block}
-.list-inline>li:not(:last-child)::after {content: "\00b7"; padding: 0 .5ex}
-</style>
-<ol class=list-inline><li>4367</li><li>20</li></ol>
+<ol style='list-style: none; margin:0; padding: 0'><li>4367</li><li>20</li></ol>
 
 
 
