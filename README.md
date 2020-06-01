@@ -92,7 +92,7 @@ dim(df)
 ```
 
 
-<ol style='list-style: none; margin:0; padding: 0'><li>4367</li><li>535</li></ol>
+<ol><li>4367</li><li>535</li></ol>
 
 
 
@@ -103,7 +103,7 @@ dim(sel.df)
 ```
 
 
-<ol style='list-style: none; margin:0; padding: 0'><li>4367</li><li>20</li></ol>
+<ol><li>4367</li><li>20</li></ol>
 
 
 
@@ -127,8 +127,7 @@ g
 graph.plot(g, isolated.genes=FALSE, layout='circle')
 ```
 
-
-![png](images/1.png)
+<img style='height: 50%; width: 50%' src='images/1.png'><br>
 
 
 
@@ -204,7 +203,7 @@ feature.plot(g, genes, feature='tf', layout='circle')
 ```
 
 
-![png](images/2.png)
+<img style='height: 50%; width: 50%' src='images/2.png'><br>
 
 
 
@@ -250,15 +249,15 @@ stats <- compare.graphs(g, gt, marginalize='both', plot=TRUE)
 ```
 
 
-![png](images/3.png)
+<img style='height: 50%; width: 50%' src='images/3.png'><br>
 
 
 
-![png](images/4.png)
+<img style='height: 50%; width: 50%' src='images/4.png'><br>
 
 
 
-![png](images/5.png)
+<img style='height: 50%; width: 50%' src='images/5.png'><br>
 
 
 
@@ -300,11 +299,11 @@ comm <- graph.communities(g, algorithm='walktrap', network=TRUE, dendrogram=TRUE
 
 
 
-![png](images/6.png)
+<img style='height: 50%; width: 50%' src='images/6.png'><br>
 
 
 
-![png](images/7.png)
+<img style='height: 50%; width: 50%' src='images/7.png'><br>
 
 
 ## Documentation
