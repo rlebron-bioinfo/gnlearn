@@ -289,26 +289,34 @@ as.bnlearn <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
 
 #' Graph Plotting
 #'
-#' This function allows you to plot a graph, regardless of the format (adjacency matrix, list of edges, igraph, or bnlearn).
+#' This function allows you to plot a graph.
 #' @param x Graph object.
 #' @param from Input format (optional).
 #' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'
 #' @param interactive Interactive plot (optional). Default: FALSE
+#' @param isolated.genes Whether or not to include isolated nodes in the plot (optional). Default: FALSE
 #' @keywords graph plot
 #' @export
 #' @examples
-#' graph.plot(obj, interactive=FALSE)
+#' graph.plot(obj)
+#' graph.plot(obj, isolated.genes=TRUE)
 #' graph.plot(obj, interactive=TRUE)
 
-graph.plot <- function(x, from='auto', layout=c('grid','star','circle','tree','nicely'),
-                       interactive=FALSE) {
+graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn'),
+                       layout=c('grid','star','circle','tree','nicely'),
+                       interactive=FALSE, isolated.genes=FALSE) {
+    from <- match.arg(from)
     layout <- match.arg(layout)
 
     if (from=='auto') {
         from=detect.format(x)
     }
 
-    g <- as.igraph(x, from=from)
+    if (isolated.genes) {
+        g <- as.igraph(x, from=from)
+    } else {
+        g <- delete.isolated(as.adjacency(x, from=from), from='adjacency', to='igraph')
+    }
 
     igraph::V(g)$color <- rgb(0.9,0.9,0.9,0.7)
     if ('weight' %in% igraph::list.edge.attributes(g)) {
@@ -361,8 +369,10 @@ graph.plot <- function(x, from='auto', layout=c('grid','star','circle','tree','n
 #' feature.plot(obj, genes, 'tf', interactive=FALSE)
 #' feature.plot(obj, genes, 'tumor.suppressor', interactive=TRUE)
 
-feature.plot <- function(x, genes, feature, from='auto', feature.color=rgb(0.7,0.9,0.9,0.7),
-                         layout=c('grid','star','circle','tree','nicely'), interactive=FALSE) {
+feature.plot <- function(x, genes, feature, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn'),
+                         feature.color=rgb(0.7,0.9,0.9,0.7), layout=c('grid','star','circle','tree','nicely'),
+                         interactive=FALSE) {
+    from <- match.arg(from)
     layout <- match.arg(layout)
 
     if (from=='auto') {
@@ -410,7 +420,7 @@ feature.plot <- function(x, genes, feature, from='auto', feature.color=rgb(0.7,0
 
 #' Graph Comparison
 #'
-#' This function allows you to compare two graphs, regardless of the format (adjacency matrix, list of edges, igraph, or bnlearn).
+#' This function allows you to compare two graphs.
 #' @param learned Learned graph or graph 1.
 #' @param true Ground truth graph or graph 2 (reference).
 #' @param marginalize Whether or not to marginalize: 'none', 'learned', 'true', or 'both'. Default: 'none'
@@ -808,6 +818,7 @@ rename.graphs <- function(graphs, names, to='igraph') {
 #' @param network Whether or not to plot the network. Default: TRUE
 #' @param network.layout igraph network layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'
 #' @param interactive.network Interactive network (optional). Default: FALSE
+#' @param network.isolated Whether or not to include isolated nodes in the plot (optional). Default: TRUE
 #' @param dendrogram Whether or not to plot a dendrogram (when possible). Default: FALSE
 #' @param dendrogram.type Type of phylogeny to be drawn: 'fan', 'phylogram', 'cladogram', 'unrooted', or 'radial'. Default: 'fan'
 #' @param from Input format (optional).
@@ -815,16 +826,17 @@ rename.graphs <- function(graphs, names, to='igraph') {
 #' @export
 #' @examples
 #' communities <- graph.communities(g)
-#' communities <- graph.communities(g, algorithm='louvain', network=TRUE, dendrogram=FALSE)
+#' communities <- graph.communities(g, algorithm='louvain', network=TRUE, network.isolated=FALSE, dendrogram=FALSE)
 #' communities <- graph.communities(g, algorithm='walktrap', network=FALSE, dendrogram=TRUE, dendrogram.type='cladogram')
 
 graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.greedy','label.prop','leading.eigen','optimal','spinglass','walktrap'),
-                              network=TRUE, network.layout=c('grid','star','circle','tree','nicely'), interactive.network=FALSE,
+                              network=TRUE, network.layout=c('grid','star','circle','tree','nicely'), interactive.network=FALSE, network.isolated=TRUE,
                               dendrogram=FALSE, dendrogram.type=c('fan','phylogram','cladogram','unrooted','radial'),
-                              from='auto') {
+                              from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
     algorithm <- match.arg(algorithm)
     network.layout <- match.arg(network.layout)
     dendrogram.type <- match.arg(dendrogram.type)
+    from <- match.arg(from)
 
     if (algorithm %in% c('louvain','label.prop','optimal','spinglass')) {
         dendrogram <- FALSE
@@ -846,6 +858,12 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
     }
 
     library(dplyr)
+
+    if (network.isolated) {
+        g <- as.igraph(x, from=from)
+    } else {
+        g <- delete.isolated(as.adjacency(x, from=from), from='adjacency', to='igraph')
+    }
 
     g <- as.igraph(x, from=from)
     if ('weight' %in% igraph::list.edge.attributes(g)) {
@@ -957,7 +975,7 @@ random.graph <- function(nodes, exp.degree, dag=TRUE, plot=TRUE,
         }
     }
     if (plot) {
-        graph.plot(g)
+        graph.plot(g, isolated.genes=FALSE)
     }
     g <- convert.format(g, from='adjacency', to=to)
     return(g)
@@ -1068,4 +1086,28 @@ graph.marginalization <- function(g, obs.genes, max.steps=Inf, to=c('igraph', 'a
     new.edges <- averaged.graph(list(t, new.edges))
     new.edges <- convert.format(new.edges, to=to)
     return(new.edges)
+}
+
+#' Delete Isolated Nodes
+#'
+#' This function allows you to delete isolated genes (nodes) in a graph.
+#' @param g Graph object.
+#' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
+#' @keywords graph isolated genes
+#' @export
+#' @examples
+#' g <- delete.isolated(g, to='igraph')
+
+delete.isolated <- function(g, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                            from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    to <- match.arg(to)
+    from <- match.arg(from)
+    if (from=='auto') {
+        from <- detect.format(g)
+    }
+    g <- convert.format(g, from=from, to='adjacency')
+    g <- drop.all.zeros(g, square.matrix='all')
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
 }

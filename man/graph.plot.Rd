@@ -6,9 +6,10 @@
 \usage{
 graph.plot(
   x,
-  from = "auto",
+  from = c("auto", "adjacency", "edges", "graph", "igraph", "bnlearn"),
   layout = c("grid", "star", "circle", "tree", "nicely"),
-  interactive = FALSE
+  interactive = FALSE,
+  isolated.genes = FALSE
 )
 }
 \arguments{
@@ -19,12 +20,15 @@ graph.plot(
 \item{layout}{igraph plot layout (optional): 'grid', 'star', 'circle', 'tree', or 'nicely'. It will be ignored if interactive=TRUE. Default: 'grid'}
 
 \item{interactive}{Interactive plot (optional). Default: FALSE}
+
+\item{isolated.genes}{Whether or not to include isolated nodes in the plot (optional). Default: FALSE}
 }
 \description{
-This function allows you to plot a graph, regardless of the format (adjacency matrix, list of edges, igraph, or bnlearn).
+This function allows you to plot a graph.
 }
 \examples{
-graph.plot(obj, interactive=FALSE)
+graph.plot(obj)
+graph.plot(obj, isolated.genes=TRUE)
 graph.plot(obj, interactive=TRUE)
 }
 \keyword{graph}

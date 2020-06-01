@@ -8,7 +8,7 @@ feature.plot(
   x,
   genes,
   feature,
-  from = "auto",
+  from = c("auto", "adjacency", "edges", "graph", "igraph", "bnlearn"),
   feature.color = rgb(0.7, 0.9, 0.9, 0.7),
   layout = c("grid", "star", "circle", "tree", "nicely"),
   interactive = FALSE

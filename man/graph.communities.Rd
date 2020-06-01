@@ -11,9 +11,10 @@ graph.communities(
   network = TRUE,
   network.layout = c("grid", "star", "circle", "tree", "nicely"),
   interactive.network = FALSE,
+  network.isolated = TRUE,
   dendrogram = FALSE,
   dendrogram.type = c("fan", "phylogram", "cladogram", "unrooted", "radial"),
-  from = "auto"
+  from = c("auto", "adjacency", "edges", "graph", "igraph", "bnlearn")
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ graph.communities(
 
 \item{interactive.network}{Interactive network (optional). Default: FALSE}
 
+\item{network.isolated}{Whether or not to include isolated nodes in the plot (optional). Default: TRUE}
+
 \item{dendrogram}{Whether or not to plot a dendrogram (when possible). Default: FALSE}
 
 \item{dendrogram.type}{Type of phylogeny to be drawn: 'fan', 'phylogram', 'cladogram', 'unrooted', or 'radial'. Default: 'fan'}
@@ -38,7 +41,7 @@ This function allows you to detect how many communities are in the graph and to 
 }
 \examples{
 communities <- graph.communities(g)
-communities <- graph.communities(g, algorithm='louvain', network=TRUE, dendrogram=FALSE)
+communities <- graph.communities(g, algorithm='louvain', network=TRUE, network.isolated=FALSE, dendrogram=FALSE)
 communities <- graph.communities(g, algorithm='walktrap', network=FALSE, dendrogram=TRUE, dendrogram.type='cladogram')
 }
 \keyword{community}
