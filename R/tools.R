@@ -792,12 +792,32 @@ averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
         a2.x <- a2[names.xa2, names.xa2]
         g1 <- ((i-1) * g1.i / i) + (g2.i / i)
         a1 <- ((i-1) * a1.i / i) + (a2.i / i)
-        g1 <- gtools::smartbind(g1, g1.x)
-        a1 <- gtools::smartbind(a1, a1.x)
+        if (length(names.xa1)==1) {
+            g1 <- as.data.frame(g1)
+            a1 <- as.data.frame(a1)
+            gene <- names.xa1[1]
+            g1[gene, gene] <- g1.x[gene, gene]
+            a1[gene, gene] <- a1.x[gene, gene]
+            g1 <- as.matrix(g1)
+            a1 <- as.matrix(a1)
+        } else {
+            g1 <- gtools::smartbind(g1, g1.x)
+            a1 <- gtools::smartbind(a1, a1.x)
+        }
         rownames(g1) <- colnames(g1)
         rownames(a1) <- colnames(a1)
-        g1 <- gtools::smartbind(g1, g2.x)
-        a1 <- gtools::smartbind(a1, a2.x)
+        if (length(names.xa2)==1) {
+            g1 <- as.data.frame(g1)
+            a1 <- as.data.frame(a1)
+            gene <- names.xa2[1]
+            g1[gene, gene] <- g2.x[gene, gene]
+            a1[gene, gene] <- a2.x[gene, gene]
+            g1 <- as.matrix(g1)
+            a1 <- as.matrix(a1)
+        } else {
+            g1 <- gtools::smartbind(g1, g2.x)
+            a1 <- gtools::smartbind(a1, a2.x)
+        }
         rownames(g1) <- colnames(g1)
         rownames(a1) <- colnames(a1)
         a1[is.na(g1)] <- 0
