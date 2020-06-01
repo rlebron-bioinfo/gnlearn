@@ -792,7 +792,10 @@ averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
         a2.x <- a2[names.xa2, names.xa2]
         g1 <- ((i-1) * g1.i / i) + (g2.i / i)
         a1 <- ((i-1) * a1.i / i) + (a2.i / i)
-        if (length(names.xa1)==1) {
+        if (length(names.xa1)==0) {
+            g1 <- g1
+            a1 <- a1
+        } else if (length(names.xa1)==1) {
             g1 <- as.data.frame(g1)
             a1 <- as.data.frame(a1)
             gene <- names.xa1[1]
@@ -806,7 +809,10 @@ averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
         }
         rownames(g1) <- colnames(g1)
         rownames(a1) <- colnames(a1)
-        if (length(names.xa2)==1) {
+        if (length(names.xa2)==0) {
+            g1 <- g1
+            a1 <- a1
+        } else if (length(names.xa2)==1) {
             g1 <- as.data.frame(g1)
             a1 <- as.data.frame(a1)
             gene <- names.xa2[1]
