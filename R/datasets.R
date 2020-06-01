@@ -469,7 +469,7 @@ select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL,
         selected.genes <- colnames(A)
     }
     if (is.null(selected.genes)) {
-        if (colnames(df) > max.genes) {
+        if (length(colnames(df)) > max.genes) {
             selected.genes <- sample(colnames(df), max.genes, replace=FALSE)
             df <- subset(df, select=selected.genes)
         }
