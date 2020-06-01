@@ -337,6 +337,7 @@ graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
     )
 
     if (interactive) {
+        layout <- third.axis(layout)
         threejs::graphjs(g,
             layout=layout)
     } else {
@@ -403,6 +404,7 @@ feature.plot <- function(x, genes, feature, from=c('auto', 'adjacency', 'edges',
     )
 
     if (interactive) {
+        layout <- third.axis(layout)
         threejs::graphjs(g,
             layout=layout)
     } else {
@@ -418,6 +420,16 @@ feature.plot <- function(x, genes, feature, from=c('auto', 'adjacency', 'edges',
             edge.arrow.width=1,
             layout=layout)
     }
+}
+
+third.axis <- function(layout) {
+    if (dim(layout)[2] == 2) {
+        layout <- as.data.frame(layout)
+        layout[,3] <- 0
+        colnames(layout) <- NULL
+        layout <- as.matrix(layout)
+    }
+    return(layout)
 }
 
 #' Graph Comparison
@@ -891,6 +903,7 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
 
     if (network & interactive.network) {
 
+        layout <- third.axis(layout)
         threejs::graphjs(g,
             vertex.color = palette[as.numeric(as.factor(igraph::vertex_attr(g, 'community')))],
             layout=network.layout)
