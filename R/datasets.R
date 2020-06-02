@@ -565,7 +565,6 @@ ground.truth <- function(x, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlea
     if (class(x)=='numeric') {
         genesets <- list.genesets()
         type <- genesets[genesets$download.code==x,]$dataset
-        #df <- df[with(df, grepl(regex, sp.scientific, ignore.case=TRUE)), ]
         if (grepl('TF-Target Interactions', type, ignore.case=TRUE)) {
             geneset <- download.geneset(x)
         } else {

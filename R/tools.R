@@ -329,7 +329,7 @@ graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
         t <- as.igraph(as.adjacency(g))
         igraph::E(t)$weight <- abs(igraph::E(t)$weight)
     } else {
-        igraph::E(g)$color <- rgb(0.2,0.2,0.2,0.9)
+        igraph::E(g)$color <- rgb(0.3,0.3,0.3,0.9)
         igraph::E(g)$width <- 2
         t <- as.igraph(as.adjacency(g))
     }
@@ -401,7 +401,7 @@ feature.plot <- function(x, genes, feature, from=c('auto', 'adjacency', 'edges',
         t <- as.igraph(as.adjacency(g))
         igraph::E(t)$weight <- abs(igraph::E(t)$weight)
     } else {
-        igraph::E(g)$color <- rgb(0.2,0.2,0.2,0.9)
+        igraph::E(g)$color <- rgb(0.3,0.3,0.3,0.9)
         igraph::E(g)$width <- 2
         t <- as.igraph(as.adjacency(g))
     }
@@ -502,9 +502,9 @@ compare.graphs <- function(learned, true, marginalize=c('none','learned','true',
         igraph::V(learned.x)$color <- rgb(0.0,0.5,0.5,0.1)
         igraph::V(true.x)$color <- rgb(0.0,0.5,0.5,0.1)
 
-        igraph::E(tp)$color <- rgb(0.7,0.0,0.7)
-        igraph::E(learned.x)$color <- rgb(0.7,0.0,0.7)
-        igraph::E(true.x)$color <- rgb(0.7,0.0,0.7)
+        igraph::E(tp)$color <- rgb(0.3,0.3,0.3,0.9)
+        igraph::E(learned.x)$color <- rgb(0.3,0.3,0.3,0.9)
+        igraph::E(true.x)$color <- rgb(0.3,0.3,0.3,0.9)
 
         if (vertical.plot & !split.plot) {
             par(mfrow = c(3,1), mar = c(2,2,2,2))
@@ -882,7 +882,7 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
         t <- as.igraph(as.adjacency(g))
         igraph::E(t)$weight <- abs(igraph::E(t)$weight)
     } else {
-        igraph::E(g)$color <- rgb(0.2,0.2,0.2,0.9)
+        igraph::E(g)$color <- rgb(0.3,0.3,0.3,0.9)
         igraph::E(g)$width <- 2
         t <- as.igraph(as.adjacency(g))
     }
