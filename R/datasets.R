@@ -434,6 +434,7 @@ export.graph <- function(g, path, sep='\t', header=TRUE, index=TRUE,
 #' @param selected.genes User-selected genes (optional).
 #' @param features Features you want to select (optional).
 #' @param max.genes Maximum number of selected genes (optional).
+#' @param selection.criteria Criteria to be applied when it is necessary to select a maximum number of genes from the previously filtered ones. Default: 'non.zeros'
 #' @param min.non.zeros Minimum number of non-zero values per gene (optional).
 #' @param cor Using correlation to exclude unconnected genes (optional).
 #' @param cor.method Correlation method: 'spearman', 'kendall', or 'pearson'. Default: 'spearman'
@@ -445,8 +446,9 @@ export.graph <- function(g, path, sep='\t', header=TRUE, index=TRUE,
 #' df <- select.genes(df, genes=genes, features=c('tumor.suppressor', 'breast.cancer'), cor=TRUE, cor.threshold=0.7)
 
 select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL,
-                         max.genes=100, min.non.zeros=2,
+                         max.genes=100, selection.criteria=c('non.zeros','mean','variance','random'), min.non.zeros=2,
                          cor=TRUE, cor.method=c('spearman','kendall','pearson'), cor.threshold=0.5) {
+    selection.criteria <- match.arg(selection.criteria)
     cor.method <- match.arg(cor.method)
     if (is.null(selected.genes)) {
         selected.genes <- colnames(df)
@@ -470,11 +472,44 @@ select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL,
     }
     if (is.null(selected.genes)) {
         if (length(colnames(df)) > max.genes) {
-            selected.genes <- sample(colnames(df), max.genes, replace=FALSE)
+            selected.genes <- switch(selection.criteria,
+                non.zeros = {
+                    nz <- as.list(colSums(df!=0))
+                    selected.genes <- names(nz[order(unlist(nz), decreasing=TRUE)])[1:max.genes]
+                },
+                mean = {
+                    m <- as.list(sapply(df, mean))
+                    selected.genes <- names(m[order(unlist(m), decreasing=TRUE)])[1:max.genes]
+                },
+                variance = {
+                    v <- as.list(sapply(df, var))
+                    selected.genes <- names(v[order(unlist(v), decreasing=TRUE)])[1:max.genes]
+                },
+                random = {
+                    selected.genes <- sample(colnames(df), max.genes, replace=FALSE)
+                }
+            )
             df <- subset(df, select=selected.genes)
         }
     } else if (length(selected.genes) > max.genes) {
-        selected.genes <- sample(colnames(df), max.genes, replace=FALSE)
+        df <- subset(df, select=selected.genes)
+        selected.genes <- switch(selection.criteria,
+            non.zeros = {
+                nz <- as.list(colSums(df!=0))
+                selected.genes <- names(nz[order(unlist(nz), decreasing=TRUE)])[1:max.genes]
+            },
+            mean = {
+                m <- as.list(sapply(df, mean))
+                selected.genes <- names(m[order(unlist(m), decreasing=TRUE)])[1:max.genes]
+            },
+            variance = {
+                v <- as.list(sapply(df, var))
+                selected.genes <- names(v[order(unlist(v), decreasing=TRUE)])[1:max.genes]
+            },
+            random = {
+                selected.genes <- sample(colnames(df), max.genes, replace=FALSE)
+            }
+        )
         df <- subset(df, select=selected.genes)
     } else {
         df <- subset(df, select=selected.genes)

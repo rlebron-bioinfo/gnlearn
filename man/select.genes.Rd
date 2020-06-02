@@ -10,6 +10,7 @@ select.genes(
   selected.genes = NULL,
   features = NULL,
   max.genes = 100,
+  selection.criteria = c("non.zeros", "mean", "variance", "random"),
   min.non.zeros = 2,
   cor = TRUE,
   cor.method = c("spearman", "kendall", "pearson"),
@@ -26,6 +27,8 @@ select.genes(
 \item{features}{Features you want to select (optional).}
 
 \item{max.genes}{Maximum number of selected genes (optional).}
+
+\item{selection.criteria}{Criteria to be applied when it is necessary to select a maximum number of genes from the previously filtered ones. Default: 'non.zeros'}
 
 \item{min.non.zeros}{Minimum number of non-zero values per gene (optional).}
 
