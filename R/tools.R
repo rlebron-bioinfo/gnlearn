@@ -449,7 +449,7 @@ third.axis <- function(layout) {
 #' @param max.steps Maximum number of steps in the path during marginalization. Default: Inf
 #' @param arcs Whether or not to list the arcs. Default: FALSE.
 #' @param plot Whether or not to plot the differences between the two graphs. Default: TRUE
-#' @param vertical.plot If you draw the comparison plots horizontally. Otherwise, they will be drawn horizontally. Default: FALSE
+#' @param vertical.plot If you draw the comparison plots horizontally. Otherwise, they will be drawn horizontally. Default: TRUE
 #' @keywords graph comparison
 #' @export
 #' @examples
@@ -457,7 +457,7 @@ third.axis <- function(layout) {
 #' comparison <- compare.graphs(obj1, obj2, plot=FALSE)
 
 compare.graphs <- function(learned, true, marginalize=c('none','learned','true','both'),
-                           max.steps=Inf, arcs=FALSE, plot=TRUE, vertical.plot=FALSE) {
+                           max.steps=Inf, arcs=FALSE, plot=TRUE, vertical.plot=TRUE) {
     marginalize <- match.arg(marginalize)
     learned <- as.igraph(learned)
     true <- as.igraph(true)
