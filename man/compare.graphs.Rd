@@ -10,7 +10,8 @@ compare.graphs(
   marginalize = c("none", "learned", "true", "both"),
   max.steps = Inf,
   arcs = FALSE,
-  plot = TRUE
+  plot = TRUE,
+  vertical.plot = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ compare.graphs(
 \item{arcs}{Whether or not to list the arcs. Default: FALSE.}
 
 \item{plot}{Whether or not to plot the differences between the two graphs. Default: TRUE}
+
+\item{vertical.plot}{If you draw the comparison plots horizontally. Otherwise, they will be drawn horizontally. Default: FALSE}
 }
 \description{
 This function allows you to compare two graphs.
