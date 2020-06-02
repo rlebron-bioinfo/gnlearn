@@ -29,7 +29,8 @@ Imports:
     matrixcalc,
     dplyr,
     ape,
-    gtools
+    gtools,
+    gplots
 Remotes:
     gherardovarando/gclm
 Suggests:

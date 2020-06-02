@@ -576,7 +576,7 @@ gene.histogram <- function(df, selected.genes=NULL, n.cols=3) {
     par(mfrow = c(n.rows, n.cols), mar = c(2, 2, 2, 2))
     for (gene in selected.genes) {
         x <- df[, gene]
-        hist(x, prob=TRUE, xlab=gene, ylab='', main='', col=rgb(0.7,0.7,0.7))
+        hist(x, prob=TRUE, xlab=gene, ylab='', main='', col=rgb(0.9,0.9,0.9))
         lines(density(x), lwd=2, col='darkred')
         curve(dnorm(x, mean=mean(x), sd=sd(x)), from=min(x), to=max(x), add=TRUE, lwd=2, col='darkgreen')
     }
@@ -608,4 +608,28 @@ gene.correlation <- function(df, selected.genes=NULL, method=c('spearman','kenda
          text(x=0.5, y=0.5, round(cor(x, y, method=method), 2), cex=2)
        }
     )
+}
+
+#' Gene Clustering
+#'
+#' This function allows you to cluster genes in your dataset by expression correlation.
+#' @param df Dataset.
+#' @param selected.genes User-selected genes (optional).
+#' @param cor.method Correlation method: 'spearman', 'kendall', or 'pearson'. Default: 'spearman'
+#' @keywords clustering genes expression
+#' @export
+#' @examples
+#' gene.clustering(df)
+
+gene.clustering <- function(df, selected.genes=NULL, cor.method=c('spearman','kendall','pearson')) {
+    method <- match.arg(method)
+    if (is.null(selected.genes)) {
+        selected.genes <- colnames(df)
+    }
+    rho <- cor(df[, selected.genes], method=cor.method)
+    diag(rho) <- NA
+    palette.breaks <- seq(0,1,0.05)
+    palette <- colorRampPalette(c(rgb(0.0,0.7,0.7), 'black', rgb(0.7,0.0,0.7)))
+    par(oma = c(2,2,2,2))
+    gplots::heatmap.2(rho, scale='none', trace='none', revC=TRUE, col=palette, breaks=palette.breaks, tracecol='yellow')
 }
