@@ -326,13 +326,11 @@ graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
     if ('weight' %in% igraph::list.edge.attributes(g)) {
         igraph::E(g)$color <- ifelse(igraph::E(g)$weight > 0, rgb(0.0,0.7,0.0,0.9), rgb(0.7,0.0,0.0,0.9))
         igraph::E(g)$width <- sapply(igraph::E(g)$weight, function(x) ceiling(abs(x))+1)
-        igraph::E(g)$arrow.width <- sapply(igraph::E(g)$weight, function(x) ceiling(abs(x)))
         t <- as.igraph(as.adjacency(g))
         igraph::E(t)$weight <- abs(igraph::E(t)$weight)
     } else {
         igraph::E(g)$color <- rgb(0.2,0.2,0.2,0.9)
         igraph::E(g)$width <- 2
-        igraph::E(g)$arrow.width <- 1
         t <- as.igraph(as.adjacency(g))
     }
 
@@ -357,6 +355,7 @@ graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
             vertex.shape='circle',
             vertex.size=30,
             edge.lty='solid',
+            edge.arrow.width=1,
             layout=layout)
     }
 }
@@ -399,13 +398,11 @@ feature.plot <- function(x, genes, feature, from=c('auto', 'adjacency', 'edges',
     if ('weight' %in% igraph::list.edge.attributes(g)) {
         igraph::E(g)$color <- ifelse(igraph::E(g)$weight > 0, rgb(0.0,0.7,0.0,0.9), rgb(0.7,0.0,0.0,0.9))
         igraph::E(g)$width <- sapply(igraph::E(g)$weight, function(x) ceiling(abs(x))+1)
-        igraph::E(g)$arrow.width <- sapply(igraph::E(g)$weight, function(x) ceiling(abs(x)))
         t <- as.igraph(as.adjacency(g))
         igraph::E(t)$weight <- abs(igraph::E(t)$weight)
     } else {
         igraph::E(g)$color <- rgb(0.2,0.2,0.2,0.9)
         igraph::E(g)$width <- 2
-        igraph::E(g)$arrow.width <- 1
         t <- as.igraph(as.adjacency(g))
     }
 
@@ -430,6 +427,7 @@ feature.plot <- function(x, genes, feature, from=c('auto', 'adjacency', 'edges',
             vertex.shape='circle',
             vertex.size=30,
             edge.lty='solid',
+            edge.arrow.width=1,
             layout=layout)
     }
 }
@@ -888,13 +886,11 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
     if ('weight' %in% igraph::list.edge.attributes(g)) {
         igraph::E(g)$color <- ifelse(igraph::E(g)$weight > 0, rgb(0.0,0.7,0.0,0.9), rgb(0.7,0.0,0.0,0.9))
         igraph::E(g)$width <- sapply(igraph::E(g)$weight, function(x) ceiling(abs(x))+1)
-        igraph::E(g)$arrow.width <- sapply(igraph::E(g)$weight, function(x) ceiling(abs(x)))
         t <- as.igraph(as.adjacency(g))
         igraph::E(t)$weight <- abs(igraph::E(t)$weight)
     } else {
         igraph::E(g)$color <- rgb(0.2,0.2,0.2,0.9)
         igraph::E(g)$width <- 2
-        igraph::E(g)$arrow.width <- 1
         t <- as.igraph(as.adjacency(g))
     }
     c <- algorithm(igraph::as.undirected(t))
@@ -936,6 +932,7 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
             vertex.shape='circle',
             vertex.size=30,
             edge.lty='solid',
+            edge.arrow.width=1,
             layout=network.layout)
 
     }
