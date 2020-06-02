@@ -28,7 +28,8 @@ Imports:
     RBGL,
     matrixcalc,
     dplyr,
-    ape
+    ape,
+    gtools
 Remotes:
     gherardovarando/gclm
 Suggests:
