@@ -558,9 +558,9 @@ dataframe.split <- function(df, m=NULL) {
 #' @keywords groundtruth graph
 #' @export
 #' @examples
-#' gt <- groundtruth.graph(2)
+#' gt <- ground.truth(2)
 
-groundtruth.graph <- function(x, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn')) {
+ground.truth <- function(x, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn')) {
     to <- match.arg(to)
     if (class(x)=='numeric') {
         genesets <- list.genesets()
