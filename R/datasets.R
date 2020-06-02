@@ -148,7 +148,6 @@ download.geneset <- function(code, host=HOST) {
         tmp <- fs::file_temp(ext='.txt')
         utils::download.file(url, destfile=tmp, quiet=TRUE, mode='wt')
         df <- read.table(tmp, sep='\t', header=TRUE, check.names=FALSE)
-        close(tmp)
         return(df)
     } else {
         return(NULL)
@@ -179,7 +178,6 @@ download.dataset  <- function(code, log=TRUE, host=HOST) {
         if (log) {
             df <- log(df+1)
         }
-        close(tmp)
         return(df)
     } else {
         return(NULL)
@@ -205,7 +203,6 @@ download.graph <- function(code, to=c('igraph', 'adjacency', 'edges', 'graph', '
         utils::download.file(url, destfile=tmp, quiet=TRUE, mode='wt')
         df <- read.table(tmp, sep='\t', header=TRUE, check.names=FALSE)
         g <- convert.format(df, from='adjacency', to=to)
-        close(tmp)
         return(g)
     } else {
         return(NULL)
