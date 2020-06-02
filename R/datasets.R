@@ -567,6 +567,7 @@ groundtruth.graph <- function(x, to=c('igraph', 'adjacency', 'edges', 'graph', '
 #' @export
 #' @examples
 #' gene.histogram(df)
+
 gene.histogram <- function(df, selected.genes=NULL, n.cols=3) {
     if (is.null(selected.genes)) {
         selected.genes <- colnames(df)
@@ -575,8 +576,36 @@ gene.histogram <- function(df, selected.genes=NULL, n.cols=3) {
     par(mfrow = c(n.rows, n.cols), mar = c(2, 2, 2, 2))
     for (gene in selected.genes) {
         x <- df[, gene]
-        hist(x, prob=TRUE, xlab=gene, ylab='', main='', col=rgb(0.9,0.9,0.9,0.7))
+        hist(x, prob=TRUE, xlab=gene, ylab='', main='', col=rgb(0.0,0.7,0.7))
         lines(density(x), lwd=2, col='darkred')
         curve(dnorm(x, mean=mean(x), sd=sd(x)), from=min(x), to=max(x), add=TRUE, lwd=2, col='darkgreen')
     }
+}
+
+#' Plot expression correlation of genes in your dataset.
+#'
+#' This function allows you to plot the expression correlation of genes in your dataset.
+#' @param df Dataset.
+#' @param selected.genes User-selected genes (optional).
+#' @param method Correlation method: 'spearman', 'kendall', or 'pearson'. Default: 'spearman'
+#' @keywords correlation genes expression
+#' @export
+#' @examples
+#' gene.correlation(df)
+
+gene.correlation <- function(df, selected.genes=NULL, method=c('spearman','kendall','pearson')) {
+    method <- math.arg(method)
+    if (is.null(selected.genes)) {
+        selected.genes <- colnames(df)
+    }
+    pairs(df[, selected.genes],
+       upper.panel = function(x, y, ...) {
+         points(x=x, y=y, col=rgb(0.0,0.7,0.7))
+         abline(coef(lm(y ~ x)), col='red', lwd=2)
+       },
+       lower.panel = function(x, y, ...) {
+         par(usr = c(0,1,0,1))
+         text(x=0.5, y=0.5, round(cor(x, y, method=method), 2), cex=2)
+       }
+    )
 }
