@@ -576,7 +576,7 @@ gene.histogram <- function(df, selected.genes=NULL, n.cols=3) {
     par(mfrow = c(n.rows, n.cols), mar = c(2, 2, 2, 2))
     for (gene in selected.genes) {
         x <- df[, gene]
-        hist(x, prob=TRUE, xlab=gene, ylab='', main='', col=rgb(0.0,0.7,0.7))
+        hist(x, prob=TRUE, xlab=gene, ylab='', main='', col=rgb(0.7,0.7,0.7))
         lines(density(x), lwd=2, col='darkred')
         curve(dnorm(x, mean=mean(x), sd=sd(x)), from=min(x), to=max(x), add=TRUE, lwd=2, col='darkgreen')
     }
@@ -594,7 +594,7 @@ gene.histogram <- function(df, selected.genes=NULL, n.cols=3) {
 #' gene.correlation(df)
 
 gene.correlation <- function(df, selected.genes=NULL, method=c('spearman','kendall','pearson')) {
-    method <- math.arg(method)
+    method <- match.arg(method)
     if (is.null(selected.genes)) {
         selected.genes <- colnames(df)
     }
