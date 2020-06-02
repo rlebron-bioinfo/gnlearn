@@ -148,6 +148,7 @@ download.geneset <- function(code, host=HOST) {
         tmp <- fs::file_temp(ext='.txt')
         utils::download.file(url, destfile=tmp, quiet=TRUE, mode='wt')
         df <- read.table(tmp, sep='\t', header=TRUE, check.names=FALSE)
+        close(tmp)
         return(df)
     } else {
         return(NULL)
@@ -178,6 +179,7 @@ download.dataset  <- function(code, log=TRUE, host=HOST) {
         if (log) {
             df <- log(df+1)
         }
+        close(tmp)
         return(df)
     } else {
         return(NULL)
@@ -203,6 +205,7 @@ download.graph <- function(code, to=c('igraph', 'adjacency', 'edges', 'graph', '
         utils::download.file(url, destfile=tmp, quiet=TRUE, mode='wt')
         df <- read.table(tmp, sep='\t', header=TRUE, check.names=FALSE)
         g <- convert.format(df, from='adjacency', to=to)
+        close(tmp)
         return(g)
     } else {
         return(NULL)
@@ -565,10 +568,12 @@ groundtruth.graph <- function(x, to=c('igraph', 'adjacency', 'edges', 'graph', '
     if (class(x)=='numeric') {
         genesets <- list.genesets()
         type <- genesets[genesets$download.code==x,]$dataset
-        if (type=='TF-Target Interactions') {
+        #df <- df[with(df, grepl(regex, sp.scientific, ignore.case=TRUE)), ]
+        if (grepl('TF-Target Interactions', type, ignore.case=TRUE)) {
             geneset <- download.geneset(x)
         } else {
-            return(NULL)
+            message(paste('Wrong type of geneset?', '->', type))
+            geneset <- download.geneset(x)
         }
     } else if (class(x) %in% c('data.frame','matrix')) {
         fmt <- detect.format(x)
