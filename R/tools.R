@@ -449,7 +449,8 @@ third.axis <- function(layout) {
 #' @param max.steps Maximum number of steps in the path during marginalization. Default: Inf
 #' @param arcs Whether or not to list the arcs. Default: FALSE.
 #' @param plot Whether or not to plot the differences between the two graphs. Default: TRUE
-#' @param vertical.plot If you draw the comparison plots horizontally. Otherwise, they will be drawn horizontally. Default: TRUE
+#' @param vertical.plot Whether to draw the comparison plots horizontally. Otherwise, they will be drawn horizontally. Default: TRUE
+#' @param split.plots Whether to split comparison plots. Otherwise, they will be drawn together. Default: TRUE
 #' @keywords graph comparison
 #' @export
 #' @examples
@@ -457,7 +458,7 @@ third.axis <- function(layout) {
 #' comparison <- compare.graphs(obj1, obj2, plot=FALSE)
 
 compare.graphs <- function(learned, true, marginalize=c('none','learned','true','both'),
-                           max.steps=Inf, arcs=FALSE, plot=TRUE, vertical.plot=TRUE) {
+                           max.steps=Inf, arcs=FALSE, plot=TRUE, vertical.plot=TRUE, split.plots=TRUE) {
     marginalize <- match.arg(marginalize)
     learned <- as.igraph(learned)
     true <- as.igraph(true)
@@ -510,9 +511,9 @@ compare.graphs <- function(learned, true, marginalize=c('none','learned','true',
         igraph::E(true.x)$color <- rgb(0.0,0.0,0.7,0.9)
         igraph::E(true.x)$lty <- 'dashed'
 
-        if (vertical.plot) {
+        if (vertical.plot & !split.plots) {
             par(mfrow = c(3, 1), mar = c(2, 2, 2, 2))
-        } else {
+        } else if (!split.plots) {
             par(mfrow = c(1, 3), mar = c(2, 2, 2, 2))
         }
 

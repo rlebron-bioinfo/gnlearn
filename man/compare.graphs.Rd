@@ -11,7 +11,8 @@ compare.graphs(
   max.steps = Inf,
   arcs = FALSE,
   plot = TRUE,
-  vertical.plot = TRUE
+  vertical.plot = TRUE,
+  split.plots = TRUE
 )
 }
 \arguments{
@@ -27,7 +28,9 @@ compare.graphs(
 
 \item{plot}{Whether or not to plot the differences between the two graphs. Default: TRUE}
 
-\item{vertical.plot}{If you draw the comparison plots horizontally. Otherwise, they will be drawn horizontally. Default: TRUE}
+\item{vertical.plot}{Whether to draw the comparison plots horizontally. Otherwise, they will be drawn horizontally. Default: TRUE}
+
+\item{split.plots}{Whether to split comparison plots. Otherwise, they will be drawn together. Default: TRUE}
 }
 \description{
 This function allows you to compare two graphs.
