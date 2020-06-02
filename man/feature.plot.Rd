@@ -9,8 +9,7 @@ feature.plot(
   genes,
   feature,
   from = c("auto", "adjacency", "edges", "graph", "igraph", "bnlearn"),
-  feature.color = rgb(0.7, 0.9, 0.9, 0.7),
-  layout = c("grid", "star", "circle", "sphere", "nicely"),
+  layout = c("circle", "star", "grid", "sphere", "nicely"),
   interactive = FALSE
 )
 }
@@ -21,9 +20,7 @@ feature.plot(
 
 \item{from}{Input format (optional).}
 
-\item{feature.color}{Color of the nodes with the feature (optional). Default: rgb(0.7,0.9,0.9,0.7)}
-
-\item{layout}{igraph plot layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'grid'}
+\item{layout}{igraph plot layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'circle'}
 
 \item{interactive}{Interactive plot (optional). Default: FALSE}
 

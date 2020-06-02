@@ -292,7 +292,7 @@ as.bnlearn <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
 #' This function allows you to plot a graph.
 #' @param x Graph object.
 #' @param from Input format (optional).
-#' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'grid'
+#' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'circle'
 #' @param interactive Interactive plot (optional). Default: FALSE
 #' @param isolated.genes Whether or not to include isolated nodes in the plot (optional). Default: FALSE
 #' @keywords graph plot
@@ -303,7 +303,7 @@ as.bnlearn <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
 #' graph.plot(obj, interactive=TRUE)
 
 graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn'),
-                       layout=c('grid','star','circle','sphere','nicely'),
+                       layout=c('circle','star','grid','sphere','nicely'),
                        interactive=FALSE, isolated.genes=FALSE) {
     from <- match.arg(from)
     layout <- match.arg(layout)
@@ -322,7 +322,7 @@ graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
         g <- delete.isolated(as.adjacency(x, from=from), from='adjacency', to='igraph')
     }
 
-    igraph::V(g)$color <- rgb(0.9,0.9,0.9,0.7)
+    igraph::V(g)$color <- rgb(0.0,0.5,0.5,0.1)
     if ('weight' %in% igraph::list.edge.attributes(g)) {
         igraph::E(g)$color <- ifelse(igraph::E(g)$weight > 0, rgb(0.0,0.7,0.0,0.9), rgb(0.7,0.0,0.0,0.9))
         igraph::E(g)$width <- sapply(igraph::E(g)$weight, function(x) ceiling(abs(x))+1)
@@ -349,9 +349,9 @@ graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
     } else {
         igraph::plot.igraph(g,
             vertex.label.font=2,
-            vertex.label.color='black',
+            vertex.label.color=rgb(0.0,0.3,0.3),
             vertex.label.family='Helvetica',
-            vertex.frame.color='black',
+            vertex.frame.color=rgb(0.0,0.3,0.3),
             vertex.shape='circle',
             vertex.size=30,
             edge.lty='solid',
@@ -367,8 +367,7 @@ graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
 #' @param genes Geneset with features.
 #' @param features Feature whose graph you want to plot.
 #' @param from Input format (optional).
-#' @param feature.color Color of the nodes with the feature (optional). Default: rgb(0.7,0.9,0.9,0.7)
-#' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'grid'
+#' @param layout igraph plot layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'circle'
 #' @param interactive Interactive plot (optional). Default: FALSE
 #' @keywords graph feature plot
 #' @export
@@ -377,8 +376,7 @@ graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
 #' feature.plot(obj, genes, 'tumor.suppressor', interactive=TRUE)
 
 feature.plot <- function(x, genes, feature, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn'),
-                         feature.color=rgb(0.7,0.9,0.9,0.7), layout=c('grid','star','circle','sphere','nicely'),
-                         interactive=FALSE) {
+                         layout=c('circle','star','grid','sphere','nicely'), interactive=FALSE) {
     from <- match.arg(from)
     layout <- match.arg(layout)
 
@@ -394,7 +392,9 @@ feature.plot <- function(x, genes, feature, from=c('auto', 'adjacency', 'edges',
     f_genes <- genes[genes[feature]==TRUE,]$name
     x <- x[x[,1] %in% f_genes | x[,2] %in% f_genes, ]
     g <- as.igraph(x, from='edges')
-    igraph::V(g)$color <- ifelse(names(igraph::V(g)) %in% f_genes, feature.color, rgb(0.9,0.9,0.9,0.7))
+    igraph::V(g)$color <- ifelse(names(igraph::V(g)) %in% f_genes, rgb(0.5,0.0,0.5,0.1), rgb(0.0,0.5,0.5,0.1))
+    igraph::V(g)$label.color <- ifelse(names(igraph::V(g)) %in% f_genes, rgb(0.3,0.0,0.3), rgb(0.0,0.3,0.3))
+    igraph::V(g)$frame.color <- ifelse(names(igraph::V(g)) %in% f_genes, rgb(0.3,0.0,0.3), rgb(0.0,0.3,0.3))
     if ('weight' %in% igraph::list.edge.attributes(g)) {
         igraph::E(g)$color <- ifelse(igraph::E(g)$weight > 0, rgb(0.0,0.7,0.0,0.9), rgb(0.7,0.0,0.0,0.9))
         igraph::E(g)$width <- sapply(igraph::E(g)$weight, function(x) ceiling(abs(x))+1)
@@ -421,9 +421,7 @@ feature.plot <- function(x, genes, feature, from=c('auto', 'adjacency', 'edges',
     } else {
         igraph::plot.igraph(g,
             vertex.label.font=2,
-            vertex.label.color='black',
             vertex.label.family='Helvetica',
-            vertex.frame.color='black',
             vertex.shape='circle',
             vertex.size=30,
             edge.lty='solid',
@@ -500,60 +498,55 @@ compare.graphs <- function(learned, true, marginalize=c('none','learned','true',
     if (plot) {
         learned.x <- igraph::difference(learned, tp)
         true.x <- igraph::difference(true, tp)
-        igraph::V(tp)$color <- rgb(0.9,0.9,0.9,0.7)
-        igraph::V(learned.x)$color <- rgb(0.9,0.9,0.9,0.7)
-        igraph::V(true.x)$color <- rgb(0.9,0.9,0.9,0.7)
+        igraph::V(tp)$color <- rgb(0.0,0.5,0.5,0.1)
+        igraph::V(learned.x)$color <- rgb(0.0,0.5,0.5,0.1)
+        igraph::V(true.x)$color <- rgb(0.0,0.5,0.5,0.1)
 
-        igraph::E(tp)$color <- rgb(0.0,0.0,0.7,0.9)
-        igraph::E(tp)$lty <- 'solid'
-
-        igraph::E(learned.x)$color <- rgb(0.0,0.0,0.7,0.9)
-        igraph::E(learned.x)$lty <- 'dashed'
-
-        igraph::E(true.x)$color <- rgb(0.0,0.0,0.7,0.9)
-        igraph::E(true.x)$lty <- 'dashed'
+        igraph::E(tp)$color <- rgb(0.7,0.0,0.7)
+        igraph::E(learned.x)$color <- rgb(0.7,0.0,0.7)
+        igraph::E(true.x)$color <- rgb(0.7,0.0,0.7)
 
         if (vertical.plot & !split.plot) {
-            par(mfrow = c(3, 1), mar = c(2, 2, 2, 2))
+            par(mfrow = c(3,1), mar = c(2,2,2,2))
         } else if (!split.plot) {
-            par(mfrow = c(1, 3), mar = c(2, 2, 2, 2))
+            par(mfrow = c(1,3), mar = c(2,2,2,2))
         }
 
         igraph::plot.igraph(tp,
             main='True Positive Arches',
             vertex.label.font=2,
-            vertex.label.color='black',
+            vertex.label.color=rgb(0.0,0.3,0.3),
             vertex.label.family='Helvetica',
-            vertex.frame.color='black',
+            vertex.frame.color=rgb(0.0,0.3,0.3),
             vertex.shape='circle',
             vertex.size=30,
             edge.width=2,
             edge.arrow.width=1,
-            layout=igraph::layout_on_grid(learned))
+            layout=igraph::layout_in_circle(tp))
 
         igraph::plot.igraph(learned.x,
             main='False Positive Arches',
             vertex.label.font=2,
-            vertex.label.color='black',
+            vertex.label.color=rgb(0.0,0.3,0.3),
             vertex.label.family='Helvetica',
-            vertex.frame.color='black',
+            vertex.frame.color=rgb(0.0,0.3,0.3),
             vertex.shape='circle',
             vertex.size=30,
             edge.width=2,
             edge.arrow.width=1,
-            layout=igraph::layout_on_grid(true))
+            layout=igraph::layout_in_circle(learned.x))
 
         igraph::plot.igraph(true.x,
             main='False Negative Arches',
             vertex.label.font=2,
-            vertex.label.color='black',
+            vertex.label.color=rgb(0.0,0.3,0.3),
             vertex.label.family='Helvetica',
-            vertex.frame.color='black',
+            vertex.frame.color=rgb(0.0,0.3,0.3),
             vertex.shape='circle',
             vertex.size=30,
             edge.width=2,
             edge.arrow.width=1,
-            layout=igraph::layout_on_grid(true))
+            layout=igraph::layout_in_circle(true.x))
     }
 
     bnlearn_learned <- as.bnlearn(learned)
@@ -829,7 +822,7 @@ rename.graphs <- function(graphs, names, to='igraph') {
 #' @param x Graph object.
 #' @param algorithm Algorithm for finding communities: 'louvain', 'edge.betweenness', 'fast.greedy', 'label.prop', 'leading.eigen', 'optimal', 'spinglass', or 'walktrap'. Default: 'louvain'
 #' @param network Whether or not to plot the network. Default: TRUE
-#' @param network.layout igraph network layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'grid'
+#' @param network.layout igraph network layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'circle'
 #' @param interactive.network Interactive network (optional). Default: FALSE
 #' @param network.isolated Whether or not to include isolated nodes in the plot (optional). Default: TRUE
 #' @param dendrogram Whether or not to plot a dendrogram (when possible). Default: FALSE
@@ -843,7 +836,7 @@ rename.graphs <- function(graphs, names, to='igraph') {
 #' communities <- graph.communities(g, algorithm='walktrap', network=FALSE, dendrogram=TRUE, dendrogram.type='cladogram')
 
 graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.greedy','label.prop','leading.eigen','optimal','spinglass','walktrap'),
-                              network=TRUE, network.layout=c('grid','star','circle','sphere','nicely'), interactive.network=FALSE, network.isolated=TRUE,
+                              network=TRUE, network.layout=c('circle','star','grid','sphere','nicely'), interactive.network=FALSE, network.isolated=TRUE,
                               dendrogram=FALSE, dendrogram.type=c('fan','phylogram','cladogram','unrooted','radial'),
                               from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
     algorithm <- match.arg(algorithm)

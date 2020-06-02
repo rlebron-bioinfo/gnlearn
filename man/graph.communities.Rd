@@ -9,7 +9,7 @@ graph.communities(
   algorithm = c("louvain", "edge.betweenness", "fast.greedy", "label.prop",
     "leading.eigen", "optimal", "spinglass", "walktrap"),
   network = TRUE,
-  network.layout = c("grid", "star", "circle", "sphere", "nicely"),
+  network.layout = c("circle", "star", "grid", "sphere", "nicely"),
   interactive.network = FALSE,
   network.isolated = TRUE,
   dendrogram = FALSE,
@@ -24,7 +24,7 @@ graph.communities(
 
 \item{network}{Whether or not to plot the network. Default: TRUE}
 
-\item{network.layout}{igraph network layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'grid'}
+\item{network.layout}{igraph network layout (optional): 'grid', 'star', 'circle', 'sphere', or 'nicely'. Default: 'circle'}
 
 \item{interactive.network}{Interactive network (optional). Default: FALSE}
 
