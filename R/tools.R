@@ -776,13 +776,34 @@ averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
         adj.2 <- sign(abs(coeff.2))
         cols.1 <- rownames(adj.1) <- colnames(adj.1) <- rownames(coeff.1) <- colnames(coeff.1)
         cols.2 <- rownames(adj.2) <- colnames(adj.2) <- rownames(coeff.2) <- colnames(coeff.2)
-        int.1 <- colnames(coeff.1) %in% colnames(coeff.2)
-        int.2 <- colnames(coeff.2) %in% colnames(coeff.1)
+        coeff.1 <- coeff.1[order(cols.1), order(cols.1)]
+        adj.1 <- adj.1[order(cols.1), order(cols.1)]
+        coeff.2 <- coeff.2[order(cols.2), order(cols.2)]
+        adj.2 <- adj.2[order(cols.2), order(cols.2)]
+        int.1 <- cols.1 %in% cols.2
+        int.2 <- cols.2 %in% cols.1
         coeff.int <- ((i-1) * coeff.1[int.1, int.1] / i) + (coeff.2[int.2, int.2] / i)
         adj.int <- ((i-1) * adj.1[int.1, int.1] / i) + (adj.2[int.2, int.2] / i)
-        coeff.1 <- gtools::smartbind(coeff.int, coeff.1[!int.1, !int.1], coeff.2[!int.2, !int.2], fill=0)
-        adj.1 <- gtools::smartbind(adj.int, adj.1[!int.1, !int.1], adj.2[!int.2, !int.2], fill=0)
+        cols.int <- rownames(adj.int) <- colnames(adj.int) <- rownames(coeff.int) <- colnames(coeff.int)
+        coeff.int <- coeff.int[order(cols.int), order(cols.int)]
+        adj.int <- adj.int[order(cols.int), order(cols.int)]
+        cols.u <- sort(union(cols.1, cols.2))
+        n.cols.u <- length(cols.u)
+        coeff.u <- as.data.frame(matrix(0, nrow=n.cols.u, ncol=n.cols.u))
+        adj.u <- as.data.frame(matrix(0, nrow=n.cols.u, ncol=n.cols.u))
+        rownames(adj.u) <- colnames(adj.u) <- rownames(coeff.u) <- colnames(coeff.u) <- cols.u
+        coeff.u <- coeff.u[order(cols.u), order(cols.u)]
+        adj.u <- adj.u[order(cols.u), order(cols.u)]
+        coeff.u[cols.u %in% cols.1, cols.u %in% cols.1] <- coeff.1
+        coeff.u[cols.u %in% cols.2, cols.u %in% cols.2] <- coeff.2
+        coeff.u[cols.u %in% cols.int, cols.u %in% cols.int] <- coeff.int
+        adj.u[cols.u %in% cols.1, cols.u %in% cols.1] <- adj.1
+        adj.u[cols.u %in% cols.2, cols.u %in% cols.2] <- adj.2
+        adj.u[cols.u %in% cols.int, cols.u %in% cols.int] <- adj.int
+        coeff.1 <- coeff.u
+        adj.1 <- adj.u
     }
+    cols.1 <- rownames(adj.1) <- colnames(adj.1) <- rownames(coeff.1) <- colnames(coeff.1)
     coeff.1 <- coeff.1[order(colnames(coeff.1)), order(colnames(coeff.1))]
     adj.1 <- adj.1[order(colnames(adj.1)), order(colnames(adj.1))]
     coeff.1[adj.1 < threshold] <- 0
