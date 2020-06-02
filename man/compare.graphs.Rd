@@ -12,7 +12,7 @@ compare.graphs(
   arcs = FALSE,
   plot = TRUE,
   vertical.plot = TRUE,
-  split.plots = TRUE
+  split.plot = TRUE
 )
 }
 \arguments{
@@ -30,7 +30,7 @@ compare.graphs(
 
 \item{vertical.plot}{Whether to draw the comparison plots horizontally. Otherwise, they will be drawn horizontally. Default: TRUE}
 
-\item{split.plots}{Whether to split comparison plots. Otherwise, they will be drawn together. Default: TRUE}
+\item{split.plot}{Whether to split comparison plots. Otherwise, they will be drawn together. Default: TRUE}
 }
 \description{
 This function allows you to compare two graphs.

@@ -556,3 +556,27 @@ groundtruth.graph <- function(x, to=c('igraph', 'adjacency', 'edges', 'graph', '
     g <- convert.format(mtx, to=to)
     return(g)
 }
+
+#' Plot expression histograms of genes in your dataset.
+#'
+#' This function allows you to plot the expression histograms of genes in your dataset.
+#' @param df Dataset.
+#' @param selected.genes User-selected genes (optional).
+#' @param n.cols Number of column in the plot (optional). Default: 3
+#' @keywords plot genes expression
+#' @export
+#' @examples
+#' gene.histogram(df)
+gene.histogram <- function(df, selected.genes=NULL, n.cols=3) {
+    if (is.null(selected.genes)) {
+        selected.genes <- colnames(df)
+    }
+    n.rows = ceiling(length(selected.genes)/n.cols)
+    par(mfrow = c(n.rows, n.cols), mar = c(2, 2, 2, 2))
+    for (gene in selected.genes) {
+        x <- df[, gene]
+        hist(x, prob=TRUE, xlab=gene, ylab='', main='', col=rgb(0.9,0.9,0.9,0.7))
+        lines(density(x), lwd=2, col='darkred')
+        curve(dnorm(x, mean=mean(x), sd=sd(x)), from=min(x), to=max(x), add=TRUE, lwd=2, col='darkgreen')
+    }
+}
