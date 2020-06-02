@@ -312,7 +312,7 @@ graph.plot <- function(x, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
         from=detect.format(x)
     }
 
-    if (igraph::gsize(g) == 0) {
+    if (igraph::gsize(as.igraph(x, from=from)) == 0) {
         isolated.genes <- TRUE
     }
 
@@ -385,7 +385,7 @@ feature.plot <- function(x, genes, feature, from=c('auto', 'adjacency', 'edges',
         from=detect.format(x)
     }
 
-    if (igraph::gsize(g) == 0) {
+    if (igraph::gsize(as.igraph(x, from=from)) == 0) {
         isolated.genes <- TRUE
     }
 
@@ -860,7 +860,7 @@ graph.communities <- function(x, algorithm=c('louvain','edge.betweenness','fast.
         from=detect.format(x)
     }
 
-    if (igraph::gsize(g) == 0) {
+    if (igraph::gsize(as.igraph(x, from=from)) == 0) {
         network.isolated <- TRUE
     }
 
