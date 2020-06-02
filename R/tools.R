@@ -800,13 +800,17 @@ averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
 
 rename.graphs <- function(graphs, names, to='igraph') {
     R <- length(graphs)
+    renamed.graphs <- list()
     for (i in 1:R) {
-        graphs[[i]] <- convert.format(graphs[[i]], to='adjacency')
-        rownames(graphs[[i]]) <- names
-        colnames(graphs[[i]]) <- names
-        graphs[[i]] <- convert.format(graphs[[i]], to=to)
+        g <- convert.format(graphs[[i]], to='adjacency')
+        if (length(g) > 0) {
+            rownames(g) <- names
+            colnames(g) <- names
+            g <- convert.format(g, to=to)
+            renamed.graphs <- list(unlist(renamed.graphs), g)
+        }
     }
-    return(graphs)
+    return(renamed.graphs)
 }
 
 #' Graph Communities

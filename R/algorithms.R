@@ -1134,8 +1134,8 @@ mll <- function(P, S) {
 #' NODAG Algorithm With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the NODAG algorithm.
-#' @param lib.path Path of 'nodag.so' file.
 #' @param df Dataset.
+#' @param lib.path Path of 'nodag.so' file.
 #' @param lambda Lambda regularization parameter. Default: 0.5
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
@@ -1145,11 +1145,14 @@ mll <- function(P, S) {
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.nodag('nodag.so', df)
+#' graph <- boot.nodag(df, '/home/user/nodag/nodag.so')
 
-boot.nodag <- function(lib.path, df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
-    dyn.load(lib.path)
+boot.nodag <- function(df, lib.path=NULL, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4) {
     to <- match.arg(to)
+    if (is.null(lib.path)) {
+        lib.path <- file.path(Sys.getenv('HOME'), 'nodag', 'nodag.so')
+    }
+    dyn.load(lib.path)
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)

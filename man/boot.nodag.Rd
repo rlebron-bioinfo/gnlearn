@@ -5,8 +5,8 @@
 \title{NODAG Algorithm With Bootstrapping}
 \usage{
 boot.nodag(
-  lib.path,
   df,
+  lib.path = NULL,
   lambda = 0.5,
   R = 200,
   m = NULL,
@@ -16,9 +16,9 @@ boot.nodag(
 )
 }
 \arguments{
-\item{lib.path}{Path of 'nodag.so' file.}
-
 \item{df}{Dataset.}
+
+\item{lib.path}{Path of 'nodag.so' file.}
 
 \item{lambda}{Lambda regularization parameter. Default: 0.5}
 
@@ -36,7 +36,7 @@ boot.nodag(
 This function allows you to learn a directed graph from a dataset using the NODAG algorithm.
 }
 \examples{
-graph <- boot.nodag('nodag.so', df)
+graph <- boot.nodag(df, '/home/user/nodag/nodag.so')
 }
 \keyword{graph}
 \keyword{learning}
