@@ -622,7 +622,7 @@ gene.correlation <- function(df, selected.genes=NULL, method=c('spearman','kenda
 #' gene.clustering(df)
 
 gene.clustering <- function(df, selected.genes=NULL, cor.method=c('spearman','kendall','pearson')) {
-    method <- match.arg(method)
+    cor.method <- match.arg(cor.method)
     if (is.null(selected.genes)) {
         selected.genes <- colnames(df)
     }
