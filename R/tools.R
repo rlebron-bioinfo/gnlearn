@@ -776,24 +776,24 @@ averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
         adj.2 <- sign(abs(coeff.2))
         cols.1 <- rownames(adj.1) <- colnames(adj.1) <- rownames(coeff.1) <- colnames(coeff.1)
         cols.2 <- rownames(adj.2) <- colnames(adj.2) <- rownames(coeff.2) <- colnames(coeff.2)
-        coeff.1 <- coeff.1[order(cols.1), order(cols.1)]
-        adj.1 <- adj.1[order(cols.1), order(cols.1)]
-        coeff.2 <- coeff.2[order(cols.2), order(cols.2)]
-        adj.2 <- adj.2[order(cols.2), order(cols.2)]
+        coeff.1 <- coeff.1[sort(cols.1), sort(cols.1)]
+        adj.1 <- adj.1[sort(cols.1), sort(cols.1)]
+        coeff.2 <- coeff.2[sort(cols.2), sort(cols.2)]
+        adj.2 <- adj.2[sort(cols.2), sort(cols.2)]
         int.1 <- cols.1 %in% cols.2
         int.2 <- cols.2 %in% cols.1
         coeff.int <- ((i-1) * coeff.1[int.1, int.1] / i) + (coeff.2[int.2, int.2] / i)
         adj.int <- ((i-1) * adj.1[int.1, int.1] / i) + (adj.2[int.2, int.2] / i)
         cols.int <- rownames(adj.int) <- colnames(adj.int) <- rownames(coeff.int) <- colnames(coeff.int)
-        coeff.int <- coeff.int[order(cols.int), order(cols.int)]
-        adj.int <- adj.int[order(cols.int), order(cols.int)]
+        coeff.int <- coeff.int[sort(cols.int), sort(cols.int)]
+        adj.int <- adj.int[sort(cols.int), sort(cols.int)]
         cols.u <- sort(union(cols.1, cols.2))
         n.cols.u <- length(cols.u)
         coeff.u <- as.data.frame(matrix(0, nrow=n.cols.u, ncol=n.cols.u))
         adj.u <- as.data.frame(matrix(0, nrow=n.cols.u, ncol=n.cols.u))
         rownames(adj.u) <- colnames(adj.u) <- rownames(coeff.u) <- colnames(coeff.u) <- cols.u
-        coeff.u <- coeff.u[order(cols.u), order(cols.u)]
-        adj.u <- adj.u[order(cols.u), order(cols.u)]
+        coeff.u <- coeff.u[sort(cols.u), sort(cols.u)]
+        adj.u <- adj.u[sort(cols.u), sort(cols.u)]
         coeff.u[cols.u %in% cols.1, cols.u %in% cols.1] <- coeff.1
         coeff.u[cols.u %in% cols.2, cols.u %in% cols.2] <- coeff.2
         coeff.u[cols.u %in% cols.int, cols.u %in% cols.int] <- coeff.int
@@ -804,8 +804,8 @@ averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
         adj.1 <- adj.u
     }
     cols.1 <- rownames(adj.1) <- colnames(adj.1) <- rownames(coeff.1) <- colnames(coeff.1)
-    coeff.1 <- coeff.1[order(colnames(coeff.1)), order(colnames(coeff.1))]
-    adj.1 <- adj.1[order(colnames(adj.1)), order(colnames(adj.1))]
+    coeff.1 <- coeff.1[sort(colnames(coeff.1)), sort(colnames(coeff.1))]
+    adj.1 <- adj.1[sort(colnames(adj.1)), sort(colnames(adj.1))]
     coeff.1[adj.1 < threshold] <- 0
     g <- convert.format(coeff.1, to=to)
     return(g)
@@ -1143,4 +1143,122 @@ delete.isolated <- function(g, to=c('igraph', 'adjacency', 'edges', 'graph', 'bn
     g <- drop.all.zeros(g, square.matrix='all')
     g <- convert.format(g, from='adjacency', to=to)
     return(g)
+}
+
+#' Drug-Gene Interactions Plotting
+#'
+#' This function allows you to visualize the interaction of a selected gene with drugs and other genes.
+#' @param x Graph object.
+#' @param drugs Geneset with drug-gene interactions.
+#' @param gene Gene whose drug interactions you want to explore.
+#' @param from Input format (optional).
+#' @param interactive Interactive plot (optional). Default: FALSE
+#' @keywords genes drugs graph plot
+#' @export
+#' @examples
+#' drugs.plot(g, 3, 'Bax')
+
+drugs.plot <- function(x, drugs, gene, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn'), interactive=FALSE) {
+    from <- match.arg(from)
+
+    if (class(drugs)=='numeric') {
+        genesets <- list.genesets()
+        type <- genesets[genesets$download.code==drugs,]$dataset
+        if (grepl('Drug-Gene Interactions', type, ignore.case=TRUE)) {
+            drugs <- download.geneset(drugs)
+        } else {
+            message(paste('Wrong type of geneset?', '->', type))
+            drugs <- download.geneset(drugs)
+        }
+    } else {
+        fmt <- detect.format(drugs)
+        drugs <- as.edges(drugs, from=fmt)
+    }
+    if (from=='auto') {
+        from=detect.format(x)
+    }
+
+    drugs.df <- drugs[drugs$to==gene,]
+    drugs <- as.adjacency(drugs.df, from='edges')
+
+    if (sum(drugs)==0) {
+
+        genes <- as.edges(x, from=from)
+        genes <- as.adjacency(genes[genes$from == gene | genes$to == gene,], from='edges')
+        g <- as.igraph(genes, from='adjacency')
+        igraph::V(g)$color <- rgb(0.0,0.5,0.5,0.1)
+        igraph::V(g)$shape <- 'circle'
+        igraph::V(g)$frame.color <- rgb(0.0,0.3,0.3)
+        igraph::V(g)$label.color <- rgb(0.0,0.3,0.3)
+        igraph::V(g)$label.cex <- 1
+
+
+    } else {
+
+        genes <- as.edges(x, from=from)
+        genes <- as.adjacency(genes[genes$from == gene | genes$to == gene,], from='edges')
+        drugs <- as.igraph(drugs)
+        g <- igraph::union(drugs, as.igraph(genes))
+        g <- as.adjacency(g)
+        g[colnames(g) %in% colnames(genes), colnames(g) %in% colnames(genes)] <- genes
+        positive <- c('activator', 'agonist', 'cofactor', 'inducer', 'partial_agonist', 'positive_allosteric_modulator', 'stimulator')
+        negative <- c('channel_blocker', 'antagonist', 'antibody', 'antisense', 'antisense_oligonucleotide', 'blocker', 'gating_inhibitor', 'inhibitor', 'inhibitory_allosteric_modulator', 'inverse_agonist', 'negative_modulator', 'vaccine')
+        undefined <- c('allosteric_modulator', 'binder', 'modulator')
+        for (i in 1:nrow(drugs.df)) {
+            drug <- drugs.df[i,]$from
+            if ('type' %in% colnames(drugs.df)) {
+                drug.type <- drugs.df[i,]$type
+                p <- sum(grepl(drug.type, positive, ignore.case=TRUE))
+                n <- sum(grepl(drug.type, negative, ignore.case=TRUE))
+                u <- sum(grepl(drug.type, undefined, ignore.case=TRUE))
+                if (p & !n) {
+                    g[drug, gene] <- 1
+                } else if (n & !p) {
+                    g[drug, gene] <- -1
+                } else {
+                    g[drug, gene] <- 1e-100
+                }
+            } else {
+                g[drug, gene] <- 1e-100
+            }
+        }
+
+        g <- as.igraph(g)
+        drugs <- igraph::delete_vertices(drugs, gene)
+        igraph::V(g)$color <- ifelse(names(igraph::V(g)) %in% names(igraph::V(drugs)), rgb(0.5,0.0,0.5,0.1), rgb(0.0,0.5,0.5,0.1))
+        igraph::V(g)$shape <- ifelse(names(igraph::V(g)) %in% names(igraph::V(drugs)), 'square', 'circle')
+        igraph::V(g)$frame.color <- ifelse(names(igraph::V(g)) %in% names(igraph::V(drugs)), rgb(0.3,0.0,0.3), rgb(0.0,0.3,0.3))
+        igraph::V(g)$label.color <- ifelse(names(igraph::V(g)) %in% names(igraph::V(drugs)), rgb(0.3,0.0,0.3), rgb(0.0,0.3,0.3))
+        igraph::V(g)$label.cex <- ifelse(names(igraph::V(g)) %in% names(igraph::V(drugs)), 0.75, 1)
+
+    }
+
+    if ('weight' %in% igraph::list.edge.attributes(g)) {
+        igraph::E(g)$color <- ifelse(igraph::E(g)$weight == 1e-100, rgb(0.0,0.0,0.7,0.9),
+                                     ifelse(igraph::E(g)$weight > 0, rgb(0.0,0.7,0.0,0.9), rgb(0.7,0.0,0.0,0.9)))
+        igraph::E(g)$width <- sapply(igraph::E(g)$weight, function(x) ceiling(abs(x))+1)
+        t <- as.igraph(as.adjacency(g))
+        igraph::E(t)$weight <- abs(igraph::E(t)$weight)
+    } else {
+        igraph::E(g)$color <- rgb(0.3,0.3,0.3,0.9)
+        igraph::E(g)$width <- 2
+        t <- as.igraph(as.adjacency(g))
+    }
+
+    layout <- igraph::layout_as_star(g, center = gene)
+
+    if (interactive) {
+        layout <- third.axis(layout)
+        threejs::graphjs(g,
+            layout=layout)
+    } else {
+        igraph::plot.igraph(g,
+            vertex.label.font=2,
+            vertex.label.family='Helvetica',
+            vertex.size=50,
+            edge.lty='solid',
+            edge.arrow.width=1,
+            layout=layout,
+            rescale=TRUE)
+    }
 }
