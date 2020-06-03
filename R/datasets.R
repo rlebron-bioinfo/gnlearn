@@ -396,7 +396,7 @@ export.dataset <- function(df, path, sep='\t', header=TRUE, index=FALSE, transpo
 #' @param path Output file path.
 #' @param sep Separator / delimiter character (optional). Default: TAB
 #' @param header Whether or not to include a header (optional). Default: TRUE
-#' @param index Whether or not to include an index column (optional). Default: FALSE
+#' @param index Whether or not to include an index column (optional). Default: TRUE
 #' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
 #' @param from Output format (optional): 'adjacency' or 'edges'. Default: 'adjacency'
 #' @keywords graphs

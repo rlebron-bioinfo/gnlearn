@@ -1262,3 +1262,41 @@ drugs.plot <- function(x, drugs, gene, from=c('auto', 'adjacency', 'edges', 'gra
             rescale=TRUE)
     }
 }
+
+#' Ortholog Genes Graph
+#'
+#' This function allows you to convert graph between different formats: adjacency matrix, list of edges, igraph and bnlearn (bnlearn).
+#' @param g Graph object.
+#' @param genes Geneset with features.
+#' @param column Name of column with ortholog genes.
+#' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
+#' @keywords graph ortholog genes
+#' @export
+#' @examples
+#' g <- ortholog.graph(g, genes, column='human.ortholog')
+
+ortholog.graph <- function(g, genes, column, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                           from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    to <- match.arg(to)
+    from <- match.arg(from)
+
+    if (from=='auto') {
+        from <- detect.format(g)
+    }
+
+    g <- as.igraph(g, from=from)
+
+    genes <- names(igraph::V(g))
+    ortholog.genes <- sapply(genes, function(name) {
+        new.name <- genes[genes$name==name,]$column
+        if (new.name=='') {
+            new.name <- paste(c('NA', name), colapse=':')
+        }
+    })
+    igraph::V(g)$name <- ortholog.genes
+    igraph::V(g)$label <- ortholog.genes
+
+    g <- convert.format(g, from='igraph', to=to)
+    return(g)
+}

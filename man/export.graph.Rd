@@ -23,7 +23,7 @@ export.graph(
 
 \item{header}{Whether or not to include a header (optional). Default: TRUE}
 
-\item{index}{Whether or not to include an index column (optional). Default: FALSE}
+\item{index}{Whether or not to include an index column (optional). Default: TRUE}
 
 \item{from}{Output format (optional): 'adjacency' or 'edges'. Default: 'adjacency'}
 }
