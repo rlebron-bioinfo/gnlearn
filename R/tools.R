@@ -105,7 +105,7 @@ as.adjacency <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igrap
             g <- as.matrix(igraph::as_adjacency_matrix(g, type='both', attr=attr))
         },
         bnlearn = {
-            g <- bnlearn::amat(g)
+            g <- from.bnlearn(g)
         }
     )
     return(g)
@@ -142,7 +142,8 @@ as.edges <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 
             g <- igraph::as_data_frame(g, what='edges')
         },
         bnlearn = {
-            g <- as.data.frame(bnlearn::arcs(g))
+            g <- from.bnlearn(g)
+            g <- as.edges(g, from='adjacency')
         }
     )
     return(g)
@@ -192,7 +193,8 @@ as.graph <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 
             g <- igraph::as_graphnel(g)
         },
         bnlearn = {
-            g <- bnlearn::as.graphNEL(g)
+            g <- from.bnlearn(g)
+            g <- as.graph(g, from='adjacency')
         }
     )
     return(g)
@@ -227,7 +229,7 @@ as.igraph <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph',
             g <- g
         },
         bnlearn = {
-            g <- bnlearn::amat(g)
+            g <- from.bnlearn(g)
             g <- igraph::graph_from_adjacency_matrix(as.matrix(g), mode='directed', weighted=TRUE, diag=TRUE)
         }
     )
@@ -285,6 +287,25 @@ as.bnlearn <- function(g, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph'
         }
     )
     return(g)
+}
+
+from.bnlearn <- function(g) {
+    fmt <- class(g)[1]
+    if (fmt=='bn') {
+        return(as.matrix(bnlearn::amat(g)))
+    } else if (fmt=='bn.fit') {
+        g <- bnlearn::amat(g)
+        for (node in g.fit) {
+            gene <- node$node
+            coeff <- as.list(node$coefficients)
+            coeff['(Intercept)'] <- NULL
+            for (parent in names(coeff)) {
+                w <- as.numeric(coeff[parent])
+                g[gene, parent] <- w
+            }
+        }
+        return(as.matrix(g))
+    }
 }
 
 #' Graph Plotting
@@ -1305,4 +1326,50 @@ ortholog.graph <- function(g, genes, column, to=c('igraph', 'adjacency', 'edges'
 
     g <- convert.format(g, from='igraph', to=to)
     return(g)
+}
+
+#' Estimate the coefficients of an adjacency matrix
+#'
+#' This function allows you to estimate the coefficients of the adjacency matrix of a previously learned graph.
+#' @param g Graph object.
+#' @param df Dataset.
+#' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @keywords graph fit coefficients
+#' @export
+#' @examples
+#' g <- fit.coefficients(g, df)
+
+fit.coefficients <- function(g, df, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                             from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn'), cluster=4) {
+    to <- match.arg(to)
+    from <- match.arg(from)
+    if (from=='auto') {
+        from <- detect.format(g)
+    }
+
+    df <- subset(df, select=colnames(as.adjacency(g, from=from)))
+    g <- as.bnlearn(g, from=from)
+    if (bnlearn::directed(g)) {
+        library(parallel)
+        cluster = makeCluster(cluster)
+        g.fit <- bnlearn::bn.fit(g, df, method='mle', keep.fitted=TRUE, cluster=cluster)
+        g <- bnlearn::amat(g)
+        for (node in g.fit) {
+            gene <- node$node
+            coeff <- as.list(node$coefficients)
+            coeff['(Intercept)'] <- NULL
+            for (parent in names(coeff)) {
+                w <- as.numeric(coeff[parent])
+                g[gene, parent] <- w
+            }
+        }
+        stopCluster(cluster)
+        g <- convert.format(g, from='adjacency', to=to)
+        return(g)
+    } else {
+        message('The graph contains undirected edges. Please edit them with the add.edge() function.')
+        return(NULL)
+    }
 }
