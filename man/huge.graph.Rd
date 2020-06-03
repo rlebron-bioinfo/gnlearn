@@ -14,6 +14,7 @@ huge.graph(
   iter.m = NULL,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
   cluster = 4,
+  seed = NULL,
   ...
 )
 }
@@ -35,6 +36,8 @@ huge.graph(
 \item{to}{Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn').}
 
 \item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: 4}
+
+\item{seed}{Seed used for random selection. Default: NULL}
 
 \item{...}{Other arguments for the specified algorithm.}
 }

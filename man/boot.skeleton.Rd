@@ -22,7 +22,8 @@ boot.skeleton(
   pcalg.maj.rule = FALSE,
   pcalg.solve.confl = FALSE,
   bnlearn.test = ci.tests,
-  bnlearn.B = NULL
+  bnlearn.B = NULL,
+  seed = NULL
 )
 }
 \arguments{
@@ -53,6 +54,8 @@ boot.skeleton(
 \item{bnlearn.test}{Conditional independence test to be used (bnlearn implementation): 'cor', 'mc-cor', 'smc-cor', 'zf', 'mc-zf', 'smc-zf', 'mi-g', 'mc-mi-g', 'smc-mi-g', or 'mi-g-sh'. Default: 'cor'}
 
 \item{bnlearn.B}{Number of permutations considered for each permutation test (bnlearn implementation).}
+
+\item{seed}{Seed used for random selection. Default: NULL}
 }
 \description{
 This function allows you to learn a directed graph from a dataset using the Peter & Clark skeleton algorithm (stable version).

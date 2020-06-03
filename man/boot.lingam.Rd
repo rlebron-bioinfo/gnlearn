@@ -10,7 +10,8 @@ boot.lingam(
   m = NULL,
   threshold = 0.5,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
-  cluster = 4
+  cluster = 4,
+  seed = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ boot.lingam(
 \item{to}{Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).}
 
 \item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: 4}
+
+\item{seed}{Seed used for random selection. Default: NULL}
 }
 \description{
 This function allows you to learn a directed graph from a dataset using the LINGAM algorithm.
