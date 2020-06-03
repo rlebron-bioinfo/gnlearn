@@ -1287,12 +1287,14 @@ ortholog.graph <- function(g, genes, column, to=c('igraph', 'adjacency', 'edges'
 
     g <- as.igraph(g, from=from)
 
-    genes <- names(igraph::V(g))
-    ortholog.genes <- sapply(genes, function(name) {
-        new.name <- genes[genes$name==name,]$column
-        if (new.name=='') {
+    nodes <- names(igraph::V(g))
+    ortholog.genes <- sapply(nodes, function(name) {
+        new.name <- genes[genes$name==name, ]
+        new.name <- new.name[1, column]
+        if (length(new.name)==0 | is.null(new.name)) {
             new.name <- paste(c('NA', name), colapse=':')
         }
+        new.name
     })
     igraph::V(g)$name <- ortholog.genes
     igraph::V(g)$label <- ortholog.genes
