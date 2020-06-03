@@ -1456,6 +1456,37 @@ add.genes <- function(g, new.genes, to=c('igraph', 'adjacency', 'edges', 'graph'
     return(g)
 }
 
+#' Rename Genes To A Graph
+#'
+#' This function renames genes of a previously learned graph.
+#' @param g Graph object.
+#' @param genes Genes to be renamed (vector).
+#' @param new.names New names (vector, in the same order).
+#' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
+#' @keywords graph genes
+#' @export
+#' @examples
+#' g <- rename.genes(g, c('A', 'B', 'C'), c('Cd74', 'Ldhc', 'Tlx3'))
+
+rename.genes <- function(g, genes, new.names, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                         from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    to <- match.arg(to)
+    from <- match.arg(from)
+
+    if (from=='auto') {
+        from <- detect.format(g)
+    }
+
+    g <- as.igraph(g, from=from)
+    genes <- genes[genes %in% names(igraph::V(g))]
+    if (length(genes) > 0) {
+        g <- igraph::set_vertex_attr(g, 'name', index=genes, new.names)
+    }
+    g <- convert.format(g, from='igraph', to=to)
+    return(g)
+}
+
 #' Delete Genes From A Graph
 #'
 #' This function deletes genes from a previously learned graph.
@@ -1469,7 +1500,7 @@ add.genes <- function(g, new.genes, to=c('igraph', 'adjacency', 'edges', 'graph'
 #' g <- delete.genes(g, c('Cd74', 'Ldhc', 'Tlx3'))
 
 delete.genes <- function(g, rm.genes, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
-                      from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+                         from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
     to <- match.arg(to)
     from <- match.arg(from)
 
@@ -1491,6 +1522,7 @@ delete.genes <- function(g, rm.genes, to=c('igraph', 'adjacency', 'edges', 'grap
 #' This function adds edges to a previously learned graph.
 #' @param g Graph object.
 #' @param new.edges New edges to be added (dataframe with at least two columns: 'from' and 'to').
+#' @param new.genes New genes (nodes) will also be included. Otherwise, only edges of nodes already present in the network will be taken into account. Default: TRUE
 #' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
 #' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
 #' @keywords graph genes edges
@@ -1498,7 +1530,7 @@ delete.genes <- function(g, rm.genes, to=c('igraph', 'adjacency', 'edges', 'grap
 #' @examples
 #' g <- add.edges(g, new.edges)
 
-add.edges <- function(g, new.edges, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+add.edges <- function(g, new.edges, new.genes=TRUE, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
                       from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
     to <- match.arg(to)
     from <- match.arg(from)
@@ -1509,6 +1541,11 @@ add.edges <- function(g, new.edges, to=c('igraph', 'adjacency', 'edges', 'graph'
 
     g <- as.adjacency(g, from=from)
     new.edges <- as.adjacency(new.edges, from='edges')
+
+    if (new.genes) {
+        g <- add.genes(g, colnames(new.edges), from='adjacency', to='adjacency')
+    }
+
     g <- g[sort(colnames(g)), sort(colnames(g))]
     cols.g <- colnames(g)
     new.edges <- new.edges[sort(colnames(new.edges)), sort(colnames(new.edges))]
