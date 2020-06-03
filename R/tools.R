@@ -782,11 +782,13 @@ averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
         adj.2 <- adj.2[sort(cols.2), sort(cols.2)]
         int.1 <- cols.1 %in% cols.2
         int.2 <- cols.2 %in% cols.1
-        coeff.int <- ((i-1) * coeff.1[int.1, int.1] / i) + (coeff.2[int.2, int.2] / i)
-        adj.int <- ((i-1) * adj.1[int.1, int.1] / i) + (adj.2[int.2, int.2] / i)
-        cols.int <- rownames(adj.int) <- colnames(adj.int) <- rownames(coeff.int) <- colnames(coeff.int)
-        coeff.int <- coeff.int[sort(cols.int), sort(cols.int)]
-        adj.int <- adj.int[sort(cols.int), sort(cols.int)]
+        if (sum(int.1) > 0 & sum(int.2) > 0) {
+            coeff.int <- ((i-1) * coeff.1[int.1, int.1] / i) + (coeff.2[int.2, int.2] / i)
+            adj.int <- ((i-1) * adj.1[int.1, int.1] / i) + (adj.2[int.2, int.2] / i)
+            cols.int <- rownames(adj.int) <- colnames(adj.int) <- rownames(coeff.int) <- colnames(coeff.int)
+            coeff.int <- coeff.int[sort(cols.int), sort(cols.int)]
+            adj.int <- adj.int[sort(cols.int), sort(cols.int)]
+        }
         cols.u <- sort(union(cols.1, cols.2))
         n.cols.u <- length(cols.u)
         coeff.u <- as.data.frame(matrix(0, nrow=n.cols.u, ncol=n.cols.u))
@@ -796,10 +798,12 @@ averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
         adj.u <- adj.u[sort(cols.u), sort(cols.u)]
         coeff.u[cols.u %in% cols.1, cols.u %in% cols.1] <- coeff.1
         coeff.u[cols.u %in% cols.2, cols.u %in% cols.2] <- coeff.2
-        coeff.u[cols.u %in% cols.int, cols.u %in% cols.int] <- coeff.int
         adj.u[cols.u %in% cols.1, cols.u %in% cols.1] <- adj.1
         adj.u[cols.u %in% cols.2, cols.u %in% cols.2] <- adj.2
-        adj.u[cols.u %in% cols.int, cols.u %in% cols.int] <- adj.int
+        if (sum(int.1) > 0 & sum(int.2) > 0) {
+            coeff.u[cols.u %in% cols.int, cols.u %in% cols.int] <- coeff.int
+            adj.u[cols.u %in% cols.int, cols.u %in% cols.int] <- adj.int
+        }
         coeff.1 <- coeff.u
         adj.1 <- adj.u
     }
