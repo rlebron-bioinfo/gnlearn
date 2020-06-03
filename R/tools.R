@@ -1351,7 +1351,7 @@ fit.coefficients <- function(g, df, to=c('igraph', 'adjacency', 'edges', 'graph'
 
     df <- subset(df, select=colnames(as.adjacency(g, from=from)))
     g <- as.bnlearn(g, from=from)
-    if (bnlearn::directed(g)) {
+    if (bnlearn::directed(g) & bnlearn::acyclic(g)) {
         library(parallel)
         cluster = makeCluster(cluster)
         g.fit <- bnlearn::bn.fit(g, df, method='mle', keep.fitted=TRUE, cluster=cluster)
@@ -1369,7 +1369,199 @@ fit.coefficients <- function(g, df, to=c('igraph', 'adjacency', 'edges', 'graph'
         g <- convert.format(g, from='adjacency', to=to)
         return(g)
     } else {
-        message('The graph contains undirected edges. Please edit them with the add.edge() function.')
+        message('The graph contains undirected edges, cycles or loops.')
         return(NULL)
     }
+}
+
+#' Return Undirected Edges
+#'
+#' This function returns all undirected edges in a graph.
+#' @param g Graph object.
+#' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
+#' @keywords graph undirected edges
+#' @export
+#' @examples
+#' g <- undirected.edges(g)
+
+undirected.edges <- function(g, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                             from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    to <- match.arg(to)
+    from <- match.arg(from)
+
+    if (from=='auto') {
+        from <- detect.format(g)
+    }
+
+    g <- as.bnlearn(g, from=from)
+    g <- bnlearn::undirected.arcs(g)
+    g <- convert.format(g, from='edges', to=to)
+    return(g)
+}
+
+#' Return Directed Edges
+#'
+#' This function returns all directed edges in a graph.
+#' @param g Graph object.
+#' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
+#' @keywords graph directed edges
+#' @export
+#' @examples
+#' g <- directed.edges(g)
+
+directed.edges <- function(g, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                           from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    to <- match.arg(to)
+    from <- match.arg(from)
+
+    if (from=='auto') {
+        from <- detect.format(g)
+    }
+
+    g <- as.bnlearn(g, from=from)
+    g <- bnlearn::directed.arcs(g)
+    g <- convert.format(g, from='edges', to=to)
+    return(g)
+}
+
+#' Add Genes To A Graph
+#'
+#' This function adds genes to a previously learned graph.
+#' @param g Graph object.
+#' @param new.genes New genes to be added (vector).
+#' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
+#' @keywords graph genes
+#' @export
+#' @examples
+#' g <- add.genes(g, c('Cd74', 'Ldhc', 'Tlx3'))
+
+add.genes <- function(g, new.genes, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                      from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    to <- match.arg(to)
+    from <- match.arg(from)
+
+    if (from=='auto') {
+        from <- detect.format(g)
+    }
+
+    g <- as.igraph(g, from=from)
+    new.genes <- new.genes[!new.genes %in% names(igraph::V(g))]
+    if (length(new.genes) > 0) {
+        g <- igraph::add_vertices(g, length(new.genes), attr=list(name=new.genes))
+    }
+    g <- convert.format(g, from='igraph', to=to)
+    return(g)
+}
+
+#' Delete Genes From A Graph
+#'
+#' This function deletes genes from a previously learned graph.
+#' @param g Graph object.
+#' @param rm.genes Genes to be deleted (vector).
+#' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
+#' @keywords graph genes
+#' @export
+#' @examples
+#' g <- delete.genes(g, c('Cd74', 'Ldhc', 'Tlx3'))
+
+delete.genes <- function(g, rm.genes, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                      from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    to <- match.arg(to)
+    from <- match.arg(from)
+
+    if (from=='auto') {
+        from <- detect.format(g)
+    }
+
+    g <- as.igraph(g, from=from)
+    rm.genes <- rm.genes[rm.genes %in% names(igraph::V(g))]
+    if (length(rm.genes) > 0) {
+        g <- igraph::delete_vertices(g, rm.genes)
+    }
+    g <- convert.format(g, from='igraph', to=to)
+    return(g)
+}
+
+#' Add Edges To A Graph
+#'
+#' This function adds edges to a previously learned graph.
+#' @param g Graph object.
+#' @param new.edges New edges to be added (dataframe with at least two columns: 'from' and 'to').
+#' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
+#' @keywords graph genes edges
+#' @export
+#' @examples
+#' g <- add.edges(g, new.edges)
+
+add.edges <- function(g, new.edges, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                      from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    to <- match.arg(to)
+    from <- match.arg(from)
+
+    if (from=='auto') {
+        from <- detect.format(g)
+    }
+
+    g <- as.adjacency(g, from=from)
+    new.edges <- as.adjacency(new.edges, from='edges')
+    g <- g[sort(colnames(g)), sort(colnames(g))]
+    cols.g <- colnames(g)
+    new.edges <- new.edges[sort(colnames(new.edges)), sort(colnames(new.edges))]
+    cols.new <- colnames(new.edges)
+    cols.new <- intersect(cols.g, cols.new)
+    new.edges <- as.edges(new.edges[cols.new, cols.new], from='adjacency')
+    for (i in 1:nrow(new.edges)) {
+        e.from <- new.edges[i,]$from
+        e.to <- new.edges[i,]$to
+        e.weight <- new.edges[i,]$weight
+        g[e.from, e.to] <- e.weight
+    }
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
+}
+
+#' Delete Edges To A Graph
+#'
+#' This function deletes edges to a previously learned graph.
+#' @param g Graph object.
+#' @param rm.edges New edges to be deleted (dataframe with at least two columns: 'from' and 'to').
+#' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
+#' @keywords graph genes edges
+#' @export
+#' @examples
+#' g <- delete.edges(g, new.edges)
+
+delete.edges <- function(g, rm.edges, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                         from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    to <- match.arg(to)
+    from <- match.arg(from)
+
+    if (from=='auto') {
+        from <- detect.format(g)
+    }
+
+    g <- as.adjacency(g, from=from)
+    new.edges <- as.adjacency(new.edges, from='edges')
+    g <- g[sort(colnames(g)), sort(colnames(g))]
+    cols.g <- colnames(g)
+    new.edges <- new.edges[sort(colnames(new.edges)), sort(colnames(new.edges))]
+    cols.new <- colnames(new.edges)
+    cols.new <- intersect(cols.g, cols.new)
+    new.edges <- as.edges(new.edges[cols.new, cols.new], from='adjacency')
+    for (i in 1:nrow(new.edges)) {
+        e.from <- new.edges[i,]$from
+        e.to <- new.edges[i,]$to
+        e.weight <- 0
+        g[e.from, e.to] <- e.weight
+    }
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
 }
