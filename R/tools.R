@@ -875,10 +875,9 @@ average.graph <- function(graphs, threshold=0.5, to='igraph') {
         all.adj[cols, cols] <- all.adj[cols, cols] + adj
     }
 
+    all.occurr[all.occurr == 0] <- 1
     all.coeff <- all.coeff / all.occurr
-    all.coeff[is.nan(all.coeff)] <- 0
     all.adj <- all.adj / all.occurr
-    all.adj[is.nan(all.adj)] <- 0
     all.coeff[all.adj < threshold] <- 0
 
     g <- convert.format(all.coeff, to=to)
