@@ -9,28 +9,32 @@ Authors@R:
            comment = c(Google.Scholar = "vi8RU-kAAAAJ"))
     person(given = "Gherardo",
            family = "Varando",
-           role = c("aut", "cre"),
+           role = c("ctb"),
            email = "gherardo.varando@upm.es",
            comment = c(Google.Scholar = "ALjiTg0AAAAJ"))
+Author:
+    Ricardo Lebrón [aut, cre],
+    Gherardo Varando [ctb]
+Maintainer: Ricardo Lebrón <rlebron@go.ugr.es>
 Description: Genetic Network Learning.
 Depends:
+    parallel,
     foreach,
     doParallel
 biocViews:
 Imports:
+    graph,
+    pcalg,
     igraph,
     threejs,
-    glasso,
     bnlearn,
-    pcalg,
+    glasso,
     jsonlite,
-    graph,
-    RBGL,
     matrixcalc,
     dplyr,
+    RBGL,
     ape,
-    gplots,
-    parallel
+    gplots
 Remotes:
     gherardovarando/gclm
 Suggests:
