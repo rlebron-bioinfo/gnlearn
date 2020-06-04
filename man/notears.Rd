@@ -2,7 +2,7 @@
 % Please edit documentation in R/algorithms.R
 \name{notears}
 \alias{notears}
-\title{Linear NO-TEARS Algorithm (REIMPLEMENTED)}
+\title{Linear NO-TEARS Algorithm (Reimplemented)}
 \usage{
 notears(
   df,

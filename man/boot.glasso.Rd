@@ -2,7 +2,7 @@
 % Please edit documentation in R/algorithms.R
 \name{boot.glasso}
 \alias{boot.glasso}
-\title{GLASSO Algorithm With Bootstrapping}
+\title{Graphical Lasso (GLASSO) With Bootstrapping}
 \usage{
 boot.glasso(
   df,

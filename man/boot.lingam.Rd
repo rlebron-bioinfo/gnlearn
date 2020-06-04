@@ -2,7 +2,7 @@
 % Please edit documentation in R/algorithms.R
 \name{boot.lingam}
 \alias{boot.lingam}
-\title{LINGAM Algorithm With Bootstrapping}
+\title{Restricted Structural Equation Models (LINGAM) With Bootstrapping}
 \usage{
 boot.lingam(
   df,

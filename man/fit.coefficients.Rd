@@ -2,7 +2,7 @@
 % Please edit documentation in R/tools.R
 \name{fit.coefficients}
 \alias{fit.coefficients}
-\title{Estimate the coefficients of an adjacency matrix}
+\title{Estimate The Coefficients Of An Adjacency Matrix}
 \usage{
 fit.coefficients(
   g,

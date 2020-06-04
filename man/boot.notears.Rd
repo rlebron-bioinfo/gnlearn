@@ -2,7 +2,7 @@
 % Please edit documentation in R/algorithms.R
 \name{boot.notears}
 \alias{boot.notears}
-\title{Linear NO-TEARS Algorithm (REIMPLEMENTED) With Bootstrapping}
+\title{Linear NO-TEARS Algorithm (Reimplemented) With Bootstrapping}
 \usage{
 boot.notears(
   df,

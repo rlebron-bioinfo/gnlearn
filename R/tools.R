@@ -836,17 +836,6 @@ averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
     return(g)
 }
 
-#' Rename Vertices Of A List Of Graphs
-#'
-#' This function allows you to rename nodes of a list of graphs.
-#' @param graphs List of graphs.
-#' @param names Vector with the new vertex names (in order).
-#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @keywords rename graph
-#' @export
-#' @examples
-#' graph <- rename.graphs(graphs, names)
-
 rename.graphs <- function(graphs, names, to='igraph') {
     R <- length(graphs)
     renamed.graphs <- list()
@@ -1328,7 +1317,7 @@ ortholog.graph <- function(g, genes, column, to=c('igraph', 'adjacency', 'edges'
     return(g)
 }
 
-#' Estimate the coefficients of an adjacency matrix
+#' Estimate The Coefficients Of An Adjacency Matrix
 #'
 #' This function allows you to estimate the coefficients of the adjacency matrix of a previously learned graph.
 #' @param g Graph object.

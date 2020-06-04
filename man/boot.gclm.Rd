@@ -2,7 +2,7 @@
 % Please edit documentation in R/algorithms.R
 \name{boot.gclm}
 \alias{boot.gclm}
-\title{GCLM Algorithm With Bootstrapping}
+\title{Graphical Continuous Lyapunov Models (GCLM) With Bootstrapping}
 \usage{
 boot.gclm(
   df,

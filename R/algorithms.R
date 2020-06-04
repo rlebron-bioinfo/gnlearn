@@ -718,7 +718,7 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
     return(g)
 }
 
-#' Linear NO-TEARS Algorithm (REIMPLEMENTED)
+#' Linear NO-TEARS Algorithm (Reimplemented)
 #'
 #' This function allows you to learn an adjacency matrix from a dataset using the Linear NO-TEARS algorithm.
 #' @param df Dataset.
@@ -841,7 +841,7 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
     return(W.est)
 }
 
-#' Linear NO-TEARS Algorithm (REIMPLEMENTED) With Bootstrapping
+#' Linear NO-TEARS Algorithm (Reimplemented) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the Linear NO-TEARS algorithm.
 #' @param df Dataset.
@@ -1035,7 +1035,7 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
 
 ## Graphical Lasso
 
-#' GLASSO Algorithm With Bootstrapping
+#' Graphical Lasso (GLASSO) With Bootstrapping
 #'
 #' This function allows you to learn an undirected graph from a dataset using the GLASSO algorithm.
 #' @param df Dataset.
@@ -1100,7 +1100,7 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
 
 ## Restricted Structural Equation Models
 
-#' LINGAM Algorithm With Bootstrapping
+#' Restricted Structural Equation Models (LINGAM) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the LINGAM algorithm.
 #' @param df Dataset.
@@ -1141,7 +1141,7 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 
 ## Graphical Continuous Lyapunov Models
 
-#' GCLM Algorithm With Bootstrapping
+#' Graphical Continuous Lyapunov Models (GCLM) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the GCLM algorithm.
 #' @param df Dataset.
