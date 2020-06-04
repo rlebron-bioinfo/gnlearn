@@ -4,88 +4,88 @@ Genetic Network Learning
 ## Package Overview
 
 *Import & Export Files:*
-* import.dataset: Import A Local Dataset
-* import.geneset: Import A Local Geneset
-* import.graph: Import A Local Graph
-* export.dataset: Export A Dataset To A File
-* export.geneset: Export A Geneset To A File
-* export.graph: Export A Graph To A File
+* _import.dataset_: Import A Local Dataset
+* _import.geneset_: Import A Local Geneset
+* _import.graph_: Import A Local Graph
+* _export.dataset_: Export A Dataset To A File
+* _export.geneset_: Export A Geneset To A File
+* _export.graph_: Export A Graph To A File
 
 *RESTful API Client:*
-* list.datasets: List Datasets Available Via RESTful API
-* list.genesets: List Genesets Available Via RESTful API
-* list.graphs: List Graphs Available Via RESTful API
-* download.dataset: Download A Dataset Via RESTful API
-* download.geneset: Download A Geneset Via RESTful API
-* download.graph: Download A Graph Via RESTful API
+* _list.datasets_: List Datasets Available Via RESTful API
+* _list.genesets_: List Genesets Available Via RESTful API
+* _list.graphs_: List Graphs Available Via RESTful API
+* _download.dataset_: Download A Dataset Via RESTful API
+* _download.geneset_: Download A Geneset Via RESTful API
+* _download.graph_: Download A Graph Via RESTful API
 
 *Dataset Manipulation:*
-* drop.all.zeros: Drop rows and/or columns with all zeros
-* select.genes: Select (automatically) the most appropriate gene columns of your dataset
-* dataframe.split: Split A Dataframe Into Training And Test Datasets
+* _drop.all.zeros_: Drop rows and/or columns with all zeros
+* _select.genes_: Select (automatically) the most appropriate gene columns of your dataset
+* _dataframe.split_: Split A Dataframe Into Training And Test Datasets
 
 *Dataset Operations:*
-* gene.histogram: Plot expression histograms of genes in your dataset
-* gene.correlation: Plot expression correlation of genes in your dataset
-* gene.clustering: Gene Clustering
+* _gene.histogram_: Plot expression histograms of genes in your dataset
+* _gene.correlation_: Plot expression correlation of genes in your dataset
+* _gene.clustering_: Gene Clustering
 
 *Structure Learning Algorithms:*
-* huge.graph: Learn Huge Graph (With Random Gene Selection + Cells Bootstrapping)
-* boot.skeleton: Peter & Clark Skeleton Algorithm With Bootstrapping
-* boot.pc: Peter & Clark Algorithm (PC) With Bootstrapping
-* boot.fci: Fast Causal Inference Algorithm (FCI) With Bootstrapping
-* boot.gs: Grow-Shrink Algorithm (GS) With Bootstrapping
-* boot.iamb: Incremental Association Algorithm (IAMB) With Bootstrapping
-* boot.parents.children: Parents & Children Algorithm With Bootstrapping
-* boot.chowliu: Chow-Liu Algorithm With Bootstrapping
-* boot.aracne: ARACNE Algorithm With Bootstrapping
-* boot.hc: Hill-Climbing Algorithm (HC) With Bootstrapping
-* boot.tabu: Tabu Search Algorithm (TABU) With Bootstrapping
-* boot.ges: Greedy Equivalence Search Algorithm (GES) With Bootstrapping
-* notears: Linear NO-TEARS Algorithm (Reimplemented)
-* boot.notears: Linear NO-TEARS Algorithm (Reimplemented) With Bootstrapping
-* boot.rsmax2: General 2-Phase Restricted Maximization Algorithm (rsmax2) With Bootstrapping
-* boot.arges: Adaptively Restricted Greedy Equivalence Search Algorithm (ARGES) With Bootstrapping
-* boot.glasso: Graphical Lasso (GLASSO) With Bootstrapping
-* boot.lingam: Restricted Structural Equation Models (LINGAM) With Bootstrapping
-* boot.gclm: Graphical Continuous Lyapunov Models (GCLM) With Bootstrapping
-* boot.nodag: NODAG Algorithm With Bootstrapping
+* _huge.graph_: Learn Huge Graph (With Random Gene Selection + Cells Bootstrapping)
+* _boot.skeleton_: Peter & Clark Skeleton Algorithm With Bootstrapping
+* _boot.pc_: Peter & Clark Algorithm (PC) With Bootstrapping
+* _boot.fci_: Fast Causal Inference Algorithm (FCI) With Bootstrapping
+* _boot.gs_: Grow-Shrink Algorithm (GS) With Bootstrapping
+* _boot.iamb_: Incremental Association Algorithm (IAMB) With Bootstrapping
+* _boot.parents.children_: Parents & Children Algorithm With Bootstrapping
+* _boot.chowliu_: Chow-Liu Algorithm With Bootstrapping
+* _boot.aracne_: ARACNE Algorithm With Bootstrapping
+* _boot.hc_: Hill-Climbing Algorithm (HC) With Bootstrapping
+* _boot.tabu_: Tabu Search Algorithm (TABU) With Bootstrapping
+* _boot.ges_: Greedy Equivalence Search Algorithm (GES) With Bootstrapping
+* _notears_: Linear NO-TEARS Algorithm (Reimplemented)
+* _boot.notears_: Linear NO-TEARS Algorithm (Reimplemented) With Bootstrapping
+* _boot.rsmax2_: General 2-Phase Restricted Maximization Algorithm (rsmax2) With Bootstrapping
+* _boot.arges_: Adaptively Restricted Greedy Equivalence Search Algorithm (ARGES) With Bootstrapping
+* _boot.glasso_: Graphical Lasso (GLASSO) With Bootstrapping
+* _boot.lingam_: Restricted Structural Equation Models (LINGAM) With Bootstrapping
+* _boot.gclm_: Graphical Continuous Lyapunov Models (GCLM) With Bootstrapping
+* _boot.nodag_: NODAG Algorithm With Bootstrapping
 
 *Graph Format:*
-* detect.format: Graph Format Detection
-* convert.format: Graph Format Conversion
-* as.adjacency: Convert Graph To Adjacency Matrix
-* as.edges: Convert Graph To Edge List
-* as.graph: Convert Graph To graph Format
-* as.igraph: Convert Graph To igraph Format
-* as.bnlearn: Convert Graph To bnlearn Format
+* _detect.format_: Graph Format Detection
+* _convert.format_: Graph Format Conversion
+* _as.adjacency_: Convert Graph To Adjacency Matrix
+* _as.edges_: Convert Graph To Edge List
+* _as.graph_: Convert Graph To graph Format
+* _as.igraph_: Convert Graph To igraph Format
+* _as.bnlearn_: Convert Graph To bnlearn Format
 
 *Graph Modifications:*
-* add.genes: Add Genes To A Graph
-* rename.genes: Rename Genes Of A Graph
-* delete.genes: Delete Genes From A Graph
-* delete.isolated: Delete Isolated Nodes
-* add.edges: Add Edges To A Graph
-* delete.edges: Delete Edges To A Graph
-* graph.marginalization: Graph Marginalization
-* fit.coefficients: Estimate The Coefficients Of An Adjacency Matrix
+* _add.genes_: Add Genes To A Graph
+* _rename.genes_: Rename Genes Of A Graph
+* _delete.genes_: Delete Genes From A Graph
+* _delete.isolated_: Delete Isolated Nodes
+* _add.edges_: Add Edges To A Graph
+* _delete.edges_: Delete Edges To A Graph
+* _graph.marginalization_: Graph Marginalization
+* _fit.coefficients_: Estimate The Coefficients Of An Adjacency Matrix
 
 *Graph Operations:*
-* undirected.edges: Return Undirected Edges
-* directed.edges: Return Directed Edges
-* graph.plot: Graph Plotting
-* compare.graphs: Graph Comparison
-* feature.degree: Feature Degree
-* feature.plot: Feature Graph Plotting
-* graph.communities: Graph Communities
-* ortholog.graph: Ortholog Genes Graph
-* drugs.plot: Drug-Gene Interactions Plotting
-* averaged.graph: Calculate The Averaged Graph          
+* _undirected.edges_: Return Undirected Edges
+* _directed.edges_: Return Directed Edges
+* _graph.plot_: Graph Plotting
+* _compare.graphs_: Graph Comparison
+* _feature.degree_: Feature Degree
+* _feature.plot_: Feature Graph Plotting
+* _graph.communities_: Graph Communities
+* _ortholog.graph_: Ortholog Genes Graph
+* _drugs.plot_: Drug-Gene Interactions Plotting
+* _averaged.graph_: Calculate The Averaged Graph          
 
 *Graph generation:*
-* random.graph: Generate A Random Graph/DAG
-* ground.truth: Create a Ground Truth Graph
-* make.edgelist: Make an edgelist from some genes to anothers
+* _random.graph_: Generate A Random Graph/DAG
+* _ground.truth_: Create a Ground Truth Graph
+* _make.edgelist_: Make an edgelist from some genes to anothers
 
 ## Install *gnlearn*
 
