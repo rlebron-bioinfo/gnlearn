@@ -22,6 +22,7 @@ Genetic Network Learning
 *Dataset Manipulation:*
 * `drop.all.zeros()`: Drop rows and/or columns with all zeros
 * `select.genes()`: Select (automatically) the most appropriate gene columns of your dataset
+* `select.cells()`: Select (automatically) the most appropriate cell rows of your dataset
 * `dataframe.split()`: Split A Dataframe Into Training And Test Datasets
 
 *Dataset Operations:*

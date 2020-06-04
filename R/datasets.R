@@ -517,6 +517,44 @@ select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL,
     return(df)
 }
 
+#' Select (automatically) the most appropriate cell rows of your dataset.
+#'
+#' This function allows you to (automatically) select the most appropriate cell rows of your dataset.
+#' @param df Dataset.
+#' @param max.cells Maximum number of selected cells (optional).
+#' @param selection.criteria Criteria to be applied to select cells. Default: 'non.zeros'
+#' @keywords select cells
+#' @export
+#' @examples
+#' df <- select.cells(df, max.cells=2000)
+
+select.cells<- function(df, max.cells=2000, selection.criteria=c('non.zeros','mean','variance','random')) {
+    selection.criteria <- match.arg(selection.criteria)
+    df <- drop.all.zeros(df)
+    if (max.cells > nrow(df)) {
+        max.cells <- nrow(df)
+    }
+    selected.cells <- switch(selection.criteria,
+        non.zeros = {
+            nz <- as.list(rowSums(df!=0))
+            selected.cells <- names(nz[order(unlist(nz), decreasing=TRUE)])[1:max.cells]
+        },
+        mean = {
+            m <- as.list(apply(df, 1, mean))
+            selected.cells <- names(m[order(unlist(m), decreasing=TRUE)])[1:max.cells]
+        },
+        variance = {
+            v <- as.list(apply(df, 1, var))
+            selected.cells <- names(v[order(unlist(v), decreasing=TRUE)])[1:max.cells]
+        },
+        random = {
+            selected.cells <- sample(rownames(df), max.cells, replace=FALSE)
+        }
+    )
+    df <- df[selected.cells, ]
+    return(df)
+}
+
 #' Split A Dataframe Into Training And Test Datasets
 #'
 #' This function allows you to split a dataframe into training and test datasets.
