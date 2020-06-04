@@ -8,6 +8,7 @@ drugs.plot(
   x,
   drugs,
   gene,
+  neighbors = TRUE,
   from = c("auto", "adjacency", "edges", "graph", "igraph", "bnlearn"),
   interactive = FALSE
 )
@@ -18,6 +19,8 @@ drugs.plot(
 \item{drugs}{Geneset with drug-gene interactions.}
 
 \item{gene}{Gene whose drug interactions you want to explore.}
+
+\item{neighbors}{Whether or not to draw neighboring genes. Default: TRUE}
 
 \item{from}{Input format (optional).}
 

@@ -1214,6 +1214,7 @@ delete.isolated <- function(g, to=c('igraph', 'adjacency', 'edges', 'graph', 'bn
 #' @param x Graph object.
 #' @param drugs Geneset with drug-gene interactions.
 #' @param gene Gene whose drug interactions you want to explore.
+#' @param neighbors Whether or not to draw neighboring genes. Default: TRUE
 #' @param from Input format (optional).
 #' @param interactive Interactive plot (optional). Default: FALSE
 #' @keywords genes drugs graph plot
@@ -1221,7 +1222,7 @@ delete.isolated <- function(g, to=c('igraph', 'adjacency', 'edges', 'graph', 'bn
 #' @examples
 #' drugs.plot(g, 3, 'Bax')
 
-drugs.plot <- function(x, drugs, gene, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn'), interactive=FALSE) {
+drugs.plot <- function(x, drugs, gene, neighbors=TRUE, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn'), interactive=FALSE) {
     from <- match.arg(from)
 
     if (class(drugs)=='numeric') {
@@ -1247,8 +1248,14 @@ drugs.plot <- function(x, drugs, gene, from=c('auto', 'adjacency', 'edges', 'gra
 
     if (sum(drugs)==0) {
 
-        genes <- as.edges(x, from=from)
-        genes <- as.adjacency(genes[genes$from == gene | genes$to == gene,], from='edges')
+        if (neighbors) {
+            genes <- as.edges(x, from=from)
+            genes <- as.adjacency(genes[genes$from == gene | genes$to == gene,], from='edges')
+        } else {
+            genes <- as.data.frame(matrix(0, nrow=1, ncol=1))
+            rownames(genes) <- colnames(genes) <- c(gene)
+        }
+
         g <- as.igraph(genes, from='adjacency')
         igraph::V(g)$color <- rgb(0.0,0.5,0.5,0.1)
         igraph::V(g)$shape <- 'circle'
@@ -1256,17 +1263,19 @@ drugs.plot <- function(x, drugs, gene, from=c('auto', 'adjacency', 'edges', 'gra
         igraph::V(g)$label.color <- rgb(0.0,0.3,0.3)
         igraph::V(g)$label.cex <- 1
 
-
     } else {
 
-        genes <- as.edges(x, from=from)
-        genes <- as.adjacency(genes[genes$from == gene | genes$to == gene,], from='edges')
-        genes <- genes[sort(rownames(genes)), sort(colnames(genes))]
-        drugs <- as.igraph(drugs)
-        g <- igraph::union(drugs, as.igraph(genes))
+        if (neighbors) {
+            genes <- as.edges(x, from=from)
+            genes <- as.adjacency(genes[genes$from == gene | genes$to == gene,], from='edges')
+            genes <- genes[sort(rownames(genes)), sort(colnames(genes))]
+        } else {
+            genes <- as.data.frame(matrix(0, nrow=1, ncol=1))
+            rownames(genes) <- colnames(genes) <- c(gene)
+        }
+
         g <- as.adjacency(g)
-        g <- g[sort(rownames(g)), sort(colnames(g))]
-        g[colnames(g) %in% colnames(genes), colnames(g) %in% colnames(genes)] <- genes
+        g <- average.graph(list(drugs, genes), threshold=0)
         positive <- c('activator', 'agonist', 'cofactor', 'inducer', 'partial_agonist', 'positive_allosteric_modulator', 'stimulator')
         negative <- c('channel_blocker', 'antagonist', 'antibody', 'antisense', 'antisense_oligonucleotide', 'blocker', 'gating_inhibitor', 'inhibitor', 'inhibitory_allosteric_modulator', 'inverse_agonist', 'negative_modulator', 'vaccine')
         undefined <- c('allosteric_modulator', 'binder', 'modulator')
@@ -1290,6 +1299,7 @@ drugs.plot <- function(x, drugs, gene, from=c('auto', 'adjacency', 'edges', 'gra
         }
 
         g <- as.igraph(g)
+        drugs <- as.igraph(drugs)
         drugs <- igraph::delete_vertices(drugs, gene)
         igraph::V(g)$color <- ifelse(names(igraph::V(g)) %in% names(igraph::V(drugs)), rgb(0.5,0.0,0.5,0.1), rgb(0.0,0.5,0.5,0.1))
         igraph::V(g)$shape <- ifelse(names(igraph::V(g)) %in% names(igraph::V(drugs)), 'square', 'circle')
