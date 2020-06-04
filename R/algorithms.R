@@ -63,7 +63,7 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         if (implementation=='pcalg') {
             suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
             varNames <- colnames(splitted.df$train)
@@ -154,7 +154,7 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         if (implementation=='pcalg') {
             suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
             varNames <- colnames(splitted.df$train)
@@ -231,7 +231,7 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
         varNames <- colnames(splitted.df$train)
         g <- switch(version,
@@ -296,7 +296,7 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         g <- bnlearn::gs(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
                          B=B, max.sx=max.sx, undirected=FALSE)
         convert.format(g, to='adjacency')
@@ -361,7 +361,7 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
                          B=B, max.sx=max.sx, undirected=FALSE)
         convert.format(g, to='adjacency')
@@ -425,7 +425,7 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
                          B=B, max.sx=max.sx, undirected=FALSE)
         convert.format(g, to='adjacency')
@@ -475,7 +475,7 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         g <- bnlearn::chow.liu(splitted.df$train, whitelist=whitelist, blacklist=blacklist, mi='mi-g')
         convert.format(g, to='adjacency')
     }
@@ -524,7 +524,7 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         g <- bnlearn::aracne(splitted.df$train, whitelist=whitelist, blacklist=blacklist, mi='mi-g')
         convert.format(g, to='adjacency')
     }
@@ -587,7 +587,7 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         g <- bnlearn::hc(splitted.df$train, newdata=splitted.df$test, start=start, whitelist=whitelist, blacklist=blacklist, score=score,
                          restart=restart, perturb=perturb, max.iter=max.iter, maxp=maxp, optimized=TRUE)
         convert.format(g, to='adjacency')
@@ -652,7 +652,7 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         g <- bnlearn::tabu(splitted.df$train, newdata=splitted.df$test, start=start, whitelist=whitelist, blacklist=blacklist, score=score,
                            tabu=tabu, max.tabu=max.tabu, max.iter=max.iter, maxp=maxp, optimized=TRUE)
         convert.format(g, to='adjacency')
@@ -704,7 +704,7 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         score <- new('GaussL0penObsScore', data=splitted.df$train)
         g <- pcalg::ges(score, labels=score$getNodes(), fixedGaps=blacklist, maxDegree=maxDegree,
                         adaptive=adaptive, phase=c('forward','backward'), iterate=TRUE)
@@ -877,7 +877,7 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         g <- notears(splitted.df$train, lambda1=lambda1, loss.type=loss.type,
                      max.iter=max.iter, h.tol=h.tol, rho.max=rho.max, w.threshold=w.threshold)
         convert.format(g, to='adjacency')
@@ -951,7 +951,7 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         g <- bnlearn::rsmax2(splitted.df$train, whitelist=whitelist, blacklist=blacklist, restrict=restrict, maximize=maximize,
                              restrict.args=restrict.args, maximize.args=maximize.args)
         convert.format(g, to='adjacency')
@@ -1014,7 +1014,7 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
         varNames <- colnames(splitted.df$train)
         skel <- pcalg::skeleton(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha, m.max=max.sx,
@@ -1071,7 +1071,7 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         S <- cov(as.matrix(splitted.df$train))
         g <- glasso::glasso(S, rho=rho)
         A <- g$wi
@@ -1127,7 +1127,7 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         g <- pcalg::lingam(splitted.df$train)
         g$Bpruned
     }
@@ -1170,7 +1170,7 @@ boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacenc
 
     graphs <- foreach(rep=1:R) %dopar% {
 
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         S.train <- cov(splitted.df$train)
         S.test <-  cov(splitted.df$test)
         dd <- diag(1/sqrt(diag(S.train)))
@@ -1252,7 +1252,7 @@ boot.nodag <- function(df, lib.path=NULL, lambda=0.5, R=200, m=NULL, threshold=0
     registerDoParallel(cluster)
 
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataframe.split(df, m=m)
+        splitted.df <- dataset.split(df, m=m)
         p <- ncol(splitted.df$train)
         out <- .Fortran('NODAG', as.integer(p),
                 as.double(cor(splitted.df$train)),

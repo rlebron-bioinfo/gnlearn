@@ -599,19 +599,19 @@ select.cells<- function(df, max.cells=2000, selection.criteria=c('non.zeros','me
     return(df)
 }
 
-#' Split A Dataframe Into Training And Test Datasets
+#' Split A Dataset Into Training And Test Datasets
 #'
-#' This function allows you to split a dataframe into training and test datasets.
+#' This function allows you to split a dataset into training and test datasets.
 #' @param df Dataset.
 #' @param m Size of training dataset (optional). Default: nrow(df)/2
 #' @keywords training test dataframe
 #' @export
 #' @examples
-#' splitted.df <- dataframe.split(df)
+#' splitted.df <- dataset.split(df)
 #' splitted.df$train
 #' splitted.df$test
 
-dataframe.split <- function(df, m=NULL) {
+dataset.split <- function(df, m=NULL) {
     if (is.null(m)) {
         m <- nrow(df)/2
     }

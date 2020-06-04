@@ -24,7 +24,7 @@ Genetic Network Learning
 * `filter.dataset()`: Select (automatically) the most appropriate gene columns and cell rows of your dataset
 * `select.genes()`: Select (automatically) the most appropriate gene columns of your dataset
 * `select.cells()`: Select (automatically) the most appropriate cell rows of your dataset
-* `dataframe.split()`: Split A Dataframe Into Training And Test Datasets
+* `dataset.split()`: Split A Dataset Into Training And Test Datasets
 
 *Dataset Operations:*
 * `gene.histogram()`: Plot expression histograms of genes in your dataset
