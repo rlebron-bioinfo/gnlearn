@@ -1366,6 +1366,37 @@ fit.coefficients <- function(g, df, to=c('igraph', 'adjacency', 'edges', 'graph'
     }
 }
 
+#' Compute The Score Of A Graph
+#'
+#' This function allows you to compute the score of a previously learned graph.
+#' @param g Graph object.
+#' @param test.df Test dataset.
+#' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
+#' @keywords graph score
+#' @export
+#' @examples
+#' score.graph(g, test.df)
+
+score.graph <- function(g, test.df, from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn')) {
+    from <- match.arg(from)
+    if (from=='auto') {
+        from <- detect.format(g)
+    }
+    test.df <- subset(test.df, select=colnames(as.adjacency(g, from=from)))
+    g <- as.bnlearn(g, from=from)
+    if (bnlearn::directed(g) & bnlearn::acyclic(g)) {
+        scores <- list()
+        scores$loglik <- bnlearn::score(g, test.df, type='loglik-g')
+        scores$aic <- bnlearn::score(g, test.df, type='aic-g')
+        scores$bic <- bnlearn::score(g, test.df, type='bic-g')
+        scores$bge <- bnlearn::score(g, test.df, type='bge')
+        return(scores)
+    } else {
+        message('The graph contains undirected edges, cycles or loops.')
+        return(NULL)
+    }
+}
+
 #' Return Undirected Edges
 #'
 #' This function returns all undirected edges in a graph.
