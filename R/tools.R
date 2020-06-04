@@ -1192,6 +1192,7 @@ drugs.plot <- function(x, drugs, gene, from=c('auto', 'adjacency', 'edges', 'gra
         from=detect.format(x)
     }
 
+    drugs$from <- gsub(' ', '\n', drugs$from)
     drugs.df <- drugs[drugs$to==gene,]
     drugs <- as.adjacency(drugs.df, from='edges')
 
@@ -1211,9 +1212,11 @@ drugs.plot <- function(x, drugs, gene, from=c('auto', 'adjacency', 'edges', 'gra
 
         genes <- as.edges(x, from=from)
         genes <- as.adjacency(genes[genes$from == gene | genes$to == gene,], from='edges')
+        genes <- genes[sort(rownames(genes)), sort(colnames(genes))]
         drugs <- as.igraph(drugs)
         g <- igraph::union(drugs, as.igraph(genes))
         g <- as.adjacency(g)
+        g <- g[sort(rownames(g)), sort(colnames(g))]
         g[colnames(g) %in% colnames(genes), colnames(g) %in% colnames(genes)] <- genes
         positive <- c('activator', 'agonist', 'cofactor', 'inducer', 'partial_agonist', 'positive_allosteric_modulator', 'stimulator')
         negative <- c('channel_blocker', 'antagonist', 'antibody', 'antisense', 'antisense_oligonucleotide', 'blocker', 'gating_inhibitor', 'inhibitor', 'inhibitory_allosteric_modulator', 'inverse_agonist', 'negative_modulator', 'vaccine')
