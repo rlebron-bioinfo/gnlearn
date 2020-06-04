@@ -426,6 +426,50 @@ export.graph <- function(g, path, sep='\t', header=TRUE, index=TRUE,
     close(file)
 }
 
+#' Select (automatically) the most appropriate gene columns and cell rows of your dataset.
+#'
+#' This function allows you to (automatically) select the most appropriate gene columns and cell rows of your dataset.
+#' @param df Dataset.
+#' @param filter.first Whether to filter the cells or the genes first. Default: cells
+#' @param genes Geneset with features (optional).
+#' @param selected.genes User-selected genes (optional).
+#' @param features Features you want to select (optional).
+#' @param max.genes Maximum number of selected genes (optional).
+#' @param max.cells Maximum number of selected cells (optional).
+#' @param genes.criteria Criteria to be applied when it is necessary to select a maximum number of genes from the previously filtered ones. Default: 'non.zeros'
+#' @param cells.criteria Criteria to be applied to select cells. Default: 'non.zeros'
+#' @param min.non.zeros Minimum number of non-zero values per gene (optional).
+#' @param cor Using correlation to exclude unconnected genes (optional).
+#' @param cor.method Correlation method: 'spearman', 'kendall', or 'pearson'. Default: 'spearman'
+#' @param cor.threshold Correlation threshold. Default: 0.1
+#' @keywords select genes
+#' @export
+#' @examples
+#' df <- filter.dataset(df, max.genes=100, max.cells=2000)
+
+filter.dataset <- function(df, filter.first=c('cells','genes'), genes=NULL, selected.genes=NULL, features=NULL,
+                           max.genes=100, genes.criteria=c('non.zeros','mean','variance','random'),
+                           cells.criteria=c('non.zeros','mean','variance','random'), min.non.zeros=2,
+                           cor=TRUE, cor.method=c('spearman','kendall','pearson'), cor.threshold=0.5) {
+    filter.first <- match.arg(filter.first)
+    genes.criteria <- match.arg(genes.criteria)
+    cells.criteria <- match.arg(cells.criteria)
+    cor.method <- match.arg(cor.method)
+
+    if (filter.first=='cells') {
+        df <- select.cells(df, max.cells=max.cells, selection.criteria=cells.criteria)
+        df <- select.genes(df, genes=genes, selected.genes=selected.genes, features=features,
+                           max.genes=max.genes, selection.criteria=genes.criteria, min.non.zeros=min.non.zeros,
+                           cor=cor, cor.method=cor.method, cor.threshold=cor.threshold)
+    } else {
+        df <- select.genes(df, genes=genes, selected.genes=selected.genes, features=features,
+                           max.genes=max.genes, selection.criteria=genes.criteria, min.non.zeros=min.non.zeros,
+                           cor=cor, cor.method=cor.method, cor.threshold=cor.threshold)
+        df <- select.cells(df, max.cells=max.cells, selection.criteria=cells.criteria)
+    }
+    return(df)
+}
+
 #' Select (automatically) the most appropriate gene columns of your dataset.
 #'
 #' This function allows you to (automatically) select the most appropriate gene columns of your dataset.
@@ -530,7 +574,6 @@ select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL,
 
 select.cells<- function(df, max.cells=2000, selection.criteria=c('non.zeros','mean','variance','random')) {
     selection.criteria <- match.arg(selection.criteria)
-    df <- drop.all.zeros(df)
     if (max.cells > nrow(df)) {
         max.cells <- nrow(df)
     }
@@ -552,6 +595,7 @@ select.cells<- function(df, max.cells=2000, selection.criteria=c('non.zeros','me
         }
     )
     df <- df[selected.cells, ]
+    df <- drop.all.zeros(df)
     return(df)
 }
 

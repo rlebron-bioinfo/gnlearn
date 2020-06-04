@@ -2,7 +2,7 @@
 % Please edit documentation in R/tools.R
 \name{feature.degree}
 \alias{feature.degree}
-\title{Feature Degree}
+\title{Feature Degree Per Gene}
 \usage{
 feature.degree(
   x,

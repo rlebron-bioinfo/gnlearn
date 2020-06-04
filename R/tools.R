@@ -612,7 +612,63 @@ f1.score <- function(tp, fp, fn) {
     return((2*p*r)/(p+r))
 }
 
-#' Feature Degree
+#' Degree Per Gene
+#'
+#' This function allows you to calculate the in-degree and out-degree of each (selected) gene.
+#' @param x Graph object.
+#' @param vertices Vertices you want to analyze. Default: all vertices.
+#' @param in.degree Whether or not to analyze in-degree (optional). Default: TRUE.
+#' @param out.degree Whether or not to analyze out-degree (optional). Default: TRUE.
+#' @param loops Whether or not to consider loops (optional). Default: FALSE.
+#' @param normalized Whether or not to normalize degrees (optional). Default: FALSE.
+#' @keywords graph vertex degree
+#' @export
+#' @examples
+#' mtx <- gene.degree(x)
+
+gene.degree <- function(x, vertices=NULL, in.degree=TRUE, out.degree=TRUE, loops=FALSE, normalized=FALSE) {
+    x <- as.adjacency(x)
+    if (!loops) {
+        diag(x) <- 0
+    }
+    k <- sum(c(in.degree, out.degree))
+    if (k==0) {
+        in.degree <- TRUE
+        out.degree <- TRUE
+        k <- 2
+    }
+    if (!is.null(vertices)) {
+        vertices <- vertices[as.logical(lapply(vertices, valid.vertex, x=x))]
+        n.vertices <- length(vertices)
+        if (n.vertices==0) {
+            vertices <- colnames(x)
+            n.vertices <- length(vertices)
+        }
+    } else {
+        vertices <- colnames(x)
+        n.vertices <- length(vertices)
+    }
+    mtx = matrix(0, n.vertices, k)
+    rownames(mtx) <- vertices
+    if (in.degree & out.degree) {
+        colnames(mtx) <- c('in.degree', 'out.degree')
+    } else if (in.degree) {
+        colnames(mtx) <- c('in.degree')
+    } else if (out.degree) {
+        colnames(mtx) <- c('out.degree')
+    }
+    for (v in vertices) {
+        if (in.degree) {
+            mtx[v, 'in.degree'] <- igraph::degree(as.igraph(x), v, mode='in', normalized=normalized)
+        }
+        if (out.degree) {
+            mtx[v, 'out.degree'] <- igraph::degree(as.igraph(x), v, mode='out', normalized=normalized)
+        }
+    }
+    return(mtx)
+}
+
+#' Feature Degree Per Gene
 #'
 #' This function allows you to calculate the in-degree and out-degree of genes that have a certain feature (e.g. transcription factors or tumor suppressor genes).
 #' @param x Graph object.
@@ -640,7 +696,7 @@ feature.degree <- function(x, genes, features=NULL, vertices=NULL, in.degree=TRU
     if (k==0) {
         in.degree <- TRUE
         out.degree <- TRUE
-        k = 2
+        k <- 2
     }
     if (!is.null(features)) {
         features <- features[as.logical(lapply(features, valid.feature, genes=genes))]

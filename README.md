@@ -21,6 +21,7 @@ Genetic Network Learning
 
 *Dataset Manipulation:*
 * `drop.all.zeros()`: Drop rows and/or columns with all zeros
+* `filter.dataset()`: Select (automatically) the most appropriate gene columns and cell rows of your dataset
 * `select.genes()`: Select (automatically) the most appropriate gene columns of your dataset
 * `select.cells()`: Select (automatically) the most appropriate cell rows of your dataset
 * `dataframe.split()`: Split A Dataframe Into Training And Test Datasets
@@ -76,7 +77,8 @@ Genetic Network Learning
 * `directed.edges()`: Return Directed Edges
 * `graph.plot()`: Graph Plotting
 * `compare.graphs()`: Graph Comparison
-* `feature.degree()`: Feature Degree
+* `gene.degree()`:  Degree Per Gene
+* `feature.degree()`: Feature Degree Per Gene
 * `feature.plot()`: Feature Graph Plotting
 * `graph.communities()`: Graph Communities
 * `ortholog.graph()`: Ortholog Genes Graph
