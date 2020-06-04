@@ -11,6 +11,7 @@ filter.dataset(
   selected.genes = NULL,
   features = NULL,
   max.genes = 100,
+  max.cells = 2000,
   genes.criteria = c("non.zeros", "mean", "variance", "random"),
   cells.criteria = c("non.zeros", "mean", "variance", "random"),
   min.non.zeros = 2,
@@ -32,6 +33,8 @@ filter.dataset(
 
 \item{max.genes}{Maximum number of selected genes (optional).}
 
+\item{max.cells}{Maximum number of selected cells (optional).}
+
 \item{genes.criteria}{Criteria to be applied when it is necessary to select a maximum number of genes from the previously filtered ones. Default: 'non.zeros'}
 
 \item{cells.criteria}{Criteria to be applied to select cells. Default: 'non.zeros'}
@@ -43,8 +46,6 @@ filter.dataset(
 \item{cor.method}{Correlation method: 'spearman', 'kendall', or 'pearson'. Default: 'spearman'}
 
 \item{cor.threshold}{Correlation threshold. Default: 0.1}
-
-\item{max.cells}{Maximum number of selected cells (optional).}
 }
 \description{
 This function allows you to (automatically) select the most appropriate gene columns and cell rows of your dataset.

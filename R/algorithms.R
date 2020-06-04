@@ -15,7 +15,7 @@ scores <- c('pred-loglik-g', 'loglik-g', 'aic-g', 'bic-g', 'bge')
 #' @param max.sx Maximum allowed size of the conditioning sets.
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param implementation Peter & Clark algorithm implementation: 'pcalg' or 'bnlearn'. Default: 'pcalg'
@@ -80,7 +80,7 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -94,7 +94,7 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
 #' @param max.sx Maximum allowed size of the conditioning sets.
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param implementation Peter & Clark algorithm implementation: 'pcalg' or 'bnlearn'. Default: 'pcalg'
@@ -172,7 +172,7 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -195,7 +195,7 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
 #' @param biCC If TRUE, only nodes on paths between nodes x and y are considered to be in Possible-D-SEP(x) when testing independence between x and y. Default: TRUE
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -249,7 +249,7 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -265,7 +265,7 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
 #' @param max.sx Maximum allowed size of the conditioning sets.
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -305,7 +305,7 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -322,7 +322,7 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
 #' @param version Algorithm version: 'iamb', 'fast.iamb', 'inter.iamb', or 'iamb.fdr'. Default: 'iamb'
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -370,7 +370,7 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -387,7 +387,7 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
 #' @param version Algorithm version: 'mmpc', 'si.hiton.pc', or 'hpc'. Default: 'mmpc'
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -434,7 +434,7 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -446,7 +446,7 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
 #' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph.
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -483,7 +483,7 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -495,7 +495,7 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
 #' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph.
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -532,7 +532,7 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -552,7 +552,7 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
 #' @param maxp Maximum number of parents for a node. Default: Inf
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -596,7 +596,7 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -614,7 +614,7 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
 #' @param maxp Maximum number of parents for a node. Default: Inf
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -661,7 +661,7 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -674,7 +674,7 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
 #' @param maxDegree Parameter used to limit the vertex degree of the estimated graph. Default: integer(0)
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -714,7 +714,7 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -853,7 +853,7 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
 #' @param w.threshold Threshold of absolute value of weight. Default: 0.3
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -886,7 +886,7 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -905,7 +905,7 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
 #' @param version Algorithm version: 'rsmax2','mmhc', or 'h2pc'. Default: 'rsmax2'
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -960,7 +960,7 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -977,7 +977,7 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
 #' @param maxDegree Parameter used to limit the vertex degree of the estimated graph. Default: integer(0)
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -1029,7 +1029,7 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -1042,7 +1042,7 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
 #' @param rho Non-negative regularization parameter for GLASSO.
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param upper Whether or not to ignore the upper triangular adjacency matrix (optional).
 #' @param lower Whether or not to ignore the lower triangular adjacency matrix (optional).
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
@@ -1086,7 +1086,7 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    A <- averaged.graph(graphs, threshold=threshold, to='adjacency')
+    A <- average.graph(graphs, threshold=threshold, to='adjacency')
     diag(A) <- 0
     if (!upper) {
         A[upper.tri(A)] <- 0
@@ -1106,7 +1106,7 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
 #' @param df Dataset.
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -1135,7 +1135,7 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -1147,7 +1147,7 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 #' @param df Dataset.
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -1206,7 +1206,7 @@ boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacenc
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    A <- averaged.graph(graphs, threshold=threshold, to='adjacency')
+    A <- average.graph(graphs, threshold=threshold, to='adjacency')
     diag(A) <- 0
     g <- convert.format(A, to=to)
     return(g)
@@ -1226,7 +1226,7 @@ mll <- function(P, S) {
 #' @param lambda Lambda regularization parameter. Default: 0.5
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -1269,7 +1269,7 @@ boot.nodag <- function(df, lib.path=NULL, lambda=0.5, R=200, m=NULL, threshold=0
     stopImplicitCluster()
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }
 
@@ -1280,7 +1280,7 @@ boot.nodag <- function(df, lib.path=NULL, lambda=0.5, R=200, m=NULL, threshold=0
 #' @param algorithm Algorithm to be used (any of the gnlearn 'boot.x' algorithms, such as boot.pc or boot.hc). Default: boot.pc
 #' @param n.genes Number of random genes per iteration. Default: 15
 #' @param R Number of iterations. Defaults: 200
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param iter.R Number of bootstrap replicates. Default: 200
 #' @param iter.m Size of each bootstrap replicate. Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn').
@@ -1312,6 +1312,6 @@ huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, 
 
     stopImplicitCluster()
 
-    g <- averaged.graph(graphs, threshold=threshold, to=to)
+    g <- average.graph(graphs, threshold=threshold, to=to)
     return(g)
 }

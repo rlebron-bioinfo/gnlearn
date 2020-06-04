@@ -27,7 +27,7 @@ huge.graph(
 
 \item{R}{Number of iterations. Defaults: 200}
 
-\item{threshold}{Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5}
+\item{threshold}{Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5}
 
 \item{iter.R}{Number of bootstrap replicates. Default: 200}
 

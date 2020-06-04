@@ -41,7 +41,7 @@ boot.pc(
 
 \item{m}{Size of each bootstrap replicate (optional). Default: nrow(df)/2}
 
-\item{threshold}{Minimum strength required for a coefficient to be included in the averaged adjacency matrix (optional). Default: 0.5}
+\item{threshold}{Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5}
 
 \item{to}{Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).}
 

@@ -83,7 +83,7 @@ Genetic Network Learning
 * `graph.communities()`: Graph Communities
 * `ortholog.graph()`: Ortholog Genes Graph
 * `drugs.plot()`: Drug-Gene Interactions Plotting
-* `averaged.graph()`: Calculate The Averaged Graph  
+* `average.graph()`: Calculate The Average Graph  
 * `score.graph()`: Compute The Score Of A Graph        
 
 *Graph generation:*

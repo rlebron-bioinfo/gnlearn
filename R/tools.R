@@ -833,63 +833,57 @@ drop.all.zeros <- function(mtx, rows=TRUE, columns=TRUE, square.matrix='none') {
     return(mtx)
 }
 
-#' Calculate The Averaged Graph
+#' Calculate The Average Graph
 #'
-#' This function allows you to calculate the averaged graph from a list of graphs.
+#' This function allows you to calculate the average graph from a list of graphs.
 #' @param graphs List of graphs.
-#' @param threshold Minimum strength required for a coefficient to be included in the averaged graph (optional). Default: 0.5
+#' @param threshold Minimum strength required for a coefficient to be included in the average graph (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @keywords average graph
 #' @export
 #' @examples
-#' graph <- averaged.graph(graphs)
+#' graph <- average.graph(graphs)
 
-averaged.graph <- function(graphs, threshold=0.5, to='igraph') {
+average.graph <- function(graphs, threshold=0.5, to='igraph') {
+
     R <- length(graphs)
-    coeff.1 <- as.data.frame(as.adjacency(graphs[[1]]))
-    adj.1 <- sign(abs(coeff.1))
-    for (i in 2:R) {
-        coeff.2 <- as.data.frame(as.adjacency(graphs[[i]]))
-        adj.2 <- sign(abs(coeff.2))
-        cols.1 <- rownames(adj.1) <- colnames(adj.1) <- rownames(coeff.1) <- colnames(coeff.1)
-        cols.2 <- rownames(adj.2) <- colnames(adj.2) <- rownames(coeff.2) <- colnames(coeff.2)
-        coeff.1 <- coeff.1[sort(cols.1), sort(cols.1)]
-        adj.1 <- adj.1[sort(cols.1), sort(cols.1)]
-        coeff.2 <- coeff.2[sort(cols.2), sort(cols.2)]
-        adj.2 <- adj.2[sort(cols.2), sort(cols.2)]
-        int.1 <- cols.1 %in% cols.2
-        int.2 <- cols.2 %in% cols.1
-        if (sum(int.1) > 0 & sum(int.2) > 0) {
-            coeff.int <- ((i-1) * coeff.1[int.1, int.1] / i) + (coeff.2[int.2, int.2] / i)
-            adj.int <- ((i-1) * adj.1[int.1, int.1] / i) + (adj.2[int.2, int.2] / i)
-            cols.int <- rownames(adj.int) <- colnames(adj.int) <- rownames(coeff.int) <- colnames(coeff.int)
-            coeff.int <- coeff.int[sort(cols.int), sort(cols.int)]
-            adj.int <- adj.int[sort(cols.int), sort(cols.int)]
-        }
-        cols.u <- sort(union(cols.1, cols.2))
-        n.cols.u <- length(cols.u)
-        coeff.u <- as.data.frame(matrix(0, nrow=n.cols.u, ncol=n.cols.u))
-        adj.u <- as.data.frame(matrix(0, nrow=n.cols.u, ncol=n.cols.u))
-        rownames(adj.u) <- colnames(adj.u) <- rownames(coeff.u) <- colnames(coeff.u) <- cols.u
-        coeff.u <- coeff.u[sort(cols.u), sort(cols.u)]
-        adj.u <- adj.u[sort(cols.u), sort(cols.u)]
-        coeff.u[cols.u %in% cols.1, cols.u %in% cols.1] <- coeff.1
-        coeff.u[cols.u %in% cols.2, cols.u %in% cols.2] <- coeff.2
-        adj.u[cols.u %in% cols.1, cols.u %in% cols.1] <- adj.1
-        adj.u[cols.u %in% cols.2, cols.u %in% cols.2] <- adj.2
-        if (sum(int.1) > 0 & sum(int.2) > 0) {
-            coeff.u[cols.u %in% cols.int, cols.u %in% cols.int] <- coeff.int
-            adj.u[cols.u %in% cols.int, cols.u %in% cols.int] <- adj.int
-        }
-        coeff.1 <- coeff.u
-        adj.1 <- adj.u
+    all.cols <- c()
+    for (i in 1:R) {
+        g <- as.data.frame(as.adjacency(graphs[[i]]))
+        rownames(g) <- colnames(g)
+        g <- g[sort(rownames(g)), sort(colnames(g))]
+        cols <- colnames(g)
+        all.cols <- c(all.cols, cols)
     }
-    cols.1 <- rownames(adj.1) <- colnames(adj.1) <- rownames(coeff.1) <- colnames(coeff.1)
-    coeff.1 <- coeff.1[sort(colnames(coeff.1)), sort(colnames(coeff.1))]
-    adj.1 <- adj.1[sort(colnames(adj.1)), sort(colnames(adj.1))]
-    coeff.1[adj.1 < threshold] <- 0
-    g <- convert.format(coeff.1, to=to)
+
+    all.cols <- sort(unique( all.cols))
+    all.occurr <- as.data.frame(matrix(0, nrow=length(all.cols), ncol=length(all.cols)))
+    rownames(all.occurr) <- colnames(all.occurr) <- all.cols
+    all.coeff <- as.data.frame(matrix(0, nrow=length(all.cols), ncol=length(all.cols)))
+    rownames(all.coeff) <- colnames(all.coeff) <- all.cols
+    all.adj <- as.data.frame(matrix(0, nrow=length(all.cols), ncol=length(all.cols)))
+    rownames(all.adj) <- colnames(all.adj) <- all.cols
+
+    for (i in 1:R) {
+        coeff <- graphs[[i]]
+        adj <- sign(abs(coeff))
+        cols <- colnames(coeff)
+        occurr <- as.data.frame(matrix(1, nrow=length(cols), ncol=length(cols)))
+        rownames(occurr) <- colnames(occurr) <- cols
+        all.occurr[cols, cols] <- all.occurr[cols, cols] + occurr
+        all.coeff[cols, cols] <- all.coeff[cols, cols] + coeff
+        all.adj[cols, cols] <- all.adj[cols, cols] + adj
+    }
+
+    all.coeff <- all.coeff / all.occurr
+    all.coeff[is.nan(all.coeff)] <- 0
+    all.adj <- all.adj / all.occurr
+    all.adj[is.nan(all.adj)] <- 0
+    all.coeff[all.adj < threshold] <- 0
+
+    g <- convert.format(all.coeff, to=to)
     return(g)
+
 }
 
 rename.graphs <- function(graphs, names, to='igraph') {
@@ -1186,7 +1180,7 @@ graph.marginalization <- function(g, obs.genes, max.steps=Inf, to=c('igraph', 'a
     }
     t <- as.adjacency(t)
     t <- t[obs.genes, obs.genes]
-    new.edges <- averaged.graph(list(t, new.edges))
+    new.edges <- average.graph(list(t, new.edges))
     new.edges <- convert.format(new.edges, to=to)
     return(new.edges)
 }
