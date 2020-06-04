@@ -448,7 +448,7 @@ export.graph <- function(g, path, sep='\t', header=TRUE, index=TRUE,
 #' df <- filter.dataset(df, max.genes=100, max.cells=2000)
 
 filter.dataset <- function(df, filter.first=c('cells','genes'), genes=NULL, selected.genes=NULL, features=NULL,
-                           max.genes=100, genes.criteria=c('non.zeros','mean','variance','random'),
+                           max.genes=100, max.cells=2000, genes.criteria=c('non.zeros','mean','variance','random'),
                            cells.criteria=c('non.zeros','mean','variance','random'), min.non.zeros=2,
                            cor=TRUE, cor.method=c('spearman','kendall','pearson'), cor.threshold=0.5) {
     filter.first <- match.arg(filter.first)
