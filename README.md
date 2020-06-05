@@ -1,5 +1,7 @@
 # gnlearn
-**G** enetic **N**etwork **Learn**ing (`gnlearn`) is an R package for Structural Learning of Huge Gene Regulatory Networks from Single-Cell datasets, using Cell-And-Gene Bootstrapping and a wide range of Structural Learning Algorithms.
+**G**enetic **N**etwork **Learn**ing (`gnlearn`) is an R package for Structural Learning of Huge Gene Regulatory Networks from Single-Cell datasets, using Cell-And-Gene Bootstrapping and a wide range of Structural Learning Algorithms.
+
+The learned Genetic Networks can be obtained as graphs (in `graph` or `igraph` R packages formats), as adjacent matrices or as a lists of edges. gnlearn` has a wide range of functions for working with both input datasets and learned networks (see *Package Overview* section).
 
 ****
 
@@ -154,4 +156,98 @@ After running one of these commands, your working directory will be mounted in /
 
 ## Examples
 
+## Citation
+
+The gnlearn article is not yet available (Ricardo Lebrón & Gherardo Varando, in preparation).
+
+Please also use the following references depending on the algorithm used:
+* PC or skeleton [[1]](#1)
+* FCI [[2]](#2)
+* RFCI [[3]](#3)
+* FCI+ [[4]](#4)
+* GS [[5]](#5)
+* IAMB [[6]](#6)
+* Fast IAMB [[6]](#6)
+* Interleaved IAMB [[7]](#7)
+* IAMB with FDR Correction [[8]](#8) [[9]](#9)
+* MMPC [[10]](#10)
+* SI-HITON-PC [[11]](#11)
+* HPC [[12]](#12)
+* Chow-Liu algorithm [[13]](#13)
+* ARACNE [[14]](#14)
+* HC [[15]](#15)
+* Tabu [[15]](#15)
+* GES [[16]](#16)
+* Linear NO-TEARS [[17]](#17)
+* RSMAX2 [[18]](#18)
+* MMHC [[19]](#19)
+* H2PC [[20]](#20)
+* ARGES [[21]](#21)
+* GLASSO [[22]](#22)
+* LINGAM [[23]](#23)
+* GCLM [[24]](#24)
+* NODAG [[25]](#25)
+
+If you use a pcalg-based or bnlearn-based implementation, please cite [[26]](#26) and [[27]](#27) respectively.
+
 ## References
+<a id="1">[1]</a>
+Colombo D, Maathuis MH (2014). "Order-Independent Constraint-Based Causal Structure Learning". Journal of Machine Learning Research, 15:3921–3962.
+
+<a id="2">[2]</a>
+
+<a id="3">[3]</a>
+
+<a id="4">[4]</a>
+
+<a id="5">[5]</a>
+Margaritis D (2003). Learning Bayesian Network Model Structure from Data. Ph.D. thesis, School of Computer Science, Carnegie-Mellon University, Pittsburgh, PA.
+
+<a id="6">[6]</a>
+Tsamardinos I, Aliferis CF, Statnikov A (2003). "Algorithms for Large Scale Markov Blanket Discovery". Proceedings of the Sixteenth International Florida Artificial Intelligence Research Society Conference, 376–381.
+
+<a id="7">[7]</a>
+Yaramakala S, Margaritis D (2005). "Speculative Markov Blanket Discovery for Optimal Feature Selection". Proceedings of the Fifth IEEE International Conference on Data Mining, 809–812.
+
+<a id="8">[8]</a>
+Pena JM (2008). "Learning Gaussian Graphical Models of Gene Networks with False Discovery Rate Control". Proceedings of the Sixth European Conference on Evolutionary Computation, Machine Learning and Data Mining in Bioinformatics, 165–176.
+
+<a id="9">[9]</a>
+Gasse M, Aussem A, Elghazel H (2014). "A Hybrid Algorithm for Bayesian Network Structure Learning with Application to Multi-Label Learning". Expert Systems with Applications, 41(15):6755–6772.
+
+<a id="10">[10]</a>
+
+
+<a id="11">[11]</a>
+
+<a id="12">[12]</a>
+
+<a id="13">[13]</a>
+
+<a id="14">[14]</a>
+
+<a id="15">[15]</a>
+
+<a id="16">[16]</a>
+
+<a id="17">[17]</a>
+
+<a id="18">[18]</a>
+
+<a id="19">[19]</a>
+
+<a id="20">[20]</a>
+
+<a id="21">[21]</a>
+
+<a id="22">[22]</a>
+
+<a id="23">[23]</a>
+
+<a id="24">[24]</a>
+
+<a id="25">[25]</a>
+
+<a id="26">[26]</a>
+
+<a id="27">[27]</a>
