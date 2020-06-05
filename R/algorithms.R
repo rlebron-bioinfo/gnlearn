@@ -1222,7 +1222,6 @@ mll <- function(P, S) {
 #'
 #' This function allows you to learn a directed graph from a dataset using the NODAG algorithm.
 #' @param df Dataset.
-#' @param lib.path Path of 'nodag.so' file.
 #' @param lambda Lambda regularization parameter. Default: 0.5
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
@@ -1231,16 +1230,13 @@ mll <- function(P, S) {
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
+#' @useDynLib gnlearn
 #' @export
 #' @examples
 #' graph <- boot.nodag(df, '/home/user/nodag/nodag.so')
 
-boot.nodag <- function(df, lib.path=NULL, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+boot.nodag <- function(df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
-    if (is.null(lib.path)) {
-        lib.path <- file.path(Sys.getenv('HOME'), 'nodag', 'nodag.so')
-    }
-    dyn.load(lib.path)
 
     if (!is.null(seed)) {
         set.seed(seed)
@@ -1257,7 +1253,8 @@ boot.nodag <- function(df, lib.path=NULL, lambda=0.5, R=200, m=NULL, threshold=0
         out <- .Fortran('NODAG', as.integer(p),
                 as.double(cor(splitted.df$train)),
                 as.double(diag(p)), as.double(lambda),
-                as.double(1e-5), as.double(0.5), as.integer(1e+3))
+                as.double(1e-5), as.double(0.5), as.integer(1e+3),
+                PACKAGE='gnlearn')
         A <- matrix(ncol=p, nrow=p, data=out[[3]])
         W <- diag(p) - diag(1/diag(A)) %*% A # ?
         A <- sign(abs(A)) # ?

@@ -6,7 +6,6 @@
 \usage{
 boot.nodag(
   df,
-  lib.path = NULL,
   lambda = 0.5,
   R = 200,
   m = NULL,
@@ -18,8 +17,6 @@ boot.nodag(
 }
 \arguments{
 \item{df}{Dataset.}
-
-\item{lib.path}{Path of 'nodag.so' file.}
 
 \item{lambda}{Lambda regularization parameter. Default: 0.5}
 

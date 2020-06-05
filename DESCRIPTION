@@ -16,7 +16,7 @@ Author:
     Ricardo Lebrón [aut, cre],
     Gherardo Varando [ctb]
 Maintainer: Ricardo Lebrón <rlebron@go.ugr.es>
-Description: Genetic Network Learning.
+Description: Genetic Network Learning (gnlearn) is an R package for structural learning of huge gene regulatory networks from single-cell datasets, using random gene resampling, cell bootstrapping, and one of the available structural learning algorithms.
 Depends:
     parallel,
     foreach,
@@ -29,14 +29,13 @@ Imports:
     threejs,
     bnlearn,
     glasso,
+    gclm,
     jsonlite,
     matrixcalc,
     dplyr,
     RBGL,
     ape,
     gplots
-Remotes:
-    gherardovarando/gclm
 Suggests:
     Rgraphviz,
     gRain,

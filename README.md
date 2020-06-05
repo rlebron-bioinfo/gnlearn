@@ -1,9 +1,9 @@
 # gnlearn
-<span style="color: blue;"><b>G</b></span>enetic <span style="color: blue;"><b>N</b></span>etwork <span style="color: blue;"><b>Learn</b></span>ing (`gnlearn`) is an R package for Structural Learning of Huge Gene Regulatory Networks from Single-Cell datasets, using Cell-And-Gene Bootstrapping and a wide range of Structural Learning Algorithms.
+**G**enetic **N**etwork **Learn**ing (`gnlearn`) is an R package for structural learning of huge gene regulatory networks from single-cell datasets, using random gene resampling, cell bootstrapping, and one of the available algorithms (see below).
 
-The learned Genetic Networks can be obtained as graphs (in `graph` or `igraph` R packages formats), as adjacent matrices or as a lists of edges. `gnlearn` has a wide range of functions for working with both input datasets and learned networks (see *Package Overview* section).
+The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R packages formats), as adjacent matrices or as a lists of edges. `gnlearn` has a wide range of functions for working with both input datasets and learned networks (see *Package Overview* section).
 
-****
+***
 
 *Constraint-Based Algorithms*
 * Peter & Clark skeleton algorithm (`boot.skeleton()`), based on `pcalg` and `bnlearn` R packages implementations.
