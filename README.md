@@ -28,7 +28,7 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 *Other Algorithms*
 * Graphical Lasso (GLASSO) (`boot.glasso()`), based on `glasso` R package implementation.
 * Restricted Structural Equation Models (LINGAM) (`boot.lingam()`), based on `pcalg` R package implementation.
-* Graphical Continuous Lyapunov Models (GCLM), based on Gherardo Varando & Niels Richard Hansen implementation (https://github.com/gherardovarando/gclm).
+* Graphical Continuous Lyapunov Models (GCLM), based on `gclm` R package implementation.
 * NODAG algorithm, based on Gherardo Varando implementation (https://github.com/gherardovarando/nodag).
 
 ## Package Overview
@@ -152,43 +152,6 @@ After running one of these commands, your working directory will be mounted in /
 
 ## Quick Start
 
-```R
-library(gnlearn)
-```
-
-```R
-list.datasets(sp.common='human', cell.identity='breast cancer')
-```
-
-```R
-df <- download.dataset(1)
-dim(df)
-```
-
-```R
-df <- download.dataset(1)
-dim(df)
-```
-
-```R
-graph <- boot.pc(filtered.df, R=200, threshold=0.9)
-```
-
-```R
-graph.plot(graph)
-```
-
-```R
-list.genesets(sp.common='human')
-```
-
-```R
-genes <- download.geneset(1)
-```
-
-```R
-feature.plot(graph, genes, feature='essential')
-```
 
 ## Documentation
 
