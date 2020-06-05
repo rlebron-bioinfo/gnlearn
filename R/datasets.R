@@ -449,8 +449,8 @@ export.graph <- function(g, path, sep='\t', header=TRUE, index=TRUE,
 
 filter.dataset <- function(df, filter.first=c('cells','genes'), genes=NULL, selected.genes=NULL, features=NULL,
                            max.genes=100, max.cells=2000, genes.criteria=c('non.zeros','mean','variance','random'),
-                           cells.criteria=c('non.zeros','mean','variance','random'), min.non.zeros=2,
-                           cor=TRUE, cor.method=c('spearman','kendall','pearson'), cor.threshold=0.5) {
+                           cells.criteria=c('non.zeros','mean','variance','random'), min.non.zeros=10,
+                           cor=TRUE, cor.method=c('spearman','kendall','pearson'), cor.threshold=0.25) {
     filter.first <- match.arg(filter.first)
     genes.criteria <- match.arg(genes.criteria)
     cells.criteria <- match.arg(cells.criteria)
@@ -490,8 +490,8 @@ filter.dataset <- function(df, filter.first=c('cells','genes'), genes=NULL, sele
 #' df <- select.genes(df, genes=genes, features=c('tumor.suppressor', 'breast.cancer'), cor=TRUE, cor.threshold=0.7)
 
 select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL,
-                         max.genes=100, selection.criteria=c('non.zeros','mean','variance','random'), min.non.zeros=2,
-                         cor=TRUE, cor.method=c('spearman','kendall','pearson'), cor.threshold=0.5) {
+                         max.genes=100, selection.criteria=c('non.zeros','mean','variance','random'), min.non.zeros=10,
+                         cor=TRUE, cor.method=c('spearman','kendall','pearson'), cor.threshold=0.25) {
     selection.criteria <- match.arg(selection.criteria)
     cor.method <- match.arg(cor.method)
     if (is.null(selected.genes)) {
@@ -558,6 +558,7 @@ select.genes <- function(df, genes=NULL, selected.genes=NULL, features=NULL,
     } else {
         df <- subset(df, select=selected.genes)
     }
+    df <- drop.all.zeros(df)
     return(df)
 }
 
@@ -615,8 +616,16 @@ dataset.split <- function(df, m=NULL) {
     if (is.null(m)) {
         m <- nrow(df)/2
     }
-    n.genes <- ncol(df)
+
+    df <- drop.all.zeros(df)
+    nz <- as.list(colSums(df!=0))
+    last.gene <- length(nz)-1
+    selected.genes <- names(nz[nz>=10])
+    df <- subset(df, select=selected.genes)
+
+    R <- 1
     repeat {
+        n.genes <- ncol(df)
         ixs <- sample(1:nrow(df), size=m, replace=FALSE)
         train <- df[ixs,]
         test <- df[-ixs,]
@@ -624,6 +633,15 @@ dataset.split <- function(df, m=NULL) {
         test <- drop.all.zeros(test, rows=TRUE, columns=TRUE)
         if (dim(train)[2]==n.genes & dim(test)[2]==n.genes) {
             break
+        } else {
+            R <- R+1
+            if (R%%100==0) {
+                nz <- as.list(colSums(df!=0))
+                last.gene <- length(nz)-1
+                selected.genes <- names(nz[order(unlist(nz), decreasing=TRUE)])[1:last.gene]
+                df <- subset(df, select=selected.genes)
+                df <- drop.all.zeros(df)
+            }
         }
     }
     return(list(

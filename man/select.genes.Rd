@@ -11,10 +11,10 @@ select.genes(
   features = NULL,
   max.genes = 100,
   selection.criteria = c("non.zeros", "mean", "variance", "random"),
-  min.non.zeros = 2,
+  min.non.zeros = 10,
   cor = TRUE,
   cor.method = c("spearman", "kendall", "pearson"),
-  cor.threshold = 0.5
+  cor.threshold = 0.25
 )
 }
 \arguments{
