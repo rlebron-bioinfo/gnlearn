@@ -1,7 +1,7 @@
 # gnlearn
 **G**enetic **N**etwork **Learn**ing (`gnlearn`) is an R package for Structural Learning of Huge Gene Regulatory Networks from Single-Cell datasets, using Cell-And-Gene Bootstrapping and a wide range of Structural Learning Algorithms.
 
-The learned Genetic Networks can be obtained as graphs (in `graph` or `igraph` R packages formats), as adjacent matrices or as a lists of edges. gnlearn` has a wide range of functions for working with both input datasets and learned networks (see *Package Overview* section).
+The learned Genetic Networks can be obtained as graphs (in `graph` or `igraph` R packages formats), as adjacent matrices or as a lists of edges. `gnlearn` has a wide range of functions for working with both input datasets and learned networks (see *Package Overview* section).
 
 ****
 
@@ -152,11 +152,56 @@ After running one of these commands, your working directory will be mounted in /
 
 ## Quick Start
 
+```R
+library(gnlearn)
+```
+
+```R
+list.datasets(sp.common='human', cell.identity='breast cancer')
+```
+
+```R
+df <- download.dataset(1)
+dim(df)
+```
+
+```R
+df <- download.dataset(1)
+dim(df)
+```
+
+```R
+graph <- boot.pc(filtered.df, R=200, threshold=0.9)
+```
+
+```R
+graph.plot(graph)
+```
+
+```R
+list.genesets(sp.common='human')
+```
+
+```R
+genes <- download.geneset(1)
+```
+
+```R
+feature.plot(graph, genes, feature='essential')
+```
+
 ## Documentation
+
 
 ## Examples
 
-## Citation
+*Example #1: Breast Cancer*
+
+*Example #2: Hepatocellular Carcinoma*
+
+*Example #3: Erythropoiesis*
+
+## Citation
 
 The gnlearn article is not yet available (Ricardo Lebrón & Gherardo Varando, in preparation).
 
