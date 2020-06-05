@@ -890,7 +890,7 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
     return(g)
 }
 
-## Hybrid (Skeleton/Constraint-Based + Score-Based)
+## Hybrid (Constraint-Based + Score-Based)
 
 #' General 2-Phase Restricted Maximization Algorithm (rsmax2) With Bootstrapping
 #'

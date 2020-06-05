@@ -1,5 +1,33 @@
 # gnlearn
-Genetic Network Learning
+**G** enetic **N**etwork **Learn**ing (`gnlearn`) is an R package for Structural Learning of Huge Gene Regulatory Networks from Single-Cell datasets, using Cell-And-Gene Bootstrapping and a wide range of Structural Learning Algorithms.
+
+****
+
+*Constraint-Based Algorithms*
+* Peter & Clark skeleton algorithm (`boot.skeleton()`), based on `pcalg` and `bnlearn` R packages implementations.
+* Peter & Clark (PC) algorithm (`boot.pc()`), based on `pcalg` and `bnlearn` R packages implementations.
+* Fast Causal Inference (FCI), Really FCI (RFCI) and FCI+ algorithms (`boot.fci()`), based on `pcalg` R package implementation.
+* Grow-Shrink (GS) algorithm (`boot.gs()`), based on `bnlearn` R package implementation.
+* Incremental Association (IAMB), Fast IAMB, Interleaved IAMB and IAMB with FDR Correction algorithms (`boot.iamb()`), based on `bnlearn` R package implementation.
+* Max-Min Parents & Children (MMPC), Semi-Interleaved Hiton-PC (SI-HITON-PC) and Hybrid Parents & Children (HPC) algorithms (`boot.parents.children()`), based on `bnlearn` R package implementation.
+* Chow-Liu algorithm (`boot.chowliu()`), based on `bnlearn` R package implementation.
+* Algorithm for the Reconstruction of Accurate Cellular Networks (ARACNE) (`boot.aracne()`), based on `bnlearn` R package implementation.
+
+*Score-Based Algorithms*
+* Hill-Climbing (HC) algorithm (`boot.hc()`), based on `bnlearn` R package implementation.
+* Tabu Search (Tabu) algorithm (`boot.tabu()`), based on `bnlearn` R package implementation.
+* Greedy Equivalence Search (GES) (`boot.ges()`), based on `pcalg` R package implementation.
+* Linear NO-TEARS algorithm (`boot.notears()`), reimplemented in R.
+
+*Hybrid (Constraint-Based + Score-Based) Algorithms*
+* General 2-Phase Restricted Maximization (RSMAX2), Max-Min Hill Climbing (MMHC) and Hybrid HPC (H2PC) algorithms (`boot.rsmax2()`), based on `bnlearn` R package implementation.
+* Adaptively Restricted Greedy Equivalence Search (ARGES) algorithm (`boot.arges()`), based on `pcalg` R package implementation.
+
+*Other Algorithms*
+* Graphical Lasso (GLASSO) (`boot.glasso()`), based on `glasso` R package implementation.
+* Restricted Structural Equation Models (LINGAM) (`boot.lingam()`), based on `pcalg` R package implementation.
+* Graphical Continuous Lyapunov Models (GCLM), based on Gherardo Varando & Niels Richard Hansen implementation (https://github.com/gherardovarando/gclm).
+* NODAG algorithm, based on Gherardo Varando implementation (https://github.com/gherardovarando/nodag).
 
 ## Package Overview
 
@@ -125,3 +153,5 @@ After running one of these commands, your working directory will be mounted in /
 ## Documentation
 
 ## Examples
+
+## References
