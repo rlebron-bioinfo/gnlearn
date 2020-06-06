@@ -55,7 +55,9 @@ boot.rsmax2(
 This function allows you to learn a directed graph from a dataset using the General 2-Phase Restricted Maximization algorithm.
 }
 \examples{
-graph <- boot.rsmax2(df)
+obj <- boot.rsmax2(df)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

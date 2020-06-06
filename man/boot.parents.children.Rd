@@ -54,7 +54,9 @@ boot.parents.children(
 This function allows you to learn a directed graph from a dataset using Parents & Children algorithms.
 }
 \examples{
-graph <- boot.parents.children(df)
+obj <- boot.parents.children(df)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

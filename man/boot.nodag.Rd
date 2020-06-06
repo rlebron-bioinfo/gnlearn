@@ -36,7 +36,9 @@ boot.nodag(
 This function allows you to learn a directed graph from a dataset using the NODAG algorithm.
 }
 \examples{
-graph <- boot.nodag(df, '/home/user/nodag/nodag.so')
+obj <- boot.nodag(df, '/home/user/nodag/nodag.so')
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

@@ -61,8 +61,10 @@ boot.skeleton(
 This function allows you to learn a directed graph from a dataset using the Peter & Clark skeleton algorithm (stable version).
 }
 \examples{
-graph <- boot.skeleton(df, implementation='pcalg')
-graph <- boot.skeleton(df, implementation='bnlearn')
+obj <- boot.skeleton(df, implementation='pcalg')
+obj <- boot.skeleton(df, implementation='bnlearn')
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

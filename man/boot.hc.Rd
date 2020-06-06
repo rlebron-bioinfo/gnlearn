@@ -57,7 +57,9 @@ boot.hc(
 This function allows you to learn a directed graph from a dataset using the Hill-Climbing algorithm.
 }
 \examples{
-graph <- boot.hc(df)
+obj <- boot.hc(df)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

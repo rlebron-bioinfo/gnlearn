@@ -42,7 +42,9 @@ boot.glasso(
 This function allows you to learn an undirected graph from a dataset using the GLASSO algorithm.
 }
 \examples{
-graph <- boot.glasso(df, rho=0.1)
+obj <- boot.glasso(df, rho=0.1)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

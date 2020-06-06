@@ -69,8 +69,10 @@ boot.pc(
 This function allows you to learn a directed graph from a dataset using the Peter & Clark algorithm (stable version).
 }
 \examples{
-graph <- boot.pc(df, implementation='pcalg')
-graph <- boot.pc(df, implementation='bnlearn')
+obj <- boot.pc(df, implementation='pcalg')
+obj <- boot.pc(df, implementation='bnlearn')
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

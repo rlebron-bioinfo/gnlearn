@@ -51,7 +51,9 @@ boot.notears(
 This function allows you to learn a directed graph from a dataset using the Linear NO-TEARS algorithm.
 }
 \examples{
-graph <- boot.notears(df)
+obj <- boot.notears(df)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

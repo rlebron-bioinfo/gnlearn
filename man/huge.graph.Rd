@@ -45,9 +45,11 @@ huge.graph(
 This function allows you to learn a directed graph from a high-dimensional dataset.
 }
 \examples{
-graph <- huge.graph(df, algorithm=boot.tabu)
-graph <- huge.graph(df, algorithm=boot.lingam)
-graph <- huge.graph(df, algorithm=boot.iamb, n.genes=20, R=100, threshold=0.9, iter.R=10)
+obj <- huge.graph(df, algorithm=boot.tabu)
+obj <- huge.graph(df, algorithm=boot.lingam)
+obj <- huge.graph(df, algorithm=boot.iamb, n.genes=20, R=100, threshold=0.9, iter.R=10)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{huge}

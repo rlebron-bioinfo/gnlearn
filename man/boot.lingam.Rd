@@ -33,7 +33,9 @@ boot.lingam(
 This function allows you to learn a directed graph from a dataset using the LINGAM algorithm.
 }
 \examples{
-graph <- boot.lingam(df)
+obj <- boot.lingam(df)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

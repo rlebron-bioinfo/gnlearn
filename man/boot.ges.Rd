@@ -42,7 +42,9 @@ boot.ges(
 This function allows you to learn a directed graph from a dataset using the Greedy Equivalence Search (GES) algorithm of Chickering (2002).
 }
 \examples{
-graph <- boot.ges(df)
+obj <- boot.ges(df)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

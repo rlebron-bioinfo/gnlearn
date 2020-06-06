@@ -33,7 +33,9 @@ boot.gclm(
 This function allows you to learn a directed graph from a dataset using the GCLM algorithm.
 }
 \examples{
-graph <- boot.gclm(df)
+obj <- boot.gclm(df)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

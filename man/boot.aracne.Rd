@@ -39,7 +39,9 @@ boot.aracne(
 This function allows you to learn a undirected graph from a dataset using the ARACNE algorithm.
 }
 \examples{
-graph <- boot.aracne(df)
+obj <- boot.aracne(df)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

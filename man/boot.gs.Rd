@@ -51,7 +51,9 @@ boot.gs(
 This function allows you to learn a directed graph from a dataset using the Grow-Shrink algorithm.
 }
 \examples{
-graph <- boot.gs(df)
+obj <- boot.gs(df)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

@@ -26,15 +26,17 @@ scores <- c('pred-loglik-g', 'loglik-g', 'aic-g', 'bic-g', 'bge')
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.skeleton(df, implementation='pcalg')
-#' graph <- boot.skeleton(df, implementation='bnlearn')
+#' obj <- boot.skeleton(df, implementation='pcalg')
+#' obj <- boot.skeleton(df, implementation='bnlearn')
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, R=200, m=NULL, threshold=0.5,
-                   to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
-                   cluster=4, implementation=c('pcalg','bnlearn'),
-                   pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
-                   pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
-                   bnlearn.test=ci.tests, bnlearn.B=NULL, seed=NULL) {
+                          to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                          cluster=4, implementation=c('pcalg','bnlearn'),
+                          pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
+                          pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
+                          bnlearn.test=ci.tests, bnlearn.B=NULL, seed=NULL) {
     to <- match.arg(to)
     implementation <- match.arg(implementation)
     pcalg.u2pd <- match.arg(pcalg.u2pd)
@@ -81,7 +83,11 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 #' Peter & Clark Algorithm (PC) With Bootstrapping
@@ -109,15 +115,17 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.pc(df, implementation='pcalg')
-#' graph <- boot.pc(df, implementation='bnlearn')
+#' obj <- boot.pc(df, implementation='pcalg')
+#' obj <- boot.pc(df, implementation='bnlearn')
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, R=200, m=NULL, threshold=0.5,
-                   to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
-                   cluster=4, implementation=c('pcalg','bnlearn'),
-                   pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
-                   pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
-                   bnlearn.test=ci.tests, bnlearn.B=NULL, seed=NULL) {
+                    to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                    cluster=4, implementation=c('pcalg','bnlearn'),
+                    pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
+                    pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
+                    bnlearn.test=ci.tests, bnlearn.B=NULL, seed=NULL) {
     to <- match.arg(to)
     implementation <- match.arg(implementation)
     pcalg.u2pd <- match.arg(pcalg.u2pd)
@@ -173,7 +181,11 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 #' Fast Causal Inference Algorithm (FCI) With Bootstrapping
@@ -202,12 +214,14 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.fci(df)
+#' obj <- boot.fci(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf, pdsep.max=Inf,
-                    conservative=FALSE, maj.rule=FALSE, version=c('fci','rfci','fci.plus'), type=c('normal','anytime','adaptive'),
-                    rules=rep(TRUE,10), doPdsep=TRUE, biCC=FALSE,
-                    R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                     conservative=FALSE, maj.rule=FALSE, version=c('fci','rfci','fci.plus'), type=c('normal','anytime','adaptive'),
+                     rules=rep(TRUE,10), doPdsep=TRUE, biCC=FALSE,
+                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     version <- match.arg(version)
     type <- match.arg(type)
     to <- match.arg(to)
@@ -250,7 +264,11 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 #' Grow-Shrink Algorithm (GS) With Bootstrapping
@@ -272,10 +290,12 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.gs(df)
+#' obj <- boot.gs(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL,
-                   R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                    R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     test <- match.arg(test)
     to <- match.arg(to)
 
@@ -306,7 +326,11 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 #' Incremental Association Algorithm (IAMB) With Bootstrapping
@@ -329,10 +353,12 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.iamb(df)
+#' obj <- boot.iamb(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('iamb','fast.iamb','inter.iamb','iamb.fdr'),
-                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                      R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     test <- match.arg(test)
     version <- match.arg(version)
     to <- match.arg(to)
@@ -371,7 +397,11 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 #' Parents & Children Algorithm With Bootstrapping
@@ -394,10 +424,12 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.parents.children(df)
+#' obj <- boot.parents.children(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('mmpc','si.hiton.pc','hpc'),
-                                 R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                                  R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     test <- match.arg(test)
     version <- match.arg(version)
     to <- match.arg(to)
@@ -435,7 +467,11 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 #' Chow-Liu Algorithm With Bootstrapping
@@ -453,7 +489,9 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.chowliu(df)
+#' obj <- boot.chowliu(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
@@ -484,7 +522,11 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 #' ARACNE Algorithm With Bootstrapping
@@ -502,7 +544,9 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.aracne(df)
+#' obj <- boot.aracne(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
@@ -533,7 +577,11 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 ## Score-Based
@@ -559,10 +607,12 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.hc(df)
+#' obj <- boot.hc(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, restart=0, perturb=1, max.iter=Inf, maxp=Inf,
-                   R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                    R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
 
     if (!is.null(seed)) {
@@ -597,7 +647,11 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 #' Tabu Search Algorithm (TABU) With Bootstrapping
@@ -621,10 +675,12 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.tabu(df)
+#' obj <- boot.tabu(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, tabu=10, max.tabu=NULL, max.iter=Inf, maxp=Inf,
-                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                      R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
 
     if (!is.null(seed)) {
@@ -662,7 +718,11 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 #' Greedy Equivalence Search Algorithm (GES) With Bootstrapping
@@ -681,10 +741,12 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.ges(df)
+#' obj <- boot.ges(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
-                    R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     adaptive <- match.arg(adaptive)
     to <- match.arg(to)
 
@@ -715,7 +777,11 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 #' Linear NO-TEARS Algorithm (Reimplemented)
@@ -860,7 +926,9 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.notears(df)
+#' obj <- boot.notears(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
                          max.iter=100, h.tol=1e-8, rho.max=1e+16, w.threshold=0.3,
@@ -887,7 +955,11 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 ## Hybrid (Constraint-Based + Score-Based)
@@ -912,11 +984,13 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.rsmax2(df)
+#' obj <- boot.rsmax2(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','gs','iamb','fast.iamb','inter.iamb','iamb.fdr','mmpc','si.hiton.pc','hpc'),
-                       maximize=c('hc','tabu'), restrict.args=list(), maximize.args=list(), version=c('rsmax2','mmhc','h2pc'),
-                       R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                        maximize=c('hc','tabu'), restrict.args=list(), maximize.args=list(), version=c('rsmax2','mmhc','h2pc'),
+                        R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     restrict <- match.arg(restrict)
     maximize <- match.arg(maximize)
     version <- match.arg(version)
@@ -961,7 +1035,11 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 #' Adaptively Restricted Greedy Equivalence Search Algorithm (ARGES) With Bootstrapping
@@ -984,11 +1062,13 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.arges(df)
+#' obj <- boot.arges(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf,
-                      adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
-                      R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                       adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
+                       R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
 
     adaptive <- match.arg(adaptive)
     to <- match.arg(to)
@@ -1030,7 +1110,11 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 ## Graphical Lasso
@@ -1051,7 +1135,9 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.glasso(df, rho=0.1)
+#' obj <- boot.glasso(df, rho=0.1)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, lower=TRUE, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
@@ -1095,7 +1181,11 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
         A[lower.tri(A)] <- 0
     }
     g <- convert.format(A, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 ## Restricted Structural Equation Models
@@ -1113,7 +1203,9 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.lingam(df)
+#' obj <- boot.lingam(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
@@ -1136,7 +1228,11 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 ## Graphical Continuous Lyapunov Models
@@ -1154,7 +1250,9 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 #' @keywords learning graph
 #' @export
 #' @examples
-#' graph <- boot.gclm(df)
+#' obj <- boot.gclm(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
@@ -1209,7 +1307,11 @@ boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacenc
     A <- average.graph(graphs, threshold=threshold, to='adjacency')
     diag(A) <- 0
     g <- convert.format(A, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 mll <- function(P, S) {
@@ -1233,7 +1335,9 @@ mll <- function(P, S) {
 #' @useDynLib gnlearn
 #' @export
 #' @examples
-#' graph <- boot.nodag(df, '/home/user/nodag/nodag.so')
+#' obj <- boot.nodag(df, '/home/user/nodag/nodag.so')
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 boot.nodag <- function(df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
@@ -1267,7 +1371,11 @@ boot.nodag <- function(df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igrap
 
     graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
 }
 
 #' Learn Huge Graph (With Random Gene Selection + Cells Bootstrapping)
@@ -1287,9 +1395,11 @@ boot.nodag <- function(df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igrap
 #' @keywords learning huge graph
 #' @export
 #' @examples
-#' graph <- huge.graph(df, algorithm=boot.tabu)
-#' graph <- huge.graph(df, algorithm=boot.lingam)
-#' graph <- huge.graph(df, algorithm=boot.iamb, n.genes=20, R=100, threshold=0.9, iter.R=10)
+#' obj <- huge.graph(df, algorithm=boot.tabu)
+#' obj <- huge.graph(df, algorithm=boot.lingam)
+#' obj <- huge.graph(df, algorithm=boot.iamb, n.genes=20, R=100, threshold=0.9, iter.R=10)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
 
 huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, iter.R=4, iter.m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL, ...) {
     to <- match.arg(to)
@@ -1304,11 +1414,21 @@ huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, 
     graphs <- foreach(rep=1:R) %dopar% {
         sel.genes <- sample(colnames(df), n.genes, replace=FALSE)
         sel.df <- subset(df, select=sel.genes)
-        algorithm(df=sel.df, R=iter.R, m=iter.m, threshold=0, to='adjacency', cluster=1, seed=seed, ...)
+        obj <- algorithm(df=sel.df, R=iter.R, m=iter.m, threshold=0, to='adjacency', cluster=1, seed=seed, ...)
+        obj$replicates
     }
 
     stopImplicitCluster()
 
+    R <- length(graphs)
+    replicates <- list()
+    for (i in 1:R) {
+        replicates <- list(unlist(replicates), graphs[[i]])
+    }
     g <- average.graph(graphs, threshold=threshold, to=to)
-    return(g)
+    obj <- list(
+        average = g,
+        replicates = replicates
+    )
+    return(obj)
 }

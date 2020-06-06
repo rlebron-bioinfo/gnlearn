@@ -57,7 +57,9 @@ boot.tabu(
 This function allows you to learn a directed graph from a dataset using the Tabu Search algorithm.
 }
 \examples{
-graph <- boot.tabu(df)
+obj <- boot.tabu(df)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

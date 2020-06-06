@@ -72,7 +72,9 @@ boot.fci(
 This function allows you to learn a directed graph from a dataset using the Fast Causal Inference algorithm (stable version).
 }
 \examples{
-graph <- boot.fci(df)
+obj <- boot.fci(df)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

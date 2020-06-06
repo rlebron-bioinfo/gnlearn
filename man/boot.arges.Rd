@@ -54,7 +54,9 @@ boot.arges(
 This function allows you to learn a directed graph from a dataset using the Adaptively Restricted Greedy Equivalence Search (ARGES) algorithm.
 }
 \examples{
-graph <- boot.arges(df)
+obj <- boot.arges(df)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}

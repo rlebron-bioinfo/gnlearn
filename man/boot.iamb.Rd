@@ -54,7 +54,9 @@ boot.iamb(
 This function allows you to learn a directed graph from a dataset using the Incremental Association algorithm.
 }
 \examples{
-graph <- boot.iamb(df)
+obj <- boot.iamb(df)
+avg.g <- obj$average
+g.rep <- obj$replicates
 }
 \keyword{graph}
 \keyword{learning}
