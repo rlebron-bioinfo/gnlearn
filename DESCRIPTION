@@ -35,7 +35,8 @@ Imports:
     dplyr,
     RBGL,
     ape,
-    gplots
+    gplots,
+    DescTools
 Suggests:
     Rgraphviz,
     gRain,

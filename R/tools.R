@@ -464,9 +464,11 @@ third.axis <- function(layout) {
 #' Graph Comparison
 #'
 #' This function allows you to compare two graphs.
-#' @param learned Learned graph or graph 1.
+#' @param learned Learned graph or graph 1 (obj$average).
 #' @param true Ground truth graph or graph 2 (reference).
-#' @param marginalize Whether or not to marginalize: 'none', 'learned', 'true', or 'both'. Default: 'none'
+#' @param learned.replicates List of learned replicates (obj$replicates) (optional). If provided, PR AUC will be calculated.
+#' @param skeleton Whether to compare graph skeletons instead of the graphs themself. Default: FALSE
+#' @param marginalize Whether or not to marginalize (it's supposed to be a Bayesian network!): 'none', 'learned', 'true', or 'both'. Default: 'none'
 #' @param max.steps Maximum number of steps in the path during marginalization. Default: Inf
 #' @param arcs Whether or not to list the arcs. Default: FALSE.
 #' @param plot Whether or not to plot the differences between the two graphs. Default: TRUE
@@ -478,11 +480,16 @@ third.axis <- function(layout) {
 #' comparison <- compare.graphs(obj1, obj2, plot=TRUE)
 #' comparison <- compare.graphs(obj1, obj2, plot=FALSE)
 
-compare.graphs <- function(learned, true, marginalize=c('none','learned','true','both'),
+compare.graphs <- function(learned, true, learned.replicates=NULL, skeleton=FALSE, marginalize=c('none','learned','true','both'),
                            max.steps=Inf, arcs=FALSE, plot=TRUE, vertical.plot=TRUE, split.plot=TRUE) {
     marginalize <- match.arg(marginalize)
     learned <- as.igraph(learned)
     true <- as.igraph(true)
+
+    if (skeleton) {
+        learned <- igraph::as.undirected(learned, mode='collapse', edge.attr.comb=igraph::igraph_opt('edge.attr.comb'))
+        true <- igraph::as.undirected(true, mode='collapse', edge.attr.comb=igraph::igraph_opt('edge.attr.comb'))
+    }
 
     learned <- igraph::simplify(learned, remove.multiple=TRUE, remove.loops=TRUE)
     true <- igraph::simplify(true, remove.multiple=TRUE, remove.loops=TRUE)
@@ -494,11 +501,11 @@ compare.graphs <- function(learned, true, marginalize=c('none','learned','true',
     marginalize.true <- marginalize == 'both' | marginalize == 'true'
 
     if (marginalize.learned) {
-        learned <- graph.marginalization(learned, v1[(v1 %in% v2)], to='igraph')
+        learned <- bn.marginalization(learned, v1[(v1 %in% v2)], to='igraph')
     }
 
     if (marginalize.true) {
-        true <- graph.marginalization(true, v2[(v2 %in% v1)], to='igraph')
+        true <- bn.marginalization(true, v2[(v2 %in% v1)], to='igraph')
     }
 
     v1 <- names(igraph::V(learned))
@@ -515,6 +522,8 @@ compare.graphs <- function(learned, true, marginalize=c('none','learned','true',
     p <- precision(igraph::ecount(tp), igraph::ecount(fp))
     r <- recall(igraph::ecount(tp), igraph::ecount(fn))
     f1 <- f1.score(igraph::ecount(tp), igraph::ecount(fp), igraph::ecount(fn))
+    miss <- miss.rate(igraph::ecount(fn), igraph::ecount(tp))
+    fdr <- fd.rate(igraph::ecount(fp), igraph::ecount(tp))
 
     if (plot) {
         learned.x <- igraph::difference(learned, tp)
@@ -585,17 +594,51 @@ compare.graphs <- function(learned, true, marginalize=c('none','learned','true',
         fn <- igraph::ecount(fn)
     }
 
-    return(list(
-        tp = tp,
-        fp = fp,
-        fn = fn,
-        precision = p,
-        recall = r,
-        f1.score = f1,
-        shd = shd,
-        hamming = hamming
-    ))
-
+    if (!is.null(learned.replicates)) {
+        R <- length(learned.replicates)
+        precision.dist <- c()
+        recall.dist <- c()
+        for (i in 1:R) {
+            learned <- learned.replicates[[i]]
+            stats <- compare.graphs(learned, true, learned.replicates=NULL, skeleton=skeleton, marginalize=marginalize,
+                                    max.steps=max.steps, arcs=FALSE, plot=FALSE, vertical.plot=FALSE, split.plot=FALSE)
+            precision.dist <- c(precision.dist, stats$precision)
+            recall.dist <- c(recall.dist, recall)
+        }
+        pr.auc <- DescTools::AUC(recall.dist, precision.dist,
+                                 from=min(recall.dist, na.rm=TRUE), to=max(recall.dist, na.rm=TRUE),
+                                 method='trapezoid', absolutearea=FALSE, subdivisions=R, na.rm=TRUE)
+        if (plot) {
+            plot(recall.dist, precision.dist, type='n', col='blue',
+                 main=paste(c('Precision-Recall Curve\n(AUC = ', pr.auc, ')'), collapse=''), xlab='Recall', ylab='Precision')
+        }
+        return(list(
+            tp = tp,
+            fp = fp,
+            fn = fn,
+            precision = p,
+            recall = r,
+            f1.score = f1,
+            pr.auc = pr.auc,
+            miss.rate = miss,
+            fdr = fdr,
+            shd = shd,
+            hamming = hamming
+        ))
+    } else {
+        return(list(
+            tp = tp,
+            fp = fp,
+            fn = fn,
+            precision = p,
+            recall = r,
+            f1.score = f1,
+            miss.rate = miss,
+            fdr = fdr,
+            shd = shd,
+            hamming = hamming
+        ))
+    }
 }
 
 precision <- function(tp, fp) {
@@ -610,6 +653,14 @@ f1.score <- function(tp, fp, fn) {
     p <- precision(tp, fp)
     r <- recall(tp, fn)
     return((2*p*r)/(p+r))
+}
+
+miss.rate <- function(fn, tp) {
+    return(fn/(fn+tp))
+}
+
+fd.rate <- function(fp, tp) {
+    return(fp/(fp+tp))
 }
 
 #' Degree Per Gene
@@ -1126,7 +1177,7 @@ make.edgelist <- function(genes, from.genes=NULL, to.genes=NULL, from.features=N
     return(edge.list)
 }
 
-#' Graph Marginalization
+#' Bayesian Network Marginalization
 #'
 #' This function allows you to marginalize a graph over observed genes.
 #' @param g Graph object.
@@ -1136,9 +1187,9 @@ make.edgelist <- function(genes, from.genes=NULL, to.genes=NULL, from.features=N
 #' @keywords graph genes marginalization
 #' @export
 #' @examples
-#' g <- graph.marginalization(g, obs.genes)
+#' g <- bn.marginalization(g, obs.genes)
 
-graph.marginalization <- function(g, obs.genes, max.steps=Inf, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn')) {
+bn.marginalization <- function(g, obs.genes, max.steps=Inf, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn')) {
     to <- match.arg(to)
     t <- as.igraph(as.adjacency(g))
     igraph::E(t)$weight <- abs(igraph::E(t)$weight)

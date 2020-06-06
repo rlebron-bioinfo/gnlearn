@@ -7,6 +7,8 @@
 compare.graphs(
   learned,
   true,
+  learned.replicates = NULL,
+  skeleton = FALSE,
   marginalize = c("none", "learned", "true", "both"),
   max.steps = Inf,
   arcs = FALSE,
@@ -16,11 +18,15 @@ compare.graphs(
 )
 }
 \arguments{
-\item{learned}{Learned graph or graph 1.}
+\item{learned}{Learned graph or graph 1 (obj$average).}
 
 \item{true}{Ground truth graph or graph 2 (reference).}
 
-\item{marginalize}{Whether or not to marginalize: 'none', 'learned', 'true', or 'both'. Default: 'none'}
+\item{learned.replicates}{List of learned replicates (obj$replicates) (optional). If provided, PR AUC will be calculated.}
+
+\item{skeleton}{Whether to compare graph skeletons instead of the graphs themself. Default: FALSE}
+
+\item{marginalize}{Whether or not to marginalize (it's supposed to be a Bayesian network!): 'none', 'learned', 'true', or 'both'. Default: 'none'}
 
 \item{max.steps}{Maximum number of steps in the path during marginalization. Default: Inf}
 

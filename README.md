@@ -99,7 +99,7 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 * `delete.isolated()`: Delete Isolated Nodes
 * `add.edges()`: Add Edges To A Graph
 * `delete.edges()`: Delete Edges To A Graph
-* `graph.marginalization()`: Graph Marginalization
+* `bn.marginalization()`: Bayesian Network Marginalization
 * `fit.coefficients()`: Estimate The Coefficients Of An Adjacency Matrix
 
 *Graph Operations:*
