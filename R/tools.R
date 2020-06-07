@@ -480,7 +480,6 @@ third.axis <- function(layout) {
 
 compare.graphs <- function(learned, true, learned.replicates=NULL, skeleton=FALSE,
                            arcs=FALSE, plot=TRUE, vertical.plot=TRUE, split.plot=TRUE) {
-    marginalize <- match.arg(marginalize)
     learned <- as.igraph(learned)
     true <- as.igraph(true)
 
