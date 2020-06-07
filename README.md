@@ -81,6 +81,7 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 * `boot.arges()`: Adaptively Restricted Greedy Equivalence Search Algorithm (ARGES) With Bootstrapping
 * `boot.glasso()`: Graphical Lasso (GLASSO) With Bootstrapping
 * `boot.lingam()`: Restricted Structural Equation Models (LINGAM) With Bootstrapping
+* `boot.genie3()`: GEne Network Inference with Ensemble of trees (GENIE3) With Bootstrapping
 * `boot.gclm()`: Graphical Continuous Lyapunov Models (GCLM) With Bootstrapping
 * `boot.nodag()`: NODAG Algorithm With Bootstrapping
 
