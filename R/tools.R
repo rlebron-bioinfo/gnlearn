@@ -603,13 +603,24 @@ compare.graphs <- function(learned, true, learned.replicates=NULL, skeleton=FALS
             stats <- compare.graphs(learned, true, learned.replicates=NULL, skeleton=skeleton, marginalize=marginalize,
                                     max.steps=max.steps, arcs=FALSE, plot=FALSE, vertical.plot=FALSE, split.plot=FALSE)
             precision.dist <- c(precision.dist, stats$precision)
-            recall.dist <- c(recall.dist, recall)
+            recall.dist <- c(recall.dist, stats$recall)
         }
-        pr.auc <- DescTools::AUC(recall.dist, precision.dist,
-                                 from=min(recall.dist, na.rm=TRUE), to=max(recall.dist, na.rm=TRUE),
-                                 method='trapezoid', absolutearea=FALSE, subdivisions=R, na.rm=TRUE)
+
+        data <- data.frame(precision.dist, recall.dist)
+
+        library(dplyr)
+        data <- data %>%
+          group_by(recall.dist) %>%
+          summarise(precision.dist=mean(precision.dist))
+
+        precision.dist <- as.numeric(data$precision.dist)
+        recall.dist <- as.numeric(data$recall.dist)
+
+        pr.auc <- DescTools::AUC(recall.dist, precision.dist) #,
+                                 #from=min(recall.dist, na.rm=TRUE), to=max(recall.dist, na.rm=TRUE),
+                                 #method='trapezoid', absolutearea=FALSE, subdivisions=length(recall.dist), na.rm=TRUE)
         if (plot) {
-            plot(recall.dist, precision.dist, type='n', col='blue',
+            plot(recall.dist, precision.dist, type='l', col='blue', lwd=3,
                  main=paste(c('Precision-Recall Curve\n(AUC = ', pr.auc, ')'), collapse=''), xlab='Recall', ylab='Precision')
         }
         return(list(
@@ -936,20 +947,20 @@ average.graph <- function(graphs, threshold=0.5, to='igraph') {
 
 }
 
-rename.graphs <- function(graphs, names, to='igraph') {
-    R <- length(graphs)
-    renamed.graphs <- list()
-    for (i in 1:R) {
-        g <- convert.format(graphs[[i]], to='adjacency')
-        if (length(g) > 0) {
-            rownames(g) <- names
-            colnames(g) <- names
-            g <- convert.format(g, to=to)
-            renamed.graphs <- list(unlist(renamed.graphs), g)
-        }
-    }
-    return(renamed.graphs)
-}
+#rename.graphs <- function(graphs, names, to='igraph') {
+#    R <- length(graphs)
+#    renamed.graphs <- list()
+#    for (i in 1:R) {
+#        g <- convert.format(graphs[[i]], to='adjacency')
+#        if (length(g) > 0) {
+#            rownames(g) <- names
+#            colnames(g) <- names
+#            g <- convert.format(g, to=to)
+#            renamed.graphs <- list(unlist(renamed.graphs), g)
+#        }
+#    }
+#    return(renamed.graphs)
+#}
 
 #' Graph Communities
 #'

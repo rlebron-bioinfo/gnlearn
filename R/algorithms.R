@@ -72,17 +72,23 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
             g <- pcalg::skeleton(suffStat, indepTest=pcalg.indep.test, labels=varNames, alpha=alpha, m.max=max.sx,
                                  fixedEdges=whitelist, fixedGaps=blacklist, method='stable', NAdelete=TRUE)
             g <- as(g@graph, 'matrix')
+            rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+            g
         } else if (implementation=='bnlearn') {
             g <- bnlearn::pc.stable(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
                              B=bnlearn.B, max.sx=max.sx, undirected=TRUE)
             convert.format(g, to='adjacency')
+            rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+            g
         }
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -170,17 +176,23 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
                            u2pd=pcalg.u2pd, conservative=pcalg.conservative, maj.rule=pcalg.maj.rule, solve.confl=pcalg.solve.confl,
                            fixedEdges=whitelist, fixedGaps=blacklist, skel.method='stable', NAdelete=TRUE)
             g <- as(g@graph, 'matrix')
+            rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+            g
         } else if (implementation=='bnlearn') {
             g <- bnlearn::pc.stable(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
                                     B=bnlearn.B, max.sx=max.sx, undirected=FALSE)
             convert.format(g, to='adjacency')
+            rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+            g
         }
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -258,12 +270,16 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
             fci.plus = { pcalg::fciPlus(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha) }
         )
         g <- as(g, 'matrix')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        g
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -320,12 +336,16 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
         g <- bnlearn::gs(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
                          B=B, max.sx=max.sx, undirected=FALSE)
         convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        g
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -391,12 +411,16 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
         g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
                          B=B, max.sx=max.sx, undirected=FALSE)
         convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        g
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -461,12 +485,16 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
         g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
                          B=B, max.sx=max.sx, undirected=FALSE)
         convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        g
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -516,12 +544,16 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
         splitted.df <- dataset.split(df, m=m)
         g <- bnlearn::chow.liu(splitted.df$train, whitelist=whitelist, blacklist=blacklist, mi='mi-g')
         convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        g
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -571,12 +603,16 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
         splitted.df <- dataset.split(df, m=m)
         g <- bnlearn::aracne(splitted.df$train, whitelist=whitelist, blacklist=blacklist, mi='mi-g')
         convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        g
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -641,12 +677,16 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
         g <- bnlearn::hc(splitted.df$train, newdata=splitted.df$test, start=start, whitelist=whitelist, blacklist=blacklist, score=score,
                          restart=restart, perturb=perturb, max.iter=max.iter, maxp=maxp, optimized=TRUE)
         convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        g
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -712,12 +752,16 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
         g <- bnlearn::tabu(splitted.df$train, newdata=splitted.df$test, start=start, whitelist=whitelist, blacklist=blacklist, score=score,
                            tabu=tabu, max.tabu=max.tabu, max.iter=max.iter, maxp=maxp, optimized=TRUE)
         convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        g
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -771,12 +815,16 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
         g <- pcalg::ges(score, labels=score$getNodes(), fixedGaps=blacklist, maxDegree=maxDegree,
                         adaptive=adaptive, phase=c('forward','backward'), iterate=TRUE)
         g <- g$repr$weight.mat()
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        g
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -948,13 +996,17 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
         splitted.df <- dataset.split(df, m=m)
         g <- notears(splitted.df$train, lambda1=lambda1, loss.type=loss.type,
                      max.iter=max.iter, h.tol=h.tol, rho.max=rho.max, w.threshold=w.threshold)
-        convert.format(g, to='adjacency')
+        g <- convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        g
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -1029,12 +1081,16 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
         g <- bnlearn::rsmax2(splitted.df$train, whitelist=whitelist, blacklist=blacklist, restrict=restrict, maximize=maximize,
                              restrict.args=restrict.args, maximize.args=maximize.args)
         convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        g
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -1104,12 +1160,16 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
         g <- pcalg::ges(score, labels=score$getNodes(), fixedGaps=!skel, maxDegree=maxDegree,
                         adaptive=adaptive, phase=c('forward','backward'), iterate=TRUE)
         g <- g$repr$weight.mat()
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        g
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -1166,12 +1226,12 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
         A <- sign(abs(A)) # ?
         A <- W * A # ?
         diag(A) <- 0
+        rownames(A) <- colnames(A) <- colnames(splitted.df$train)
         A
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     A <- average.graph(graphs, threshold=threshold, to='adjacency')
     diag(A) <- 0
     if (!upper) {
@@ -1181,6 +1241,9 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
         A[lower.tri(A)] <- 0
     }
     g <- convert.format(A, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -1221,13 +1284,17 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
     graphs <- foreach(rep=1:R) %dopar% {
         splitted.df <- dataset.split(df, m=m)
         g <- pcalg::lingam(splitted.df$train)
-        g$Bpruned
+        g <- g$Bpruned
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        g
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -1297,16 +1364,20 @@ boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacenc
             mll(solve(res$Sigma), dd %*% S.test %*% dd)
         })
         bidx <- which.min(tmp)
-        t(results.path[[bidx]]$B)
+        A <- t(results.path[[bidx]]$B)
+        rownames(A) <- colnames(A) <- colnames(splitted.df$train)
+        A
 
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     A <- average.graph(graphs, threshold=threshold, to='adjacency')
     diag(A) <- 0
     g <- convert.format(A, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -1364,13 +1435,16 @@ boot.nodag <- function(df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igrap
         A <- sign(abs(A)) # ?
         A <- W * A # ?
         diag(A) <- 0
+        rownames(A) <- colnames(A) <- colnames(splitted.df$train)
         A
     }
 
     stopImplicitCluster()
 
-    graphs <- rename.graphs(graphs, colnames(df), to='adjacency')
     g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
     obj <- list(
         average = g,
         replicates = graphs
@@ -1423,7 +1497,7 @@ huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, 
     R <- length(graphs)
     replicates <- list()
     for (i in 1:R) {
-        replicates <- list(unlist(replicates), graphs[[i]])
+        replicates <- c(replicates, graphs[[i]])
     }
     g <- average.graph(graphs, threshold=threshold, to=to)
     obj <- list(
