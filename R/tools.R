@@ -493,20 +493,6 @@ compare.graphs <- function(learned, true, learned.replicates=NULL, skeleton=FALS
 
     v1 <- names(igraph::V(learned))
     v2 <- names(igraph::V(true))
-
-    marginalize.learned <- marginalize == 'both' | marginalize == 'learned'
-    marginalize.true <- marginalize == 'both' | marginalize == 'true'
-
-    if (marginalize.learned) {
-        learned <- bn.marginalization(learned, v1[(v1 %in% v2)], to='igraph')
-    }
-
-    if (marginalize.true) {
-        true <- bn.marginalization(true, v2[(v2 %in% v1)], to='igraph')
-    }
-
-    v1 <- names(igraph::V(learned))
-    v2 <- names(igraph::V(true))
     r1 <- v1[!(v1 %in% v2)]
     r2 <- v2[!(v2 %in% v1)]
     learned <- igraph::delete_vertices(learned, r1)
@@ -610,8 +596,8 @@ compare.graphs <- function(learned, true, learned.replicates=NULL, skeleton=FALS
         fall.out.dist <- c()
         for (i in 1:R) {
             learned <- learned.replicates[[i]]
-            stats <- compare.graphs(learned, true, learned.replicates=NULL, skeleton=skeleton, marginalize=marginalize,
-                                    max.steps=max.steps, arcs=FALSE, plot=FALSE, vertical.plot=FALSE, split.plot=FALSE)
+            stats <- compare.graphs(learned, true, learned.replicates=NULL, skeleton=skeleton,
+                                    arcs=FALSE, plot=FALSE, vertical.plot=FALSE, split.plot=FALSE)
             precision.dist <- c(precision.dist, stats$Precision)
             recall.dist <- c(recall.dist, stats$Recall)
             fall.out.dist <- c(fall.out.dist, stats$Fall.Out)
