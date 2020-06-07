@@ -582,34 +582,47 @@ compare.graphs <- function(learned, true, learned.replicates=NULL, skeleton=FALS
     hamming <- bnlearn::hamming(bnlearn_learned, bnlearn_true)
 
     if (arcs) {
-        tp <- igraph::as_edgelist(tp)
-        fp <- igraph::as_edgelist(fp)
-        fn <- igraph::as_edgelist(fn)
-    } else {
         tp <- igraph::ecount(tp)
         fp <- igraph::ecount(fp)
         fn <- igraph::ecount(fn)
+        tp.out <- igraph::as_edgelist(tp)
+        fp.out <- igraph::as_edgelist(fp)
+        fn.out <- igraph::as_edgelist(fn)
+    } else {
+        tp.out <- tp <- igraph::ecount(tp)
+        fp.out <- fp <- igraph::ecount(fp)
+        fn.out <- fn <- igraph::ecount(fn)
     }
+
+    N <- igraph::gorder(u)
+    tn <- ifelse(skeleton, N*(N-1)/2, N*(N-1))
+    s <- selectivity(tn, fp)
+    npv <- np.value(tn, fn)
+    f <- fall.out(fp, tn)
+    fo.r <- fo.rate(fn, tn)
+    acc <- accuracy(tp, tn, fp, fn)
+    b.acc <- balanced.accuracy(tp, tn, fp, fn)
 
     if (!is.null(learned.replicates)) {
         R <- length(learned.replicates)
         precision.dist <- c()
         recall.dist <- c()
+        fall.out.dist <- c()
         for (i in 1:R) {
             learned <- learned.replicates[[i]]
             stats <- compare.graphs(learned, true, learned.replicates=NULL, skeleton=skeleton, marginalize=marginalize,
                                     max.steps=max.steps, arcs=FALSE, plot=FALSE, vertical.plot=FALSE, split.plot=FALSE)
-            precision.dist <- c(precision.dist, stats$precision)
-            recall.dist <- c(recall.dist, stats$recall)
+            precision.dist <- c(precision.dist, stats$Precision)
+            recall.dist <- c(recall.dist, stats$Recall)
+            fall.out.dist <- c(fall.out.dist, stats$Fall.Out)
         }
 
-        data <- data.frame(precision.dist, recall.dist)
-
         library(dplyr)
+
+        data <- data.frame(precision.dist, recall.dist)
         data <- data %>%
           group_by(recall.dist) %>%
           summarise(precision.dist=mean(precision.dist))
-
         precision.dist <- as.numeric(data$precision.dist)
         recall.dist <- as.numeric(data$recall.dist)
         pr.auc <- DescTools::AUC(recall.dist, precision.dist)
@@ -618,31 +631,60 @@ compare.graphs <- function(learned, true, learned.replicates=NULL, skeleton=FALS
             plot(recall.dist, precision.dist, type='l', col='blue', lwd=3,
                  main=paste(c('Precision-Recall Curve\n(AUC = ', pr.auc, ')'), collapse=''), xlab='Recall', ylab='Precision')
         }
+
+        data <- data.frame(fall.out.dist, recall.dist)
+        data <- data %>%
+          group_by(recall.dist) %>%
+          summarise(fall.out.dist=mean(fall.out.dist))
+        fall.out.dist <- as.numeric(data$fall.out.dist)
+        recall.dist <- as.numeric(data$recall.dist)
+        roc.auc <- DescTools::AUC(fall.out.dist, recall.dist)
+
+        if (plot) {
+            plot(fall.out.dist, recall.dist, type='l', col='blue', lwd=3,
+                 main=paste(c('Receiver Operating Characteristic (ROC) Curve\n(AUC = ', pr.auc, ')'), collapse=''), xlab='Fall-Out', ylab='Recall')
+        }
+
         return(list(
-            tp = tp,
-            fp = fp,
-            fn = fn,
-            precision = p,
-            recall = r,
-            f1.score = f1,
-            pr.auc = pr.auc,
-            miss.rate = miss,
-            fdr = fdr,
-            shd = shd,
-            hamming = hamming
+            TP = tp.out,
+            FP = fp.out,
+            FN = fn.out,
+            TN = tn,
+            Precision = p,
+            Recall = r,
+            F1.Score = f1,
+            PR.AUC = pr.auc,
+            Miss.Rate = miss,
+            FDR = fdr,
+            Selectivity = s,
+            NPV = npv,
+            Fall.Out = f,
+            ROC.AUC = roc.auc,
+            FOR = fo.r,
+            Accuracy = acc,
+            Balanced.Accuracy = b.acc,
+            SHD = shd,
+            Hamming = hamming
         ))
     } else {
         return(list(
-            tp = tp,
-            fp = fp,
-            fn = fn,
-            precision = p,
-            recall = r,
-            f1.score = f1,
-            miss.rate = miss,
-            fdr = fdr,
-            shd = shd,
-            hamming = hamming
+            TP = tp.out,
+            FP = fp.out,
+            FN = fn.out,
+            TN = tn,
+            Precision = p,
+            Recall = r,
+            F1.Score = f1,
+            Miss.Rate = miss,
+            FDR = fdr,
+            Selectivity = s,
+            NPV = npv,
+            Fall.Out = f,
+            FOR = fo.r,
+            Accuracy = acc,
+            Balanced.Accuracy = b.acc,
+            SHD = shd,
+            Hamming = hamming
         ))
     }
 }
@@ -667,6 +709,32 @@ miss.rate <- function(fn, tp) {
 
 fd.rate <- function(fp, tp) {
     return(fp/(fp+tp))
+}
+
+selectivity <- function(tn, fp) {
+    return(tn/(tn+fp))
+}
+
+np.value <- function(tn, fn) {
+    return(tn/(tn+fn))
+}
+
+fall.out <- function(fp, tn) {
+    return(fp/(fp+tn))
+}
+
+fo.rate <- function(fn, tn) {
+    return(fn/(fn+tn))
+}
+
+accuracy <- function(tp, tn, fp, fn) {
+    return((tp+tn)/(tp+tn+fp+fn))
+}
+
+balanced.accuracy <- function(tp, tn, fp, fn) {
+    r <- recall(tp, fn)
+    s <- selectivity(tn, fp)
+    return((r+s)/2)
 }
 
 #' Degree Per Gene
