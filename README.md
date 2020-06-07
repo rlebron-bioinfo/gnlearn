@@ -28,6 +28,7 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 *Other Algorithms*
 * Graphical Lasso (GLASSO) (`boot.glasso()`), based on `glasso` R package implementation.
 * Restricted Structural Equation Models (LINGAM) (`boot.lingam()`), based on `pcalg` R package implementation.
+* GEne Network Inference with Ensemble of trees (GENIE3) (`boot.genie3()`), based on `GENIE3` R package implementation.
 * Graphical Continuous Lyapunov Models (GCLM), based on `gclm` R package implementation.
 * NODAG algorithm, based on Gherardo Varando implementation (https://github.com/gherardovarando/nodag).
 
@@ -192,6 +193,7 @@ Please also use the following references depending on the algorithm used:
 * ARGES [[21]](#21)
 * GLASSO [[22]](#22)
 * LINGAM [[23]](#23)
+* GENIE3 [[]](#)
 * GCLM [[24]](#24)
 * NODAG [[25]](#25)
 

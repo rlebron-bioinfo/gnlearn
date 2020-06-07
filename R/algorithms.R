@@ -1302,6 +1302,65 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
     return(obj)
 }
 
+## GEne Network Inference with Ensemble of trees
+
+#' GEne Network Inference with Ensemble of trees (GENIE3) with Bootstrapping
+#'
+#' This function allows you to learn a directed graph from a dataset using the GENIE3 algorithm.
+#' @param df Dataset.
+#' @param tree.method Random Forest ('rf') or Extra-Trees ('et'). Default: 'rf'
+#' @param K Number of candidate regulators that are randomly selected at each tree node for the best split determination. Default: 'sqrt' (square root of the number of genes)
+#' @param n.trees Number of trees that are grown per ensemble. Default: 1000
+#' @param min.weight Minimum absolute value considered in the adjacency matrix. Lower values will be replaced by zero. Default: 0.1
+#' @param R Number of bootstrap replicates (optional). Default: 200
+#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' obj <- boot.genie3(df)
+#' avg.g <- obj$average
+#' g.rep <- obj$replicates
+
+boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.tress=1000, min.weight=0.1,
+                        R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                        cluster=4, seed=NULL) {
+    tree.method <- match.arg(tree.method)
+    to <- match.arg(to)
+
+    if (!is.null(seed)) {
+        set.seed(seed)
+    }
+
+    if (class(K)[1]=='character' & K != 'sqrt' & K != 'all') {
+        K <- 'sqrt'
+    }
+
+    df <- drop.all.zeros(df)
+
+    graphs <- foreach(rep=1:R) %dopar% {
+        splitted.df <- dataset.split(df, m=m)
+        splitted.df$train <- t(splitted.df$train)
+        g <- GENIE3(splitted.df$train, treeMethod=tree.method, K=K, nTrees=n.trees, nCores=cluster)
+        rownames(g) <- colnames(g) <- rownames(splitted.df$train)
+        g[g < min.weight] <- 0
+        g
+    }
+
+    g <- average.graph(graphs, threshold=threshold, to=to)
+    for (i in 1:R) {
+        graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
+    }
+    obj <- list(
+        average = g,
+        replicates = graphs
+    )
+    return(obj)
+}
+
 ## Graphical Continuous Lyapunov Models
 
 #' Graphical Continuous Lyapunov Models (GCLM) With Bootstrapping

@@ -29,6 +29,7 @@ Imports:
     threejs,
     bnlearn,
     glasso,
+    GENIE3,
     gclm,
     jsonlite,
     matrixcalc,
@@ -36,7 +37,8 @@ Imports:
     RBGL,
     ape,
     gplots,
-    DescTools
+    DescTools,
+    doRNG
 Suggests:
     Rgraphviz,
     gRain,
