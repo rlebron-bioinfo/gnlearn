@@ -9,8 +9,6 @@ compare.graphs(
   true,
   learned.replicates = NULL,
   skeleton = FALSE,
-  marginalize = c("none", "learned", "true", "both"),
-  max.steps = Inf,
   arcs = FALSE,
   plot = TRUE,
   vertical.plot = TRUE,
@@ -25,10 +23,6 @@ compare.graphs(
 \item{learned.replicates}{List of learned replicates (obj$replicates) (optional). If provided, PR AUC will be calculated.}
 
 \item{skeleton}{Whether to compare graph skeletons instead of the graphs themself. Default: FALSE}
-
-\item{marginalize}{Whether or not to marginalize (it's supposed to be a Bayesian network!): 'none', 'learned', 'true', or 'both'. Default: 'none'}
-
-\item{max.steps}{Maximum number of steps in the path during marginalization. Default: Inf}
 
 \item{arcs}{Whether or not to list the arcs. Default: FALSE.}
 

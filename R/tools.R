@@ -468,8 +468,6 @@ third.axis <- function(layout) {
 #' @param true Ground truth graph or graph 2 (reference).
 #' @param learned.replicates List of learned replicates (obj$replicates) (optional). If provided, PR AUC will be calculated.
 #' @param skeleton Whether to compare graph skeletons instead of the graphs themself. Default: FALSE
-#' @param marginalize Whether or not to marginalize (it's supposed to be a Bayesian network!): 'none', 'learned', 'true', or 'both'. Default: 'none'
-#' @param max.steps Maximum number of steps in the path during marginalization. Default: Inf
 #' @param arcs Whether or not to list the arcs. Default: FALSE.
 #' @param plot Whether or not to plot the differences between the two graphs. Default: TRUE
 #' @param vertical.plot Whether to draw the comparison plots horizontally. Otherwise, they will be drawn horizontally. Default: TRUE
@@ -480,8 +478,8 @@ third.axis <- function(layout) {
 #' comparison <- compare.graphs(obj1, obj2, plot=TRUE)
 #' comparison <- compare.graphs(obj1, obj2, plot=FALSE)
 
-compare.graphs <- function(learned, true, learned.replicates=NULL, skeleton=FALSE, marginalize=c('none','learned','true','both'),
-                           max.steps=Inf, arcs=FALSE, plot=TRUE, vertical.plot=TRUE, split.plot=TRUE) {
+compare.graphs <- function(learned, true, learned.replicates=NULL, skeleton=FALSE,
+                           arcs=FALSE, plot=TRUE, vertical.plot=TRUE, split.plot=TRUE) {
     marginalize <- match.arg(marginalize)
     learned <- as.igraph(learned)
     true <- as.igraph(true)
@@ -615,10 +613,8 @@ compare.graphs <- function(learned, true, learned.replicates=NULL, skeleton=FALS
 
         precision.dist <- as.numeric(data$precision.dist)
         recall.dist <- as.numeric(data$recall.dist)
+        pr.auc <- DescTools::AUC(recall.dist, precision.dist)
 
-        pr.auc <- DescTools::AUC(recall.dist, precision.dist) #,
-                                 #from=min(recall.dist, na.rm=TRUE), to=max(recall.dist, na.rm=TRUE),
-                                 #method='trapezoid', absolutearea=FALSE, subdivisions=length(recall.dist), na.rm=TRUE)
         if (plot) {
             plot(recall.dist, precision.dist, type='l', col='blue', lwd=3,
                  main=paste(c('Precision-Recall Curve\n(AUC = ', pr.auc, ')'), collapse=''), xlab='Recall', ylab='Precision')
@@ -947,21 +943,6 @@ average.graph <- function(graphs, threshold=0.5, to='igraph') {
 
 }
 
-#rename.graphs <- function(graphs, names, to='igraph') {
-#    R <- length(graphs)
-#    renamed.graphs <- list()
-#    for (i in 1:R) {
-#        g <- convert.format(graphs[[i]], to='adjacency')
-#        if (length(g) > 0) {
-#            rownames(g) <- names
-#            colnames(g) <- names
-#            g <- convert.format(g, to=to)
-#            renamed.graphs <- list(unlist(renamed.graphs), g)
-#        }
-#    }
-#    return(renamed.graphs)
-#}
-
 #' Graph Communities
 #'
 #' This function allows you to detect how many communities are in the graph and to which community each node and edge belongs.
@@ -1186,64 +1167,6 @@ make.edgelist <- function(genes, from.genes=NULL, to.genes=NULL, from.features=N
     edge.list <- edge.list[edge.list$from != edge.list$to,]
     rownames(edge.list) <- NULL
     return(edge.list)
-}
-
-#' Bayesian Network Marginalization
-#'
-#' This function allows you to marginalize a graph over observed genes.
-#' @param g Graph object.
-#' @param obs.genes Vector of observed genes.
-#' @param max.steps Maximum number of steps in the path. Default: Inf
-#' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
-#' @keywords graph genes marginalization
-#' @export
-#' @examples
-#' g <- bn.marginalization(g, obs.genes)
-
-bn.marginalization <- function(g, obs.genes, max.steps=Inf, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn')) {
-    to <- match.arg(to)
-    t <- as.igraph(as.adjacency(g))
-    igraph::E(t)$weight <- abs(igraph::E(t)$weight)
-    R <- length(obs.genes)
-    new.edges <- as.data.frame(matrix(0, nrow=R, ncol=R))
-    rownames(new.edges) <- colnames(new.edges) <- obs.genes
-    for (gene.1 in obs.genes) {
-        for (gene.2 in obs.genes) {
-            if (gene.1 != gene.2) {
-                default.warn <- getOption("warn")
-                options(warn=-1)
-                sh.paths <- igraph::all_shortest_paths(t, from=gene.1, to=gene.2, mode='out')$res
-                options(warn = default.warn)
-                keep <- TRUE
-                if (length(sh.paths) > 0) {
-                    for (sh.path in sh.paths) {
-                        sh.path <- names(sh.path)
-                        if (length(sh.path) > 2 & (length(sh.path)-2) <= max.steps) {
-                            sh.path <- sh.path[2:(length(sh.path)-1)]
-                            for (gene.3 in sh.path) {
-                                if (gene.3 %in% obs.genes) {
-                                    keep <- FALSE
-                                }
-                            }
-                        } else {
-                            keep <- FALSE
-                            break
-                        }
-                    }
-                } else {
-                    keep <- FALSE
-                }
-                if (keep) {
-                    new.edges[gene.1, gene.2] <- 1
-                }
-            }
-        }
-    }
-    t <- as.adjacency(t)
-    t <- t[obs.genes, obs.genes]
-    new.edges <- average.graph(list(t, new.edges))
-    new.edges <- convert.format(new.edges, to=to)
-    return(new.edges)
 }
 
 #' Delete Isolated Nodes
