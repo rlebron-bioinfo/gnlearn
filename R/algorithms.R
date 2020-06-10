@@ -40,8 +40,10 @@ skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf,
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (pcalg.conservative | pcalg.solve.confl) {
         pcalg.u2pd <- 'relaxed'
@@ -120,8 +122,10 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (pcalg.conservative | pcalg.solve.confl) {
         pcalg.u2pd <- 'relaxed'
@@ -199,8 +203,10 @@ pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, m=NUL
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (pcalg.conservative | pcalg.solve.confl) {
         pcalg.u2pd <- 'relaxed'
@@ -292,8 +298,10 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (pcalg.conservative | pcalg.solve.confl) {
         pcalg.u2pd <- 'relaxed'
@@ -375,8 +383,10 @@ fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItes
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'adjacency')
@@ -449,8 +459,10 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'adjacency')
@@ -510,8 +522,10 @@ gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -566,8 +580,10 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -625,8 +641,10 @@ iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, 
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     algorithm <- switch(version,
         iamb = bnlearn::iamb,
@@ -690,8 +708,10 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     algorithm <- switch(version,
         iamb = bnlearn::iamb,
@@ -756,8 +776,10 @@ parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, 
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     algorithm <- switch(version,
         mmpc = bnlearn::mmpc,
@@ -820,8 +842,10 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     algorithm <- switch(version,
         mmpc = bnlearn::mmpc,
@@ -876,8 +900,10 @@ chowliu <- function(df, whitelist=NULL, blacklist=NULL, m=NULL, to=c('igraph', '
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -922,8 +948,10 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -971,8 +999,10 @@ aracne <- function(df, whitelist=NULL, blacklist=NULL, m=NULL, to=c('igraph', 'a
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -1017,8 +1047,10 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -1075,8 +1107,10 @@ hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, res
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (!is.null(start)) {
         start <- convert.format(start, to='bnlearn')
@@ -1134,8 +1168,10 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (!is.null(start)) {
         start <- convert.format(start, to='bnlearn')
@@ -1196,8 +1232,10 @@ tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, t
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (!is.null(start)) {
          start <- convert.format(start, to='bnlearn')
@@ -1258,8 +1296,10 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (!is.null(start)) {
          start <- convert.format(start, to='bnlearn')
@@ -1319,10 +1359,10 @@ ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), 
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
-
-    library(pcalg)
 
     if (!is.null(blacklist)) {
         blacklist <- convert.format(blacklist, 'adjacency')
@@ -1332,7 +1372,7 @@ ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), 
     df <- drop.all.zeros(df)
 
     splitted.df <- dataset.split(df, m=m)
-    score <- new('GaussL0penObsScore', data=splitted.df$train)
+    score <- new(pcalg::.__C__GaussL0penObsScore, data=splitted.df$train)
     g <- pcalg::ges(score, labels=score$getNodes(), fixedGaps=blacklist, maxDegree=maxDegree,
                     adaptive=adaptive, phase=c('forward','backward'), iterate=TRUE)
     g <- g$repr$weight.mat()
@@ -1369,10 +1409,10 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
-
-    library(pcalg)
 
     if (!is.null(blacklist)) {
         blacklist <- convert.format(blacklist, 'adjacency')
@@ -1424,8 +1464,10 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     splitted.df <- dataset.split(df, m=m)
     X <- df <- as.matrix(splitted.df$train)
@@ -1567,8 +1609,10 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     df <- drop.all.zeros(df)
 
@@ -1623,8 +1667,10 @@ rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','g
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     restrict <- switch(version,
         rsmax2 = restrict,
@@ -1697,8 +1743,10 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     restrict <- switch(version,
         rsmax2 = restrict,
@@ -1768,10 +1816,10 @@ arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCIt
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
-
-    library(pcalg)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'adjacency')
@@ -1791,7 +1839,7 @@ arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCIt
     skel <- pcalg::skeleton(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha, m.max=max.sx,
                             fixedEdges=whitelist, fixedGaps=blacklist, method='stable', NAdelete=TRUE)
     skel <- as(skel@graph, 'matrix')
-    score <- new('GaussL0penObsScore', data=splitted.df$train)
+    score <- new(pcalg::.__C__GaussL0penObsScore, data=splitted.df$train)
     g <- pcalg::ges(score, labels=score$getNodes(), fixedGaps=!skel, maxDegree=maxDegree,
                     adaptive=adaptive, phase=c('forward','backward'), iterate=TRUE)
     g <- g$repr$weight.mat()
@@ -1834,10 +1882,10 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
-
-    library(pcalg)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'adjacency')
@@ -1890,8 +1938,10 @@ glasso <- function(df, rho=0.1, m=NULL, to=c('igraph', 'adjacency', 'edges', 'gr
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     df <- drop.all.zeros(df)
 
@@ -1933,8 +1983,10 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph'
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     df <- drop.all.zeros(df)
 
@@ -1976,8 +2028,10 @@ lingam <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bn
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     df <- drop.all.zeros(df)
 
@@ -2014,8 +2068,10 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     df <- drop.all.zeros(df)
 
@@ -2063,8 +2119,10 @@ genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.tress=1000, min.wei
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (class(K)[1]=='character' & K != 'sqrt' & K != 'all') {
         K <- 'sqrt'
@@ -2111,8 +2169,10 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.tress=1000, mi
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     if (class(K)[1]=='character' & K != 'sqrt' & K != 'all') {
         K <- 'sqrt'
@@ -2157,8 +2217,10 @@ gclm <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnle
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
@@ -2222,8 +2284,10 @@ boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacenc
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
@@ -2271,8 +2335,10 @@ nodag <- function(df, lambda=0.5, m=NULL, to=c('igraph', 'adjacency', 'edges', '
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
@@ -2319,8 +2385,10 @@ boot.nodag <- function(df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igrap
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
@@ -2370,8 +2438,10 @@ huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, 
 
     if (is.null(seed)) {
         seed <- sample(1:10**10, 1)
+        set.seed(seed)
+    } else {
+        set.seed(seed)
     }
-    set.seed(seed)
 
     df <- drop.all.zeros(df)
     registerDoParallel(cluster)
