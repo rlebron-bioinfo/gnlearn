@@ -2132,7 +2132,7 @@ genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.tress=1000, min.wei
 
     splitted.df <- dataset.split(df, m=m)
     splitted.df$train <- t(splitted.df$train)
-    g <- GENIE3(splitted.df$train, treeMethod=tree.method, K=K, nTrees=n.trees, nCores=cluster)
+    g <- GENIE3::GENIE3(splitted.df$train, treeMethod=tree.method, K=K, nTrees=n.trees, nCores=cluster)
     rownames(g) <- colnames(g) <- rownames(splitted.df$train)
     g[g < min.weight] <- 0
 
