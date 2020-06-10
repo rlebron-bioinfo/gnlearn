@@ -1418,9 +1418,15 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
 
 notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
                     max.iter=100, h.tol=1e-8, rho.max=1e+16, w.threshold=0.3, m=NULL,
-                    to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn')) {
+                    to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
     loss.type <- match.arg(loss.type)
     to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
     splitted.df <- dataset.split(df, m=m)
     X <- df <- as.matrix(splitted.df$train)
 
