@@ -5,6 +5,82 @@ scores <- c('pred-loglik-g', 'loglik-g', 'aic-g', 'bic-g', 'bge')
 
 ## Constraint-Based
 
+#' Peter & Clark Skeleton Algorithm
+#'
+#' This function allows you to learn a directed graph from a dataset using the Peter & Clark skeleton algorithm (stable version).
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param alpha Target nominal type I error rate. Default: 0.01
+#' @param max.sx Maximum allowed size of the conditioning sets.
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param implementation Peter & Clark algorithm implementation: 'pcalg' or 'bnlearn'. Default: 'pcalg'
+#' @param pcalg.indep.test Conditional independence test to be used (pcalg implementation). Default: pcalg::gaussCItest
+#' @param bnlearn.test Conditional independence test to be used (bnlearn implementation): 'cor', 'mc-cor', 'smc-cor', 'zf', 'mc-zf', 'smc-zf', 'mi-g', 'mc-mi-g', 'smc-mi-g', or 'mi-g-sh'. Default: 'cor'
+#' @param bnlearn.B Number of permutations considered for each permutation test (bnlearn implementation).
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- skeleton(df, implementation='pcalg')
+#' g <- skeleton(df, implementation='bnlearn')
+
+skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, m=NULL,
+                     to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                     cluster=4, implementation=c('pcalg','bnlearn'),
+                     pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
+                     pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
+                     bnlearn.test=ci.tests, bnlearn.B=NULL, seed=NULL) {
+    to <- match.arg(to)
+    implementation <- match.arg(implementation)
+    pcalg.u2pd <- match.arg(pcalg.u2pd)
+    bnlearn.test <- match.arg(bnlearn.test)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    if (pcalg.conservative | pcalg.solve.confl) {
+        pcalg.u2pd <- 'relaxed'
+    }
+
+    if (!is.null(whitelist) & implementation=='pcalg') {
+        whitelist <- convert.format(whitelist, 'adjacency')
+        whitelist <- whitelist > 0
+    }
+
+    if (!is.null(blacklist) & implementation=='pcalg') {
+        blacklist <- convert.format(blacklist, 'adjacency')
+        blacklist <- blacklist > 0
+    }
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    if (implementation=='pcalg') {
+        suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
+        varNames <- colnames(splitted.df$train)
+        g <- pcalg::skeleton(suffStat, indepTest=pcalg.indep.test, labels=varNames, alpha=alpha, m.max=max.sx,
+                             fixedEdges=whitelist, fixedGaps=blacklist, method='stable', NAdelete=TRUE)
+        g <- as(g@graph, 'matrix')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+    } else if (implementation=='bnlearn') {
+        cluster <- parallel::makeCluster(cluster)
+        parallel::clusterSetRNGStream(cluster, seed)
+        g <- bnlearn::pc.stable(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
+                                B=bnlearn.B, max.sx=max.sx, undirected=TRUE, cluster=cluster)
+        g <- convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        parallel::stopCluster(cluster)
+    }
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
+}
+
 #' Peter & Clark Skeleton Algorithm With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the Peter & Clark skeleton algorithm (stable version).
@@ -14,7 +90,7 @@ scores <- c('pred-loglik-g', 'loglik-g', 'aic-g', 'bic-g', 'bge')
 #' @param alpha Target nominal type I error rate. Default: 0.01
 #' @param max.sx Maximum allowed size of the conditioning sets.
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -42,9 +118,10 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
     pcalg.u2pd <- match.arg(pcalg.u2pd)
     bnlearn.test <- match.arg(bnlearn.test)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     if (pcalg.conservative | pcalg.solve.confl) {
         pcalg.u2pd <- 'relaxed'
@@ -63,26 +140,13 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        if (implementation=='pcalg') {
-            suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
-            varNames <- colnames(splitted.df$train)
-            g <- pcalg::skeleton(suffStat, indepTest=pcalg.indep.test, labels=varNames, alpha=alpha, m.max=max.sx,
-                                 fixedEdges=whitelist, fixedGaps=blacklist, method='stable', NAdelete=TRUE)
-            g <- as(g@graph, 'matrix')
-            rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-            g
-        } else if (implementation=='bnlearn') {
-            g <- bnlearn::pc.stable(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
-                             B=bnlearn.B, max.sx=max.sx, undirected=TRUE)
-            convert.format(g, to='adjacency')
-            rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-            g
-        }
+        skeleton(df, whitelist=whitelist, blacklist=blacklist, alpha=alpha, max.sx=max.sx, m=m,
+                 to='adjacency', cluster=1, implementation=implementation,
+                 pcalg.indep.test=pcalg.indep.test, pcalg.u2pd=pcalg.u2pd,
+                 pcalg.conservative=pcalg.conservative, pcalg.maj.rule=pcalg.maj.rule, pcalg.solve.confl=pcalg.solve.confl,
+                 bnlearn.test=bnlearn.test, bnlearn.B=bnlearn.B, seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -96,6 +160,95 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
     return(obj)
 }
 
+#' Peter & Clark Algorithm (PC)
+#'
+#' This function allows you to learn a directed graph from a dataset using the Peter & Clark algorithm (stable version).
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param alpha Target nominal type I error rate. Default: 0.01
+#' @param max.sx Maximum allowed size of the conditioning sets.
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param implementation Peter & Clark algorithm implementation: 'pcalg' or 'bnlearn'. Default: 'pcalg'
+#' @param pcalg.indep.test Conditional independence test to be used (pcalg implementation). Default: pcalg::gaussCItest
+#' @param pcalg.u2pd Method for dealing with conflicting information when trying to orient edges (pcalg implementation). Default: 'relaxed'
+#' @param pcalg.conservative Whether or not the conservative PC is used (pcalg implementation). Default: FALSE
+#' @param pcalg.maj.rule Whether or not the triples shall be checked for ambiguity using a majority rule idea, which is less strict than the conservative PC algorithm (pcalg implementation). Default: FALSE
+#' @param pcalg.solve.confl If TRUE, the orientation of the v-structures and the orientation rules work with lists for candidate sets and allow bi-directed edges to resolve conflicting edge orientations (pcalg implementation). Default: FALSE
+#' @param bnlearn.test Conditional independence test to be used (bnlearn implementation): 'cor', 'mc-cor', 'smc-cor', 'zf', 'mc-zf', 'smc-zf', 'mi-g', 'mc-mi-g', 'smc-mi-g', or 'mi-g-sh'. Default: 'cor'
+#' @param bnlearn.B Number of permutations considered for each permutation test (bnlearn implementation).
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- pc(df, implementation='pcalg')
+#' g <- pc(df, implementation='bnlearn')
+
+pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, m=NULL,
+               to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+               cluster=4, implementation=c('pcalg','bnlearn'),
+               pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
+               pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
+               bnlearn.test=ci.tests, bnlearn.B=NULL, seed=NULL) {
+    to <- match.arg(to)
+    implementation <- match.arg(implementation)
+    pcalg.u2pd <- match.arg(pcalg.u2pd)
+    bnlearn.test <- match.arg(bnlearn.test)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    if (pcalg.conservative | pcalg.solve.confl) {
+        pcalg.u2pd <- 'relaxed'
+    }
+
+    if (!is.null(whitelist) & implementation=='pcalg') {
+        whitelist <- convert.format(whitelist, 'adjacency')
+        whitelist <- whitelist > 0
+    }
+
+    if (!is.null(blacklist) & implementation=='pcalg') {
+        blacklist <- convert.format(blacklist, 'adjacency')
+        blacklist <- blacklist > 0
+    }
+
+    if (!is.null(whitelist) & implementation=='bnlearn') {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist) & implementation=='bnlearn') {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    if (implementation=='pcalg') {
+        suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
+        varNames <- colnames(splitted.df$train)
+        g <- pcalg::pc(suffStat, indepTest=pcalg.indep.test, labels=varNames, alpha=alpha, m.max=max.sx,
+                       u2pd=pcalg.u2pd, conservative=pcalg.conservative, maj.rule=pcalg.maj.rule, solve.confl=pcalg.solve.confl,
+                       fixedEdges=whitelist, fixedGaps=blacklist, skel.method='stable', NAdelete=TRUE)
+        g <- as(g@graph, 'matrix')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+    } else if (implementation=='bnlearn') {
+        cluster <- parallel::makeCluster(cluster)
+        parallel::clusterSetRNGStream(cluster, seed)
+        g <- bnlearn::pc.stable(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
+                                B=bnlearn.B, max.sx=max.sx, undirected=FALSE, cluster=cluster)
+        g <- convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        parallel::stopCluster(cluster)
+    }
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
+}
+
 #' Peter & Clark Algorithm (PC) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the Peter & Clark algorithm (stable version).
@@ -105,7 +258,7 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
 #' @param alpha Target nominal type I error rate. Default: 0.01
 #' @param max.sx Maximum allowed size of the conditioning sets.
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -137,9 +290,10 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
     pcalg.u2pd <- match.arg(pcalg.u2pd)
     bnlearn.test <- match.arg(bnlearn.test)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     if (pcalg.conservative | pcalg.solve.confl) {
         pcalg.u2pd <- 'relaxed'
@@ -166,27 +320,13 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        if (implementation=='pcalg') {
-            suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
-            varNames <- colnames(splitted.df$train)
-            g <- pcalg::pc(suffStat, indepTest=pcalg.indep.test, labels=varNames, alpha=alpha, m.max=max.sx,
-                           u2pd=pcalg.u2pd, conservative=pcalg.conservative, maj.rule=pcalg.maj.rule, solve.confl=pcalg.solve.confl,
-                           fixedEdges=whitelist, fixedGaps=blacklist, skel.method='stable', NAdelete=TRUE)
-            g <- as(g@graph, 'matrix')
-            rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-            g
-        } else if (implementation=='bnlearn') {
-            g <- bnlearn::pc.stable(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
-                                    B=bnlearn.B, max.sx=max.sx, undirected=FALSE)
-            convert.format(g, to='adjacency')
-            rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-            g
-        }
+        pc(df, whitelist=whitelist, blacklist=blacklist, alpha=alpha, max.sx=max.sx, m=m,
+           to='adjacency', cluster=1, implementation=implementation,
+           pcalg.indep.test=pcalg.indep.test, pcalg.u2pd=pcalg.u2pd,
+           pcalg.conservative=pcalg.conservative, pcalg.maj.rule=pcalg.maj.rule, pcalg.solve.confl=pcalg.solve.confl,
+           bnlearn.test=bnlearn.test, bnlearn.B=bnlearn.B, seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -198,6 +338,75 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
         replicates = graphs
     )
     return(obj)
+}
+
+#' Fast Causal Inference Algorithm (FCI)
+#'
+#' This function allows you to learn a directed graph from a dataset using the Fast Causal Inference algorithm (stable version).
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param indep.test Conditional independence test to be used (pcalg implementation). Default: pcalg::gaussCItest
+#' @param alpha Target nominal type I error rate. Default: 0.01
+#' @param max.sx Maximum allowed size of the conditioning sets.
+#' @param pdsep.max Maximum size of Possible-D-SEP for which subsets are considered as conditioning sets in the conditional independence tests.
+#' @param conservative Whether or not the conservative PC is used (pcalg implementation). Default: FALSE
+#' @param maj.rule Whether or not the triples shall be checked for ambiguity using a majority rule idea, which is less strict than the conservative PC algorithm (pcalg implementation). Default: FALSE
+#' @param version Version of FCI algorithm to be used: 'fci', 'rfci', or 'fci.plus'. Default: 'fci'
+#' @param type Type of FCI algorithm to be used: 'normal', 'anytime', or 'adaptive'. Default: 'normal'
+#' @param rules Logical vector of length 10 indicating which rules should be used when directing edges. Default: rep(TRUE,10)
+#' @param doPdsep If FALSE, Possible-D-SEP is not computed, so that the algorithm simplifies to the Modified PC algorithm of Spirtes, Glymour and Scheines (2000, p.84). Default: TRUE
+#' @param biCC If TRUE, only nodes on paths between nodes x and y are considered to be in Possible-D-SEP(x) when testing independence between x and y. Default: TRUE
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- fci(df)
+
+fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf, pdsep.max=Inf,
+                conservative=FALSE, maj.rule=FALSE, version=c('fci','rfci','fci.plus'), type=c('normal','anytime','adaptive'),
+                rules=rep(TRUE,10), doPdsep=TRUE, biCC=FALSE, m=NULL,
+                to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+    version <- match.arg(version)
+    type <- match.arg(type)
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'adjacency')
+        whitelist <- whitelist > 0
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'adjacency')
+        blacklist <- blacklist > 0
+    }
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
+    varNames <- colnames(splitted.df$train)
+    g <- switch(version,
+        fci = { pcalg::fci(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha, m.max=max.sx, pdsep.max=pdsep.max,
+                           conservative=conservative, maj.rule=maj.rule, type=type, rules=rules, doPdsep=doPdsep, biCC=biCC,
+                           fixedEdges=whitelist, fixedGaps=blacklist, skel.method='stable', NAdelete=TRUE) },
+        rfci = { pcalg::rfci(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha, m.max=max.sx,
+                             conservative=conservative, maj.rule=maj.rule, rules=rules,
+                             fixedEdges=whitelist, fixedGaps=blacklist, skel.method='stable', NAdelete=TRUE) },
+        fci.plus = { pcalg::fciPlus(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha) }
+    )
+    g <- as(g, 'matrix')
+    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
 }
 
 #' Fast Causal Inference Algorithm (FCI) With Bootstrapping
@@ -218,7 +427,7 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
 #' @param doPdsep If FALSE, Possible-D-SEP is not computed, so that the algorithm simplifies to the Modified PC algorithm of Spirtes, Glymour and Scheines (2000, p.84). Default: TRUE
 #' @param biCC If TRUE, only nodes on paths between nodes x and y are considered to be in Possible-D-SEP(x) when testing independence between x and y. Default: TRUE
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -238,9 +447,10 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
     type <- match.arg(type)
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'adjacency')
@@ -255,25 +465,12 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
-        varNames <- colnames(splitted.df$train)
-        g <- switch(version,
-            fci = { pcalg::fci(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha, m.max=max.sx, pdsep.max=pdsep.max,
-                               conservative=conservative, maj.rule=maj.rule, type=type, rules=rules, doPdsep=doPdsep, biCC=biCC,
-                               fixedEdges=whitelist, fixedGaps=blacklist, skel.method='stable', NAdelete=TRUE) },
-            rfci = { pcalg::rfci(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha, m.max=max.sx,
-                                 conservative=conservative, maj.rule=maj.rule, rules=rules,
-                                 fixedEdges=whitelist, fixedGaps=blacklist, skel.method='stable', NAdelete=TRUE) },
-            fci.plus = { pcalg::fciPlus(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha) }
-        )
-        g <- as(g, 'matrix')
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        g
+        fci(df, whitelist=whitelist, blacklist=blacklist, indep.test=indep.test, alpha=alpha, max.sx=max.sx, pdsep.max=pdsep.max,
+                        conservative=conservative, maj.rule=maj.rule, version=version, type=type,
+                        rules=rules, doPdsep=doPdsep, biCC=biCC, m=m,
+                        to='adjacency', seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -287,6 +484,58 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
     return(obj)
 }
 
+#' Grow-Shrink Algorithm (GS)
+#'
+#' This function allows you to learn a directed graph from a dataset using the Grow-Shrink algorithm.
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param test Conditional independence test to be used: 'cor', 'mc-cor', 'smc-cor', 'zf', 'mc-zf', 'smc-zf', 'mi-g', 'mc-mi-g', 'smc-mi-g', or 'mi-g-sh'. Default: 'cor'
+#' @param alpha Target nominal type I error rate. Default: 0.01
+#' @param B Number of permutations considered for each permutation test.
+#' @param max.sx Maximum allowed size of the conditioning sets.
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- gs(df)
+
+gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL,
+               m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+    test <- match.arg(test)
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    cluster <- parallel::makeCluster(cluster)
+    parallel::clusterSetRNGStream(cluster, seed)
+    g <- bnlearn::gs(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
+                     B=B, max.sx=max.sx, undirected=FALSE, cluster=cluster)
+    g <- convert.format(g, to='adjacency')
+    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+    parallel::stopCluster(cluster)
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
+}
+
 #' Grow-Shrink Algorithm (GS) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the Grow-Shrink algorithm.
@@ -298,7 +547,7 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
 #' @param B Number of permutations considered for each permutation test.
 #' @param max.sx Maximum allowed size of the conditioning sets.
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -315,9 +564,10 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
     test <- match.arg(test)
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -330,16 +580,10 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        g <- bnlearn::gs(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
-                         B=B, max.sx=max.sx, undirected=FALSE)
-        convert.format(g, to='adjacency')
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        g
+        gs(df, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha, B=B, max.sx=max.sx,
+           m=m, to='adjacency', cluster=1, seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -351,6 +595,67 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
         replicates = graphs
     )
     return(obj)
+}
+
+#' Incremental Association Algorithm (IAMB)
+#'
+#' This function allows you to learn a directed graph from a dataset using the Incremental Association algorithm.
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param test Conditional independence test to be used: 'cor', 'mc-cor', 'smc-cor', 'zf', 'mc-zf', 'smc-zf', 'mi-g', 'mc-mi-g', 'smc-mi-g', or 'mi-g-sh'. Default: 'cor'
+#' @param alpha Target nominal type I error rate. Default: 0.01
+#' @param B Number of permutations considered for each permutation test.
+#' @param max.sx Maximum allowed size of the conditioning sets.
+#' @param version Algorithm version: 'iamb', 'fast.iamb', 'inter.iamb', or 'iamb.fdr'. Default: 'iamb'
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- iamb(df)
+
+iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('iamb','fast.iamb','inter.iamb','iamb.fdr'),
+                 m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+    test <- match.arg(test)
+    version <- match.arg(version)
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    algorithm <- switch(version,
+        iamb = bnlearn::iamb,
+        fast.iamb = bnlearn::fast.iamb,
+        inter.iamb = bnlearn::inter.iamb,
+        iamb.fdr = bnlearn::iamb.fdr
+    )
+
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    cluster <- parallel::makeCluster(cluster)
+    parallel::clusterSetRNGStream(cluster, seed)
+    g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
+                   B=B, max.sx=max.sx, undirected=FALSE, cluster=cluster)
+    g <- convert.format(g, to='adjacency')
+    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+    parallel::stopCluster(cluster)
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
 }
 
 #' Incremental Association Algorithm (IAMB) With Bootstrapping
@@ -365,7 +670,7 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
 #' @param max.sx Maximum allowed size of the conditioning sets.
 #' @param version Algorithm version: 'iamb', 'fast.iamb', 'inter.iamb', or 'iamb.fdr'. Default: 'iamb'
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -383,9 +688,10 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
     version <- match.arg(version)
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     algorithm <- switch(version,
         iamb = bnlearn::iamb,
@@ -405,16 +711,10 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
-                         B=B, max.sx=max.sx, undirected=FALSE)
-        convert.format(g, to='adjacency')
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        g
+        iamb(df, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha, B=B, max.sx=max.sx, version=version,
+             m=m, to='adjacency', cluster=1, seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -426,6 +726,66 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
         replicates = graphs
     )
     return(obj)
+}
+
+#' Parents & Children Algorithm
+#'
+#' This function allows you to learn a directed graph from a dataset using Parents & Children algorithms.
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param test Conditional independence test to be used: 'cor', 'mc-cor', 'smc-cor', 'zf', 'mc-zf', 'smc-zf', 'mi-g', 'mc-mi-g', 'smc-mi-g', or 'mi-g-sh'. Default: 'cor'
+#' @param alpha Target nominal type I error rate. Default: 0.01
+#' @param B Number of permutations considered for each permutation test.
+#' @param max.sx Maximum allowed size of the conditioning sets.
+#' @param version Algorithm version: 'mmpc', 'si.hiton.pc', or 'hpc'. Default: 'mmpc'
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- parents.children(df)
+
+parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('mmpc','si.hiton.pc','hpc'),
+                             m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+    test <- match.arg(test)
+    version <- match.arg(version)
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    algorithm <- switch(version,
+        mmpc = bnlearn::mmpc,
+        si.hiton.pc = bnlearn::si.hiton.pc,
+        hpc = bnlearn::hpc
+    )
+
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    cluster <- parallel::makeCluster(cluster)
+    parallel::clusterSetRNGStream(cluster, seed)
+    g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
+                   B=B, max.sx=max.sx, undirected=FALSE, cluster=cluster)
+    g <- convert.format(g, to='adjacency')
+    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+    parallel::stopCluster(cluster)
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
 }
 
 #' Parents & Children Algorithm With Bootstrapping
@@ -440,7 +800,7 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
 #' @param max.sx Maximum allowed size of the conditioning sets.
 #' @param version Algorithm version: 'mmpc', 'si.hiton.pc', or 'hpc'. Default: 'mmpc'
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -458,9 +818,10 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
     version <- match.arg(version)
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     algorithm <- switch(version,
         mmpc = bnlearn::mmpc,
@@ -479,16 +840,10 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
-                         B=B, max.sx=max.sx, undirected=FALSE)
-        convert.format(g, to='adjacency')
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        g
+        parents.children(df, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha, B=B, max.sx=max.sx, version=version,
+                         m=m, to='adjacency', cluster=1, seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -502,6 +857,47 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
     return(obj)
 }
 
+#' Chow-Liu Algorithm
+#'
+#' This function allows you to learn a undirected graph from a dataset using the Chow-Liu algorithm.
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph.
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph.
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- chowliu(df)
+
+chowliu <- function(df, whitelist=NULL, blacklist=NULL, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    g <- bnlearn::chow.liu(splitted.df$train, whitelist=whitelist, blacklist=blacklist, mi='mi-g')
+    g <- convert.format(g, to='adjacency')
+    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
+}
+
 #' Chow-Liu Algorithm With Bootstrapping
 #'
 #' This function allows you to learn a undirected graph from a dataset using the Chow-Liu algorithm.
@@ -509,7 +905,7 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
 #' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph.
 #' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph.
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -524,9 +920,10 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
 boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -539,15 +936,9 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        g <- bnlearn::chow.liu(splitted.df$train, whitelist=whitelist, blacklist=blacklist, mi='mi-g')
-        convert.format(g, to='adjacency')
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        g
+        chowliu(df, whitelist=whitelist, blacklist=blacklist, m=m, to='adjacency', seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -561,6 +952,47 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
     return(obj)
 }
 
+#' ARACNE Algorithm
+#'
+#' This function allows you to learn a undirected graph from a dataset using the ARACNE algorithm.
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph.
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph.
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- aracne(df)
+
+aracne <- function(df, whitelist=NULL, blacklist=NULL, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    g <- bnlearn::aracne(splitted.df$train, whitelist=whitelist, blacklist=blacklist, mi='mi-g')
+    g <- convert.format(g, to='adjacency')
+    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
+}
+
 #' ARACNE Algorithm With Bootstrapping
 #'
 #' This function allows you to learn a undirected graph from a dataset using the ARACNE algorithm.
@@ -568,7 +1000,7 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
 #' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph.
 #' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph.
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -583,9 +1015,10 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
 boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -598,15 +1031,9 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        g <- bnlearn::aracne(splitted.df$train, whitelist=whitelist, blacklist=blacklist, mi='mi-g')
-        convert.format(g, to='adjacency')
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        g
+        aracne(df, whitelist=whitelist, blacklist=blacklist, m=m, to='adjacency', seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -622,6 +1049,60 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
 
 ## Score-Based
 
+#' Hill-Climbing Algorithm (HC)
+#'
+#' This function allows you to learn a directed graph from a dataset using the Hill-Climbing algorithm.
+#' @param df Dataset.
+#' @param start Preseeded directed acyclic graph used to initialize the algorithm (optional).
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param score Score to be used: 'pred-loglik-g', 'loglik-g', 'aic-g', 'bic-g', or 'bge'. Default: 'pred-loglik-g'
+#' @param restart Number of random restarts. Default: 0
+#' @param perturb Number of attempts to randomly insert/remove/reverse an arc on every random restart. Default: 1
+#' @param max.iter Maximum number of iterations. Default: Inf
+#' @param maxp Maximum number of parents for a node. Default: Inf
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- hc(df)
+
+hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, restart=0, perturb=1, max.iter=Inf, maxp=Inf,
+               m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    if (!is.null(start)) {
+        start <- convert.format(start, to='bnlearn')
+    }
+    score <- match.arg(score)
+
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    g <- bnlearn::hc(splitted.df$train, newdata=splitted.df$test, start=start, whitelist=whitelist, blacklist=blacklist, score=score,
+                     restart=restart, perturb=perturb, max.iter=max.iter, maxp=maxp, optimized=TRUE)
+    g <- convert.format(g, to='adjacency')
+    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
+}
+
 #' Hill-Climbing Algorithm (HC) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the Hill-Climbing algorithm.
@@ -635,7 +1116,7 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
 #' @param max.iter Maximum number of iterations. Default: Inf
 #' @param maxp Maximum number of parents for a node. Default: Inf
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -651,9 +1132,10 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     if (!is.null(start)) {
         start <- convert.format(start, to='bnlearn')
@@ -671,16 +1153,10 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        g <- bnlearn::hc(splitted.df$train, newdata=splitted.df$test, start=start, whitelist=whitelist, blacklist=blacklist, score=score,
-                         restart=restart, perturb=perturb, max.iter=max.iter, maxp=maxp, optimized=TRUE)
-        convert.format(g, to='adjacency')
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        g
+        hc(df, start=start, whitelist=whitelist, blacklist=blacklist, score=score, restart=restart, perturb=perturb, max.iter=max.iter, maxp=maxp,
+           m=m, to='adjacency', seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -692,6 +1168,63 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
         replicates = graphs
     )
     return(obj)
+}
+
+#' Tabu Search Algorithm (TABU)
+#'
+#' This function allows you to learn a directed graph from a dataset using the Tabu Search algorithm.
+#' @param df Dataset.
+#' @param start Preseeded directed acyclic graph used to initialize the algorithm (optional).
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param score Score to be used: 'pred-loglik-g', 'loglik-g', 'aic-g', 'bic-g', or 'bge'. Default: 'pred-loglik-g'
+#' @param tabu Length of the tabu list. Default: 10
+#' @param max.tabu Iterations tabu search can perform without improving the best score. Default: tabu (10)
+#' @param max.iter Maximum number of iterations. Default: Inf
+#' @param maxp Maximum number of parents for a node. Default: Inf
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- tabu(df)
+
+tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, tabu=10, max.tabu=NULL, max.iter=Inf, maxp=Inf,
+                 m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    if (!is.null(start)) {
+         start <- convert.format(start, to='bnlearn')
+     }
+    score <- match.arg(score)
+    if (is.null(max.tabu)) {
+        max.tabu <- tabu
+    }
+
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    g <- bnlearn::tabu(splitted.df$train, newdata=splitted.df$test, start=start, whitelist=whitelist, blacklist=blacklist, score=score,
+                       tabu=tabu, max.tabu=max.tabu, max.iter=max.iter, maxp=maxp, optimized=TRUE)
+    g <- convert.format(g, to='adjacency')
+    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
 }
 
 #' Tabu Search Algorithm (TABU) With Bootstrapping
@@ -707,7 +1240,7 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
 #' @param max.iter Maximum number of iterations. Default: Inf
 #' @param maxp Maximum number of parents for a node. Default: Inf
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -723,9 +1256,10 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
                       R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     if (!is.null(start)) {
          start <- convert.format(start, to='bnlearn')
@@ -746,16 +1280,10 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        g <- bnlearn::tabu(splitted.df$train, newdata=splitted.df$test, start=start, whitelist=whitelist, blacklist=blacklist, score=score,
-                           tabu=tabu, max.tabu=max.tabu, max.iter=max.iter, maxp=maxp, optimized=TRUE)
-        convert.format(g, to='adjacency')
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        g
+        tabu(df, start=start, whitelist=whitelist, blacklist=blacklist, score=score, tabu=tabu, max.tabu=max.tabu, max.iter=max.iter, maxp=maxp,
+             m=m, to='adjacency', seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -776,8 +1304,53 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
 #' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
 #' @param adaptive Whether constraints should be adapted to newly detected v-structures or unshielded triples: 'none', 'vstructures', or 'triples'. Default: 'none'
 #' @param maxDegree Parameter used to limit the vertex degree of the estimated graph. Default: integer(0)
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- ges(df)
+
+ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
+                m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+    adaptive <- match.arg(adaptive)
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    library(pcalg)
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'adjacency')
+        blacklist <- blacklist > 0
+    }
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    score <- new('GaussL0penObsScore', data=splitted.df$train)
+    g <- pcalg::ges(score, labels=score$getNodes(), fixedGaps=blacklist, maxDegree=maxDegree,
+                    adaptive=adaptive, phase=c('forward','backward'), iterate=TRUE)
+    g <- g$repr$weight.mat()
+    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
+}
+
+#' Greedy Equivalence Search Algorithm (GES) With Bootstrapping
+#'
+#' This function allows you to learn a directed graph from a dataset using the Greedy Equivalence Search (GES) algorithm of Chickering (2002).
+#' @param df Dataset.
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param adaptive Whether constraints should be adapted to newly detected v-structures or unshielded triples: 'none', 'vstructures', or 'triples'. Default: 'none'
+#' @param maxDegree Parameter used to limit the vertex degree of the estimated graph. Default: integer(0)
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -794,9 +1367,10 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
     adaptive <- match.arg(adaptive)
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     library(pcalg)
 
@@ -808,17 +1382,10 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        score <- new('GaussL0penObsScore', data=splitted.df$train)
-        g <- pcalg::ges(score, labels=score$getNodes(), fixedGaps=blacklist, maxDegree=maxDegree,
-                        adaptive=adaptive, phase=c('forward','backward'), iterate=TRUE)
-        g <- g$repr$weight.mat()
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        g
+        ges(df, blacklist=blacklist, adaptive=adaptive, maxDegree=maxDegree,
+            m=m, to='adjacency', seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -842,15 +1409,20 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
 #' @param h.tol Minimum absolute value of h. Default: 1e-8
 #' @param rho.max Maximum value of rho. Default: 1e+16
 #' @param w.threshold Threshold of absolute value of weight. Default: 0.3
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @keywords learning adjacency
 #' @export
 #' @examples
-#' mtx <- notears(df)
+#' g <- notears(df)
 
 notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
-                    max.iter=100, h.tol=1e-8, rho.max=1e+16, w.threshold=0.3) {
+                    max.iter=100, h.tol=1e-8, rho.max=1e+16, w.threshold=0.3, m=NULL,
+                    to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn')) {
     loss.type <- match.arg(loss.type)
-    X <- df <- as.matrix(df)
+    to <- match.arg(to)
+    splitted.df <- dataset.split(df, m=m)
+    X <- df <- as.matrix(splitted.df$train)
 
     loss.func <- function(W) { # ?
         M <- X %*% W
@@ -952,7 +1524,10 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
     W.est <- adj(w.est)
     W.est[abs(W.est) < w.threshold] <- 0
     colnames(W.est) <- rownames(W.est) <- nodes
-    return(W.est)
+
+    rownames(W.est) <- colnames(W.est) <- colnames(splitted.df$train)
+    g <- convert.format(W.est, from='adjacency', to=to)
+    return(g)
 }
 
 #' Linear NO-TEARS Algorithm (Reimplemented) With Bootstrapping
@@ -966,7 +1541,7 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
 #' @param rho.max Maximum value of rho. Default: 1e+16
 #' @param w.threshold Threshold of absolute value of weight. Default: 0.3
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -984,23 +1559,19 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
     loss.type <- match.arg(loss.type)
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        g <- notears(splitted.df$train, lambda1=lambda1, loss.type=loss.type,
-                     max.iter=max.iter, h.tol=h.tol, rho.max=rho.max, w.threshold=w.threshold)
-        g <- convert.format(g, to='adjacency')
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        g
+        notears(df, lambda1=lambda1, loss.type=loss.type,
+                max.iter=max.iter, h.tol=h.tol, rho.max=rho.max, w.threshold=w.threshold, m=m,
+                to='adjacency')
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -1016,6 +1587,76 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
 
 ## Hybrid (Constraint-Based + Score-Based)
 
+#' General 2-Phase Restricted Maximization Algorithm (rsmax2)
+#'
+#' This function allows you to learn a directed graph from a dataset using the General 2-Phase Restricted Maximization algorithm.
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param restrict Constraint-based or local search algorithm to be used in the restrict phase: 'pc.stable', 'gs', 'iamb', 'fast.iamb', 'inter.iamb', 'iamb.fdr', 'mmpc', 'si.hiton.pc', or 'hpc'. Default: 'pc.stable'
+#' @param maximize Score-based algorithm to be used in the maximize phase: 'hc' or 'tabu'. Default: 'hc'
+#' @param restrict.args List of arguments to be passed to the algorithm specified by restrict.
+#' @param maximize.args List of arguments to be passed to the algorithm specified by maximize.
+#' @param version Algorithm version: 'rsmax2','mmhc', or 'h2pc'. Default: 'rsmax2'
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- rsmax2(df)
+
+rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','gs','iamb','fast.iamb','inter.iamb','iamb.fdr','mmpc','si.hiton.pc','hpc'),
+                   maximize=c('hc','tabu'), restrict.args=list(), maximize.args=list(), version=c('rsmax2','mmhc','h2pc'),
+                   m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+    restrict <- match.arg(restrict)
+    maximize <- match.arg(maximize)
+    version <- match.arg(version)
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    restrict <- switch(version,
+        rsmax2 = restrict,
+        mmhc = 'mmpc',
+        h2pc = 'hpc'
+    )
+
+    maximize <- switch(version,
+        rsmax2 = maximize,
+        mmhc = 'hc',
+        h2pc = 'hc'
+    )
+
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'edges')
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'edges')
+    }
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+
+    cluster <- parallel::makeCluster(cluster)
+    parallel::clusterSetRNGStream(cluster, seed)
+    restrict.args$cluster <- cluster
+    g <- bnlearn::rsmax2(splitted.df$train, whitelist=whitelist, blacklist=blacklist, restrict=restrict, maximize=maximize,
+                         restrict.args=restrict.args, maximize.args=maximize.args)
+    g <- convert.format(g, to='adjacency')
+    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+    parallel::stopCluster(cluster)
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
+}
+
 #' General 2-Phase Restricted Maximization Algorithm (rsmax2) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the General 2-Phase Restricted Maximization algorithm.
@@ -1028,7 +1669,7 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
 #' @param maximize.args List of arguments to be passed to the algorithm specified by maximize.
 #' @param version Algorithm version: 'rsmax2','mmhc', or 'h2pc'. Default: 'rsmax2'
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -1048,9 +1689,10 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
     version <- match.arg(version)
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     restrict <- switch(version,
         rsmax2 = restrict,
@@ -1075,16 +1717,11 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        g <- bnlearn::rsmax2(splitted.df$train, whitelist=whitelist, blacklist=blacklist, restrict=restrict, maximize=maximize,
-                             restrict.args=restrict.args, maximize.args=maximize.args)
-        convert.format(g, to='adjacency')
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        g
+        rsmax2(df, whitelist=whitelist, blacklist=blacklist, restrict=restrict,
+               maximize=maximize, restrict.args=restrict.args, maximize.args=maximize.args, version=version,
+               m=m, to='adjacency', cluster=1, seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -1096,6 +1733,66 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
         replicates = graphs
     )
     return(obj)
+}
+
+#' Adaptively Restricted Greedy Equivalence Search Algorithm (ARGES)
+#'
+#' This function allows you to learn a directed graph from a dataset using the Adaptively Restricted Greedy Equivalence Search (ARGES) algorithm.
+#' @param df Dataset.
+#' @param whitelist A data frame with two columns, containing a set of arcs to be included in the graph (optional).
+#' @param blacklist A data frame with two columns, containing a set of arcs not to be included in the graph (optional).
+#' @param indep.test Conditional independence test to be used (pcalg implementation). Default: pcalg::gaussCItest
+#' @param alpha Target nominal type I error rate. Default: 0.01
+#' @param max.sx Maximum allowed size of the conditioning sets.
+#' @param adaptive Whether constraints should be adapted to newly detected v-structures or unshielded triples: 'none', 'vstructures', or 'triples'. Default: 'none'
+#' @param maxDegree Parameter used to limit the vertex degree of the estimated graph. Default: integer(0)
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- arges(df)
+
+arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf,
+                  adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
+                  m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+    adaptive <- match.arg(adaptive)
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    library(pcalg)
+
+    if (!is.null(whitelist)) {
+        whitelist <- convert.format(whitelist, 'adjacency')
+        whitelist <- whitelist > 0
+    }
+
+    if (!is.null(blacklist)) {
+        blacklist <- convert.format(blacklist, 'adjacency')
+        blacklist <- blacklist > 0
+    }
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
+    varNames <- colnames(splitted.df$train)
+    skel <- pcalg::skeleton(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha, m.max=max.sx,
+                            fixedEdges=whitelist, fixedGaps=blacklist, method='stable', NAdelete=TRUE)
+    skel <- as(skel@graph, 'matrix')
+    score <- new('GaussL0penObsScore', data=splitted.df$train)
+    g <- pcalg::ges(score, labels=score$getNodes(), fixedGaps=!skel, maxDegree=maxDegree,
+                    adaptive=adaptive, phase=c('forward','backward'), iterate=TRUE)
+    g <- g$repr$weight.mat()
+    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
 }
 
 #' Adaptively Restricted Greedy Equivalence Search Algorithm (ARGES) With Bootstrapping
@@ -1110,7 +1807,7 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
 #' @param adaptive Whether constraints should be adapted to newly detected v-structures or unshielded triples: 'none', 'vstructures', or 'triples'. Default: 'none'
 #' @param maxDegree Parameter used to limit the vertex degree of the estimated graph. Default: integer(0)
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -1129,9 +1826,10 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
     adaptive <- match.arg(adaptive)
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     library(pcalg)
 
@@ -1148,22 +1846,11 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        suffStat <- list(C=cor(splitted.df$train), n=nrow(splitted.df$train))
-        varNames <- colnames(splitted.df$train)
-        skel <- pcalg::skeleton(suffStat, indepTest=indep.test, labels=varNames, alpha=alpha, m.max=max.sx,
-                                fixedEdges=whitelist, fixedGaps=blacklist, method='stable', NAdelete=TRUE)
-        skel <- as(skel@graph, 'matrix')
-        score <- new('GaussL0penObsScore', data=splitted.df$train)
-        g <- pcalg::ges(score, labels=score$getNodes(), fixedGaps=!skel, maxDegree=maxDegree,
-                        adaptive=adaptive, phase=c('forward','backward'), iterate=TRUE)
-        g <- g$repr$weight.mat()
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        g
+        arges(df, whitelist=whitelist, blacklist=blacklist, indep.test=indep.test, alpha=alpha, max.sx=max.sx,
+              adaptive=adaptive, maxDegree=maxDegree,
+              m=m, to='adjacency', seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -1179,16 +1866,52 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
 
 ## Graphical Lasso
 
+#' Graphical Lasso (GLASSO)
+#'
+#' This function allows you to learn an undirected graph from a dataset using the GLASSO algorithm.
+#' @param df Dataset.
+#' @param rho Non-negative regularization parameter for GLASSO.
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- glasso(df, rho=0.1)
+
+glasso <- function(df, rho=0.1, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    S <- cov(as.matrix(splitted.df$train))
+    g <- glasso::glasso(S, rho=rho)
+    A <- g$wi
+    p <- ncol(splitted.df$train) # ?
+    W <- diag(p) - diag(1/diag(A)) %*% A # ?
+    A <- sign(abs(A)) # ?
+    A <- W * A # ?
+    diag(A) <- 0
+    rownames(A) <- colnames(A) <- colnames(splitted.df$train)
+
+    g <- convert.format(A, from='adjacency', to=to)
+    return(g)
+}
+
 #' Graphical Lasso (GLASSO) With Bootstrapping
 #'
 #' This function allows you to learn an undirected graph from a dataset using the GLASSO algorithm.
 #' @param df Dataset.
 #' @param rho Non-negative regularization parameter for GLASSO.
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
-#' @param upper Whether or not to ignore the upper triangular adjacency matrix (optional).
-#' @param lower Whether or not to ignore the lower triangular adjacency matrix (optional).
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -1199,47 +1922,24 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, lower=TRUE, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
-
-    k <- sum(c(upper, lower))
-    if (k==0) {
-        upper <- TRUE
-        lower <- TRUE
-    }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        S <- cov(as.matrix(splitted.df$train))
-        g <- glasso::glasso(S, rho=rho)
-        A <- g$wi
-        p <- ncol(splitted.df$train) # ?
-        W <- diag(p) - diag(1/diag(A)) %*% A # ?
-        A <- sign(abs(A)) # ?
-        A <- W * A # ?
-        diag(A) <- 0
-        rownames(A) <- colnames(A) <- colnames(splitted.df$train)
-        A
+        glasso(df, rho=rho, m=m, to='adjacency', seed=NULL)
     }
-
     stopImplicitCluster()
 
     A <- average.graph(graphs, threshold=threshold, to='adjacency')
-    diag(A) <- 0
-    if (!upper) {
-        A[upper.tri(A)] <- 0
-    }
-    if (!lower) {
-        A[lower.tri(A)] <- 0
-    }
+
     g <- convert.format(A, to=to)
     for (i in 1:R) {
         graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
@@ -1253,12 +1953,45 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
 
 ## Restricted Structural Equation Models
 
+#' Restricted Structural Equation Models (LINGAM)
+#'
+#' This function allows you to learn a directed graph from a dataset using the LINGAM algorithm.
+#' @param df Dataset.
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- lingam(df)
+
+lingam <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    g <- pcalg::lingam(splitted.df$train)
+    g <- g$Bpruned
+    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
+}
+
+## Restricted Structural Equation Models
+
 #' Restricted Structural Equation Models (LINGAM) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the LINGAM algorithm.
 #' @param df Dataset.
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -1273,22 +2006,17 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, upper=FALSE, 
 boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        g <- pcalg::lingam(splitted.df$train)
-        g <- g$Bpruned
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        g
+        lingam(df, m=m, to='adjacency', seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -1304,6 +2032,50 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 
 ## GEne Network Inference with Ensemble of trees
 
+#' GEne Network Inference with Ensemble of trees (GENIE3)
+#'
+#' This function allows you to learn a directed graph from a dataset using the GENIE3 algorithm.
+#' @param df Dataset.
+#' @param tree.method Random Forest ('rf') or Extra-Trees ('et'). Default: 'rf'
+#' @param K Number of candidate regulators that are randomly selected at each tree node for the best split determination. Default: 'sqrt' (square root of the number of genes)
+#' @param n.trees Number of trees that are grown per ensemble. Default: 1000
+#' @param min.weight Minimum absolute value considered in the adjacency matrix. Lower values will be replaced by zero. Default: 0.1
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- genie3(df)
+
+genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.tress=1000, min.weight=0.1,
+                   m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
+                   cluster=4, seed=NULL) {
+    tree.method <- match.arg(tree.method)
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    if (class(K)[1]=='character' & K != 'sqrt' & K != 'all') {
+        K <- 'sqrt'
+    }
+
+    df <- drop.all.zeros(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    splitted.df$train <- t(splitted.df$train)
+    g <- GENIE3(splitted.df$train, treeMethod=tree.method, K=K, nTrees=n.trees, nCores=cluster)
+    rownames(g) <- colnames(g) <- rownames(splitted.df$train)
+    g[g < min.weight] <- 0
+
+    g <- convert.format(g, from='adjacency', to=to)
+    return(g)
+}
+
 #' GEne Network Inference with Ensemble of trees (GENIE3) with Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the GENIE3 algorithm.
@@ -1313,7 +2085,7 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 #' @param n.trees Number of trees that are grown per ensemble. Default: 1000
 #' @param min.weight Minimum absolute value considered in the adjacency matrix. Lower values will be replaced by zero. Default: 0.1
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -1331,9 +2103,10 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.tress=1000, mi
     tree.method <- match.arg(tree.method)
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     if (class(K)[1]=='character' & K != 'sqrt' & K != 'all') {
         K <- 'sqrt'
@@ -1341,14 +2114,12 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.tress=1000, mi
 
     df <- drop.all.zeros(df)
 
+    registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        splitted.df$train <- t(splitted.df$train)
-        g <- GENIE3(splitted.df$train, treeMethod=tree.method, K=K, nTrees=n.trees, nCores=cluster)
-        rownames(g) <- colnames(g) <- rownames(splitted.df$train)
-        g[g < min.weight] <- 0
-        g
+        genie3(df, tree.method=tree.method, K=K, n.tress=n.tress, min.weight=min.weight,
+               m=m, to='adjacency', cluster=1, seed=NULL)
     }
+    stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -1363,12 +2134,72 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.tress=1000, mi
 
 ## Graphical Continuous Lyapunov Models
 
+#' Graphical Continuous Lyapunov Models (GCLM)
+#'
+#' This function allows you to learn a directed graph from a dataset using the GCLM algorithm.
+#' @param df Dataset.
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @export
+#' @examples
+#' g <- gclm(df)
+
+gclm <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    df <- drop.all.zeros(df)
+    df <- as.matrix(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    S.train <- cov(splitted.df$train)
+    S.test <-  cov(splitted.df$test)
+    dd <- diag(1/sqrt(diag(S.train)))
+    S.train.cor <- cov2cor(S.train)
+
+    # estimate path
+    results.path <- gclm::gclm.path(S.train.cor,
+                                    B = -0.5*solve(S.train.cor),
+                                    lambdac = 0.01,
+                                    lambdas = 6*10^seq(-4,0, length=100),
+                                    eps = 1e-6, job=0, maxIter=1000)
+
+    # fit MLE to all path
+    results.path <- lapply(results.path, function(res) {
+        gclm::gclm(S.train.cor,
+                   B = res$B,
+                   C = res$C,
+                   lambda = 0,
+                   lambdac = -1,
+                   eps = 1e-10,
+                   job = 10)
+    })
+
+    # compute minus loglik
+    tmp <- sapply(results.path, function(res) {
+        mll(solve(res$Sigma), dd %*% S.test %*% dd)
+    })
+    bidx <- which.min(tmp)
+    A <- t(results.path[[bidx]]$B)
+    rownames(A) <- colnames(A) <- colnames(splitted.df$train)
+    diag(A) <- 0
+
+    g <- convert.format(A, from='adjacency', to=to)
+    return(g)
+}
+
 #' Graphical Continuous Lyapunov Models (GCLM) With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the GCLM algorithm.
 #' @param df Dataset.
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -1383,56 +2214,21 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.tress=1000, mi
 boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-
-        splitted.df <- dataset.split(df, m=m)
-        S.train <- cov(splitted.df$train)
-        S.test <-  cov(splitted.df$test)
-        dd <- diag(1/sqrt(diag(S.train)))
-        S.train.cor <- cov2cor(S.train)
-
-        # estimate path
-        results.path <- gclm::gclm.path(S.train.cor,
-                                        B = -0.5*solve(S.train.cor),
-                                        lambdac = 0.01,
-                                        lambdas = 6*10^seq(-4,0, length=100),
-                                        eps = 1e-6, job=0, maxIter=1000)
-
-        # fit MLE to all path
-        results.path <- lapply(results.path, function(res) {
-            gclm::gclm(S.train.cor,
-                       B = res$B,
-                       C = res$C,
-                       lambda = 0,
-                       lambdac = -1,
-                       eps = 1e-10,
-                       job = 10)
-        })
-
-        # compute minus loglik
-        tmp <- sapply(results.path, function(res) {
-            mll(solve(res$Sigma), dd %*% S.test %*% dd)
-        })
-        bidx <- which.min(tmp)
-        A <- t(results.path[[bidx]]$B)
-        rownames(A) <- colnames(A) <- colnames(splitted.df$train)
-        A
-
+        gclm(df, m=m, to='adjacency', seed=NULL)
     }
-
     stopImplicitCluster()
 
     A <- average.graph(graphs, threshold=threshold, to='adjacency')
-    diag(A) <- 0
     g <- convert.format(A, to=to)
     for (i in 1:R) {
         graphs[[i]] <- convert.format(graphs[[i]], from='adjacency', to=to)
@@ -1450,13 +2246,56 @@ mll <- function(P, S) {
 
 ## NODAG
 
+#' NODAG Algorithm
+#'
+#' This function allows you to learn a directed graph from a dataset using the NODAG algorithm.
+#' @param df Dataset.
+#' @param lambda Lambda regularization parameter. Default: 0.5
+#' @param m Size of training set (optional). Default: nrow(df)/2
+#' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
+#' @param seed Seed used for random selection. Default: NULL
+#' @keywords learning graph
+#' @useDynLib gnlearn
+#' @export
+#' @examples
+#' g <- nodag(df)
+
+nodag <- function(df, lambda=0.5, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+    to <- match.arg(to)
+
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
+    }
+    set.seed(seed)
+
+    df <- drop.all.zeros(df)
+    df <- as.matrix(df)
+
+    splitted.df <- dataset.split(df, m=m)
+    p <- ncol(splitted.df$train)
+    out <- .Fortran('NODAG', as.integer(p),
+            as.double(cor(splitted.df$train)),
+            as.double(diag(p)), as.double(lambda),
+            as.double(1e-5), as.double(0.5), as.integer(1e+3),
+            PACKAGE='gnlearn')
+    A <- matrix(ncol=p, nrow=p, data=out[[3]])
+    W <- diag(p) - diag(1/diag(A)) %*% A # ?
+    A <- sign(abs(A)) # ?
+    A <- W * A # ?
+    diag(A) <- 0
+    rownames(A) <- colnames(A) <- colnames(splitted.df$train)
+
+    g <- convert.format(A, from='adjacency', to=to)
+    return(g)
+}
+
 #' NODAG Algorithm With Bootstrapping
 #'
 #' This function allows you to learn a directed graph from a dataset using the NODAG algorithm.
 #' @param df Dataset.
 #' @param lambda Lambda regularization parameter. Default: 0.5
 #' @param R Number of bootstrap replicates (optional). Default: 200
-#' @param m Size of each bootstrap replicate (optional). Default: nrow(df)/2
+#' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
@@ -1472,32 +2311,18 @@ mll <- function(P, S) {
 boot.nodag <- function(df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
 
     registerDoParallel(cluster)
-
     graphs <- foreach(rep=1:R) %dopar% {
-        splitted.df <- dataset.split(df, m=m)
-        p <- ncol(splitted.df$train)
-        out <- .Fortran('NODAG', as.integer(p),
-                as.double(cor(splitted.df$train)),
-                as.double(diag(p)), as.double(lambda),
-                as.double(1e-5), as.double(0.5), as.integer(1e+3),
-                PACKAGE='gnlearn')
-        A <- matrix(ncol=p, nrow=p, data=out[[3]])
-        W <- diag(p) - diag(1/diag(A)) %*% A # ?
-        A <- sign(abs(A)) # ?
-        A <- W * A # ?
-        diag(A) <- 0
-        rownames(A) <- colnames(A) <- colnames(splitted.df$train)
-        A
+        nodag(df, lambda=lambda, m=m, to='adjacency', seed=NULL)
     }
-
     stopImplicitCluster()
 
     g <- average.graph(graphs, threshold=threshold, to=to)
@@ -1520,7 +2345,7 @@ boot.nodag <- function(df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igrap
 #' @param R Number of iterations. Defaults: 200
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param iter.R Number of bootstrap replicates. Default: 200
-#' @param iter.m Size of each bootstrap replicate. Default: nrow(df)/2
+#' @param iter.m Size of training set. Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn').
 #' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
@@ -1537,9 +2362,10 @@ boot.nodag <- function(df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igrap
 huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, iter.R=4, iter.m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL, ...) {
     to <- match.arg(to)
 
-    if (!is.null(seed)) {
-        set.seed(seed)
+    if (is.null(seed)) {
+        seed <- sample(1:10**10, 1)
     }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
     registerDoParallel(cluster)

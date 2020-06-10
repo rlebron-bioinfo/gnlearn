@@ -11,7 +11,9 @@ notears(
   max.iter = 100,
   h.tol = 1e-08,
   rho.max = 1e+16,
-  w.threshold = 0.3
+  w.threshold = 0.3,
+  m = NULL,
+  to = c("igraph", "adjacency", "edges", "graph", "bnlearn")
 )
 }
 \arguments{
@@ -28,12 +30,16 @@ notears(
 \item{rho.max}{Maximum value of rho. Default: 1e+16}
 
 \item{w.threshold}{Threshold of absolute value of weight. Default: 0.3}
+
+\item{m}{Size of training set (optional). Default: nrow(df)/2}
+
+\item{to}{Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).}
 }
 \description{
 This function allows you to learn an adjacency matrix from a dataset using the Linear NO-TEARS algorithm.
 }
 \examples{
-mtx <- notears(df)
+g <- notears(df)
 }
 \keyword{adjacency}
 \keyword{learning}

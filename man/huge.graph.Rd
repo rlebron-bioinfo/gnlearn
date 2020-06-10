@@ -31,7 +31,7 @@ huge.graph(
 
 \item{iter.R}{Number of bootstrap replicates. Default: 200}
 
-\item{iter.m}{Size of each bootstrap replicate. Default: nrow(df)/2}
+\item{iter.m}{Size of training set. Default: nrow(df)/2}
 
 \item{to}{Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn').}
 

@@ -40,7 +40,7 @@ boot.arges(
 
 \item{R}{Number of bootstrap replicates (optional). Default: 200}
 
-\item{m}{Size of each bootstrap replicate (optional). Default: nrow(df)/2}
+\item{m}{Size of training set (optional). Default: nrow(df)/2}
 
 \item{threshold}{Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5}
 

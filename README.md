@@ -5,7 +5,7 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 
 ***
 
-*Constraint-Based Algorithms*
+<em><strong>Constraint-Based Algorithms</strong></em>
 * Peter & Clark skeleton algorithm (`boot.skeleton()`), based on `pcalg` and `bnlearn` R packages implementations.
 * Peter & Clark (PC) algorithm (`boot.pc()`), based on `pcalg` and `bnlearn` R packages implementations.
 * Fast Causal Inference (FCI), Really FCI (RFCI) and FCI+ algorithms (`boot.fci()`), based on `pcalg` R package implementation.
@@ -15,17 +15,17 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 * Chow-Liu algorithm (`boot.chowliu()`), based on `bnlearn` R package implementation.
 * Algorithm for the Reconstruction of Accurate Cellular Networks (ARACNE) (`boot.aracne()`), based on `bnlearn` R package implementation.
 
-*Score-Based Algorithms*
+<em><strong>Score-Based Algorithms</strong></em>
 * Hill-Climbing (HC) algorithm (`boot.hc()`), based on `bnlearn` R package implementation.
 * Tabu Search (Tabu) algorithm (`boot.tabu()`), based on `bnlearn` R package implementation.
 * Greedy Equivalence Search (GES) (`boot.ges()`), based on `pcalg` R package implementation.
 * Linear NO-TEARS algorithm (`boot.notears()`), reimplemented in R.
 
-*Hybrid (Constraint-Based + Score-Based) Algorithms*
+<em><strong>Hybrid (Constraint-Based + Score-Based) Algorithms</strong></em>
 * General 2-Phase Restricted Maximization (RSMAX2), Max-Min Hill Climbing (MMHC) and Hybrid HPC (H2PC) algorithms (`boot.rsmax2()`), based on `bnlearn` R package implementation.
 * Adaptively Restricted Greedy Equivalence Search (ARGES) algorithm (`boot.arges()`), based on `pcalg` R package implementation.
 
-*Other Algorithms*
+<em><strong>Other Algorithms</strong></em>
 * Graphical Lasso (GLASSO) (`boot.glasso()`), based on `glasso` R package implementation.
 * Restricted Structural Equation Models (LINGAM) (`boot.lingam()`), based on `pcalg` R package implementation.
 * GEne Network Inference with Ensemble of trees (GENIE3) (`boot.genie3()`), based on `GENIE3` R package implementation.
@@ -64,6 +64,25 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 
 <em><strong>Structure Learning Algorithms:</strong></em>
 <em>Without Bootstrapping:</em>
+* `skeleton()`: Peter & Clark Skeleton Algorithm
+* `pc()`: Peter & Clark Algorithm (PC)
+* `fci()`: Fast Causal Inference Algorithm (FCI)
+* `gs()`: Grow-Shrink Algorithm (GS)
+* `iamb()`: Incremental Association Algorithm (IAMB)
+* `parents.children()`: Parents & Children Algorithm
+* `chowliu()`: Chow-Liu Algorithm
+* `aracne()`: ARACNE Algorithm
+* `hc()`: Hill-Climbing Algorithm (HC)
+* `tabu()`: Tabu Search Algorithm (TABU)
+* `ges()`: Greedy Equivalence Search Algorithm (GES)
+* `notears()`: Linear NO-TEARS Algorithm (Reimplemented)
+* `rsmax2()`: General 2-Phase Restricted Maximization Algorithm (rsmax2)
+* `arges()`: Adaptively Restricted Greedy Equivalence Search Algorithm (ARGES)
+* `glasso()`: Graphical Lasso (GLASSO)
+* `lingam()`: Restricted Structural Equation Models (LINGAM)
+* `genie3()`: GEne Network Inference with Ensemble of trees (GENIE3)
+* `gclm()`: Graphical Continuous Lyapunov Models (GCLM)
+* `nodag()`: NODAG Algorithm
 
 <em>With Bootstrapping:</em>
 * `huge.graph()`: Learn Huge Graph (With Random Gene Selection + Cells Bootstrapping)
@@ -78,7 +97,6 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 * `boot.hc()`: Hill-Climbing Algorithm (HC) With Bootstrapping
 * `boot.tabu()`: Tabu Search Algorithm (TABU) With Bootstrapping
 * `boot.ges()`: Greedy Equivalence Search Algorithm (GES) With Bootstrapping
-* `notears()`: Linear NO-TEARS Algorithm (Reimplemented)
 * `boot.notears()`: Linear NO-TEARS Algorithm (Reimplemented) With Bootstrapping
 * `boot.rsmax2()`: General 2-Phase Restricted Maximization Algorithm (rsmax2) With Bootstrapping
 * `boot.arges()`: Adaptively Restricted Greedy Equivalence Search Algorithm (ARGES) With Bootstrapping
