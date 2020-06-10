@@ -590,12 +590,12 @@ compare.graphs <- function(learned, true, learned.replicates=NULL, skeleton=FALS
     b.acc <- balanced.accuracy(tp, tn, fp, fn)
 
     if (!is.null(learned.replicates)) {
-        R <- length(learned.replicates)
+        step <- 1/length(learned.replicates)
         precision.dist <- c()
         recall.dist <- c()
         fall.out.dist <- c()
-        for (i in 1:R) {
-            learned <- learned.replicates[[i]]
+        for (threshold in seq(from=0, to=1, by=step)) {
+            learned <- g <- average.graph(learned.replicates, threshold=threshold, to='igraph')
             stats <- compare.graphs(learned, true, learned.replicates=NULL, skeleton=skeleton,
                                     arcs=FALSE, plot=FALSE, vertical.plot=FALSE, split.plot=FALSE)
             precision.dist <- c(precision.dist, stats$Precision)
