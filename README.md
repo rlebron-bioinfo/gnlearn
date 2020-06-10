@@ -34,7 +34,7 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 
 ## Package Overview
 
-*Import & Export Files:*
+<em><strong>Import & Export Files:</strong></em>
 * `import.dataset()`: Import A Local Dataset
 * `import.geneset()`: Import A Local Geneset
 * `import.graph()`: Import A Local Graph
@@ -42,7 +42,7 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 * `export.geneset()`: Export A Geneset To A File
 * `export.graph()`: Export A Graph To A File
 
-*RESTful API Client:*
+<em><strong>RESTful API Client:</strong></em>
 * `list.datasets()`: List Datasets Available Via RESTful API
 * `list.genesets()`: List Genesets Available Via RESTful API
 * `list.graphs()`: List Graphs Available Via RESTful API
@@ -50,19 +50,22 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 * `download.geneset()`: Download A Geneset Via RESTful API
 * `download.graph()`: Download A Graph Via RESTful API
 
-*Dataset Manipulation:*
+<em><strong>Dataset Manipulation:</strong></em>
 * `drop.all.zeros()`: Drop rows and/or columns with all zeros
 * `filter.dataset()`: Select (automatically) the most appropriate gene columns and cell rows of your dataset
 * `select.genes()`: Select (automatically) the most appropriate gene columns of your dataset
 * `select.cells()`: Select (automatically) the most appropriate cell rows of your dataset
 * `dataset.split()`: Split A Dataset Into Training And Test Datasets
 
-*Dataset Operations:*
+<em><strong>Dataset Operations:</strong></em>
 * `gene.histogram()`: Plot expression histograms of genes in your dataset
 * `gene.correlation()`: Plot expression correlation of genes in your dataset
 * `gene.clustering()`: Gene Clustering
 
-*Structure Learning Algorithms:*
+<em><strong>Structure Learning Algorithms:</strong></em>
+<em>Without Bootstrapping:</em>
+
+<em>With Bootstrapping:</em>
 * `huge.graph()`: Learn Huge Graph (With Random Gene Selection + Cells Bootstrapping)
 * `boot.skeleton()`: Peter & Clark Skeleton Algorithm With Bootstrapping
 * `boot.pc()`: Peter & Clark Algorithm (PC) With Bootstrapping
@@ -85,7 +88,7 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 * `boot.gclm()`: Graphical Continuous Lyapunov Models (GCLM) With Bootstrapping
 * `boot.nodag()`: NODAG Algorithm With Bootstrapping
 
-*Graph Format:*
+<em><strong>Graph Format:</strong></em>
 * `detect.format()`: Graph Format Detection
 * `convert.format()`: Graph Format Conversion
 * `as.adjacency()`: Convert Graph To Adjacency Matrix
@@ -94,7 +97,7 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 * `as.igraph()`: Convert Graph To igraph Format
 * `as.bnlearn()`: Convert Graph To bnlearn Format
 
-*Graph Modifications:*
+<em><strong>Graph Modifications:</strong></em>
 * `add.genes()`: Add Genes To A Graph
 * `rename.genes()`: Rename Genes Of A Graph
 * `delete.genes()`: Delete Genes From A Graph
@@ -103,7 +106,7 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 * `delete.edges()`: Delete Edges To A Graph
 * `fit.coefficients()`: Estimate The Coefficients Of An Adjacency Matrix
 
-*Graph Operations:*
+<em><strong>Graph Operations:</strong></em>
 * `undirected.edges()`: Return Undirected Edges
 * `directed.edges()`: Return Directed Edges
 * `graph.plot()`: Graph Plotting
@@ -117,7 +120,7 @@ The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R
 * `average.graph()`: Calculate The Average Graph  
 * `score.graph()`: Compute The Score Of A Graph        
 
-*Graph generation:*
+<em><strong>Graph generation:</strong></em>
 * `random.graph()`: Generate A Random Graph/DAG
 * `ground.truth()`: Create a Ground Truth Graph
 * `make.edgelist()`: Make an edgelist from some genes to anothers
