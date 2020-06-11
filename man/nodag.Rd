@@ -6,7 +6,7 @@
 \usage{
 nodag(
   df,
-  lambda = 0.5,
+  lambda = 0.1,
   m = NULL,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
   seed = sample(1:10^6, 1)
@@ -15,7 +15,7 @@ nodag(
 \arguments{
 \item{df}{Dataset.}
 
-\item{lambda}{Lambda regularization parameter. Default: 0.5}
+\item{lambda}{Lambda regularization parameter. Default: 0.1}
 
 \item{m}{Size of training set (optional). Default: nrow(df)/2}
 

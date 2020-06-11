@@ -6,7 +6,7 @@
 \usage{
 gclm(
   df,
-  lambda = NULL,
+  lambda = 0.1,
   m = NULL,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
   seed = sample(1:10^6, 1)
@@ -15,7 +15,7 @@ gclm(
 \arguments{
 \item{df}{Dataset.}
 
-\item{lambda}{Lambda regularization parameter. Default: NULL (auto)}
+\item{lambda}{Lambda regularization parameter. Use NULL to compute lambda. Default: 0.1}
 
 \item{m}{Size of training set (optional). Default: nrow(df)/2}
 

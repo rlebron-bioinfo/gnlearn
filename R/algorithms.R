@@ -2038,7 +2038,7 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, mi
 #'
 #' This function allows you to learn a directed graph from a dataset using the GCLM algorithm.
 #' @param df Dataset.
-#' @param lambda Lambda regularization parameter. Default: NULL (auto)
+#' @param lambda Lambda regularization parameter. Use NULL to compute lambda. Default: 0.1
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param seed Seed used for random selection. Default: NULL
@@ -2047,7 +2047,7 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, mi
 #' @examples
 #' g <- gclm(df)
 
-gclm <- function(df, lambda=NULL, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**6, 1)) {
+gclm <- function(df, lambda=0.1, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**6, 1)) {
     to <- match.arg(to)
 
     set.seed(seed)
@@ -2112,7 +2112,7 @@ gclm <- function(df, lambda=NULL, m=NULL, to=c('igraph', 'adjacency', 'edges', '
 #'
 #' This function allows you to learn a directed graph from a dataset using the GCLM algorithm.
 #' @param df Dataset.
-#' @param lambda Lambda regularization parameter. Default: NULL (auto)
+#' @param lambda Lambda regularization parameter. Use NULL to compute lambda. Default: 0.1
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
@@ -2126,7 +2126,7 @@ gclm <- function(df, lambda=NULL, m=NULL, to=c('igraph', 'adjacency', 'edges', '
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.gclm <- function(df, lambda=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+boot.gclm <- function(df, lambda=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
     to <- match.arg(to)
 
     set.seed(seed)
@@ -2162,7 +2162,7 @@ mll <- function(P, S) {
 #'
 #' This function allows you to learn a directed graph from a dataset using the NODAG algorithm.
 #' @param df Dataset.
-#' @param lambda Lambda regularization parameter. Default: 0.5
+#' @param lambda Lambda regularization parameter. Default: 0.1
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param seed Seed used for random selection. Default: NULL
@@ -2172,7 +2172,7 @@ mll <- function(P, S) {
 #' @examples
 #' g <- nodag(df)
 
-nodag <- function(df, lambda=0.5, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**6, 1)) {
+nodag <- function(df, lambda=0.1, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**6, 1)) {
     to <- match.arg(to)
 
     set.seed(seed)
@@ -2202,7 +2202,7 @@ nodag <- function(df, lambda=0.5, m=NULL, to=c('igraph', 'adjacency', 'edges', '
 #'
 #' This function allows you to learn a directed graph from a dataset using the NODAG algorithm.
 #' @param df Dataset.
-#' @param lambda Lambda regularization parameter. Default: 0.5
+#' @param lambda Lambda regularization parameter. Default: 0.1
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
@@ -2217,7 +2217,7 @@ nodag <- function(df, lambda=0.5, m=NULL, to=c('igraph', 'adjacency', 'edges', '
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.nodag <- function(df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+boot.nodag <- function(df, lambda=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
     to <- match.arg(to)
 
     set.seed(seed)

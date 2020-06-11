@@ -6,7 +6,7 @@
 \usage{
 boot.nodag(
   df,
-  lambda = 0.5,
+  lambda = 0.1,
   R = 200,
   m = NULL,
   threshold = 0.5,
@@ -18,7 +18,7 @@ boot.nodag(
 \arguments{
 \item{df}{Dataset.}
 
-\item{lambda}{Lambda regularization parameter. Default: 0.5}
+\item{lambda}{Lambda regularization parameter. Default: 0.1}
 
 \item{R}{Number of bootstrap replicates (optional). Default: 200}
 
