@@ -2111,7 +2111,7 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 #' @examples
 #' g <- genie3(df)
 
-genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.tress=1000, min.weight=0.1,
+genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, min.weight=0.1,
                    m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
                    cluster=4, seed=NULL) {
     tree.method <- match.arg(tree.method)
@@ -2123,6 +2123,8 @@ genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.tress=1000, min.wei
     } else {
         set.seed(seed)
     }
+
+    tree.method <- toupper(tree.method)
 
     if (class(K)[1]=='character' & K != 'sqrt' & K != 'all') {
         K <- 'sqrt'
@@ -2161,7 +2163,7 @@ genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.tress=1000, min.wei
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.tress=1000, min.weight=0.1,
+boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, min.weight=0.1,
                         R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
                         cluster=4, seed=NULL) {
     tree.method <- match.arg(tree.method)
@@ -2173,6 +2175,8 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.tress=1000, mi
     } else {
         set.seed(seed)
     }
+
+    tree.method <- toupper(tree.method)
 
     if (class(K)[1]=='character' & K != 'sqrt' & K != 'all') {
         K <- 'sqrt'

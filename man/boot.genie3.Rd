@@ -8,7 +8,7 @@ boot.genie3(
   df,
   tree.method = c("rf", "et"),
   K = "sqrt",
-  n.tress = 1000,
+  n.trees = 1000,
   min.weight = 0.1,
   R = 200,
   m = NULL,
@@ -25,6 +25,8 @@ boot.genie3(
 
 \item{K}{Number of candidate regulators that are randomly selected at each tree node for the best split determination. Default: 'sqrt' (square root of the number of genes)}
 
+\item{n.trees}{Number of trees that are grown per ensemble. Default: 1000}
+
 \item{min.weight}{Minimum absolute value considered in the adjacency matrix. Lower values will be replaced by zero. Default: 0.1}
 
 \item{R}{Number of bootstrap replicates (optional). Default: 200}
@@ -38,8 +40,6 @@ boot.genie3(
 \item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: 4}
 
 \item{seed}{Seed used for random selection. Default: NULL}
-
-\item{n.trees}{Number of trees that are grown per ensemble. Default: 1000}
 }
 \description{
 This function allows you to learn a directed graph from a dataset using the GENIE3 algorithm.
