@@ -1383,7 +1383,7 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
 #' @param max.iter Maximum number of dual ascent steps. Default: 100
 #' @param h.tol Minimum absolute value of h. Default: 1e-8
 #' @param rho.max Maximum value of rho. Default: 1e+16
-#' @param w.threshold Threshold of absolute value of weight. Default: 0.3
+#' @param w.threshold Threshold of absolute value of weight. Default: 0.1
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @keywords learning adjacency
@@ -1392,7 +1392,7 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
 #' g <- notears(df)
 
 notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
-                    max.iter=100, h.tol=1e-8, rho.max=1e+16, w.threshold=0.3, m=NULL,
+                    max.iter=100, h.tol=1e-6, rho.max=1e+6, w.threshold=0.1, m=NULL,
                     to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**6, 1)) {
     loss.type <- match.arg(loss.type)
     to <- match.arg(to)
@@ -2144,15 +2144,13 @@ gclm <- function(df, lambda=0.1, m=NULL, to=c('igraph', 'adjacency', 'edges', 'g
 
     } else {
 
-        results.path <- lapply(results.path, function(res) {
-            gclm::gclm(S.train.cor,
-                       B = -0.5*diag(p),
-                       lambda = lambda,
-                       lambdac = 0.01,
-                       eps = 1e-5,
-                       job = 0,
-                       maxIter=1000)
-        })
+        results.path <- gclm::gclm(S.train.cor,
+                                   B = -0.5*diag(p),
+                                   lambda = lambda,
+                                   lambdac = 0.01,
+                                   eps = 1e-5,
+                                   job = 0,
+                                   maxIter=1000)
 
         A <- t(results.path$B)
     }

@@ -9,9 +9,9 @@ notears(
   lambda1 = 0.1,
   loss.type = c("l2", "logistic", "poisson"),
   max.iter = 100,
-  h.tol = 1e-08,
-  rho.max = 1e+16,
-  w.threshold = 0.3,
+  h.tol = 1e-06,
+  rho.max = 1e+06,
+  w.threshold = 0.1,
   m = NULL,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
   seed = sample(1:10^6, 1)
@@ -30,7 +30,7 @@ notears(
 
 \item{rho.max}{Maximum value of rho. Default: 1e+16}
 
-\item{w.threshold}{Threshold of absolute value of weight. Default: 0.3}
+\item{w.threshold}{Threshold of absolute value of weight. Default: 0.1}
 
 \item{m}{Size of training set (optional). Default: nrow(df)/2}
 
