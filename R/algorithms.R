@@ -2038,6 +2038,7 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, mi
 #'
 #' This function allows you to learn a directed graph from a dataset using the GCLM algorithm.
 #' @param df Dataset.
+#' @param lambda Lambda regularization parameter. Default: NULL (auto)
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
 #' @param seed Seed used for random selection. Default: NULL
@@ -2046,7 +2047,7 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, mi
 #' @examples
 #' g <- gclm(df)
 
-gclm <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**6, 1)) {
+gclm <- function(df, lambda=NULL, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**6, 1)) {
     to <- match.arg(to)
 
     set.seed(seed)
@@ -2059,31 +2060,47 @@ gclm <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnle
     S.test <-  cov(splitted.df$test)
     dd <- diag(1/sqrt(diag(S.train)))
     S.train.cor <- cov2cor(S.train)
+    p <- ncol(S.train)
 
-    # estimate path
-    results.path <- gclm::gclm.path(S.train.cor,
-                                    B = -0.5*solve(S.train.cor),
-                                    lambdac = 0.01,
-                                    lambdas = 6*10^seq(-4,0, length=100),
-                                    eps = 1e-6, job=0, maxIter=1000)
+    if (is.null(lambda)) {
 
-    # fit MLE to all path
-    results.path <- lapply(results.path, function(res) {
-        gclm::gclm(S.train.cor,
-                   B = res$B,
-                   C = res$C,
-                   lambda = 0,
-                   lambdac = -1,
-                   eps = 1e-10,
-                   job = 10)
-    })
+        results.path <- gclm::gclm.path(S.train.cor,
+                                        B = -0.5*diag(p),
+                                        lambdac = 0.01,
+                                        lambdas =6*10^seq(0,-4,length=100),
+                                        eps = 1e-5, job=0, maxIter=100)
 
-    # compute minus loglik
-    tmp <- sapply(results.path, function(res) {
-        mll(solve(res$Sigma), dd %*% S.test %*% dd)
-    })
-    bidx <- which.min(tmp)
-    A <- t(results.path[[bidx]]$B)
+        results.path <- lapply(results.path, function(res) {
+            gclm::gclm(S.train.cor,
+                       B = results.path$B,
+                       C = results.path$C,
+                       lambda = 0,
+                       lambdac = -1,
+                       eps = 1e-6,
+                       job = 10)
+        })
+
+        tmp <- sapply(results.path, function(res) {
+            mll(solve(res$Sigma), dd %*% S.test %*% dd)
+        })
+        bidx <- which.min(tmp)
+        A <- t(results.path[[bidx]]$B)
+
+    } else {
+
+        results.path <- lapply(results.path, function(res) {
+            gclm::gclm(S.train.cor,
+                       B = -0.5*diag(p),
+                       lambda = lambda,
+                       lambdac = 0.01,
+                       eps = 1e-5,
+                       job = 0,
+                       maxIter=1000)
+        })
+
+        A <- t(results.path$B)
+    }
+
     rownames(A) <- colnames(A) <- colnames(splitted.df$train)
     diag(A) <- 0
 
@@ -2095,6 +2112,7 @@ gclm <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnle
 #'
 #' This function allows you to learn a directed graph from a dataset using the GCLM algorithm.
 #' @param df Dataset.
+#' @param lambda Lambda regularization parameter. Default: NULL (auto)
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
@@ -2108,7 +2126,7 @@ gclm <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnle
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+boot.gclm <- function(df, lambda=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
     to <- match.arg(to)
 
     set.seed(seed)
@@ -2118,7 +2136,7 @@ boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacenc
 
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
-        gclm(df, m=m, to='adjacency', seed=sample(1:10**6, 1))
+        gclm(df, lambda=lambda, m=m, to='adjacency', seed=sample(1:10**6, 1))
     }
     stopImplicitCluster()
 

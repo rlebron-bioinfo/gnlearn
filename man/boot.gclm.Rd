@@ -6,6 +6,7 @@
 \usage{
 boot.gclm(
   df,
+  lambda = NULL,
   R = 200,
   m = NULL,
   threshold = 0.5,
@@ -16,6 +17,8 @@ boot.gclm(
 }
 \arguments{
 \item{df}{Dataset.}
+
+\item{lambda}{Lambda regularization parameter. Default: NULL (auto)}
 
 \item{R}{Number of bootstrap replicates (optional). Default: 200}
 
