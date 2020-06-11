@@ -8,7 +8,7 @@ gclm(
   df,
   m = NULL,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
-  seed = NULL
+  seed = sample(1:10^10, 1)
 )
 }
 \arguments{

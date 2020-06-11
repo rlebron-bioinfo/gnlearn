@@ -32,18 +32,13 @@ skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf,
                      cluster=4, implementation=c('pcalg','bnlearn'),
                      pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
                      pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
-                     bnlearn.test=ci.tests, bnlearn.B=NULL, seed=NULL) {
+                     bnlearn.test=ci.tests, bnlearn.B=NULL, seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
     implementation <- match.arg(implementation)
     pcalg.u2pd <- match.arg(pcalg.u2pd)
     bnlearn.test <- match.arg(bnlearn.test)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (pcalg.conservative | pcalg.solve.confl) {
         pcalg.u2pd <- 'relaxed'
@@ -114,18 +109,13 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
                           cluster=4, implementation=c('pcalg','bnlearn'),
                           pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
                           pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
-                          bnlearn.test=ci.tests, bnlearn.B=NULL, seed=NULL) {
+                          bnlearn.test=ci.tests, bnlearn.B=NULL, seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
     implementation <- match.arg(implementation)
     pcalg.u2pd <- match.arg(pcalg.u2pd)
     bnlearn.test <- match.arg(bnlearn.test)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (pcalg.conservative | pcalg.solve.confl) {
         pcalg.u2pd <- 'relaxed'
@@ -149,7 +139,7 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
                  to='adjacency', cluster=1, implementation=implementation,
                  pcalg.indep.test=pcalg.indep.test, pcalg.u2pd=pcalg.u2pd,
                  pcalg.conservative=pcalg.conservative, pcalg.maj.rule=pcalg.maj.rule, pcalg.solve.confl=pcalg.solve.confl,
-                 bnlearn.test=bnlearn.test, bnlearn.B=bnlearn.B, seed=NULL)
+                 bnlearn.test=bnlearn.test, bnlearn.B=bnlearn.B, seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -195,18 +185,13 @@ pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, m=NUL
                cluster=4, implementation=c('pcalg','bnlearn'),
                pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
                pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
-               bnlearn.test=ci.tests, bnlearn.B=NULL, seed=NULL) {
+               bnlearn.test=ci.tests, bnlearn.B=NULL, seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
     implementation <- match.arg(implementation)
     pcalg.u2pd <- match.arg(pcalg.u2pd)
     bnlearn.test <- match.arg(bnlearn.test)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (pcalg.conservative | pcalg.solve.confl) {
         pcalg.u2pd <- 'relaxed'
@@ -290,18 +275,13 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
                     cluster=4, implementation=c('pcalg','bnlearn'),
                     pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
                     pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
-                    bnlearn.test=ci.tests, bnlearn.B=NULL, seed=NULL) {
+                    bnlearn.test=ci.tests, bnlearn.B=NULL, seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
     implementation <- match.arg(implementation)
     pcalg.u2pd <- match.arg(pcalg.u2pd)
     bnlearn.test <- match.arg(bnlearn.test)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (pcalg.conservative | pcalg.solve.confl) {
         pcalg.u2pd <- 'relaxed'
@@ -333,7 +313,7 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
            to='adjacency', cluster=1, implementation=implementation,
            pcalg.indep.test=pcalg.indep.test, pcalg.u2pd=pcalg.u2pd,
            pcalg.conservative=pcalg.conservative, pcalg.maj.rule=pcalg.maj.rule, pcalg.solve.confl=pcalg.solve.confl,
-           bnlearn.test=bnlearn.test, bnlearn.B=bnlearn.B, seed=NULL)
+           bnlearn.test=bnlearn.test, bnlearn.B=bnlearn.B, seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -376,17 +356,12 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
 fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf, pdsep.max=Inf,
                 conservative=FALSE, maj.rule=FALSE, version=c('fci','rfci','fci.plus'), type=c('normal','anytime','adaptive'),
                 rules=rep(TRUE,10), doPdsep=TRUE, biCC=FALSE, m=NULL,
-                to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+                to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**10, 1)) {
     version <- match.arg(version)
     type <- match.arg(type)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'adjacency')
@@ -452,17 +427,12 @@ fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItes
 boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf, pdsep.max=Inf,
                      conservative=FALSE, maj.rule=FALSE, version=c('fci','rfci','fci.plus'), type=c('normal','anytime','adaptive'),
                      rules=rep(TRUE,10), doPdsep=TRUE, biCC=FALSE,
-                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     version <- match.arg(version)
     type <- match.arg(type)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'adjacency')
@@ -481,7 +451,7 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
         fci(df, whitelist=whitelist, blacklist=blacklist, indep.test=indep.test, alpha=alpha, max.sx=max.sx, pdsep.max=pdsep.max,
                         conservative=conservative, maj.rule=maj.rule, version=version, type=type,
                         rules=rules, doPdsep=doPdsep, biCC=biCC, m=m,
-                        to='adjacency', seed=NULL)
+                        to='adjacency', seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -516,16 +486,11 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
 #' g <- gs(df)
 
 gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL,
-               m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+               m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     test <- match.arg(test)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -574,16 +539,11 @@ gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=
 #' g.rep <- obj$replicates
 
 boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL,
-                    R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                    R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     test <- match.arg(test)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -598,7 +558,7 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
         gs(df, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha, B=B, max.sx=max.sx,
-           m=m, to='adjacency', cluster=1, seed=NULL)
+           m=m, to='adjacency', cluster=1, seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -634,17 +594,12 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
 #' g <- iamb(df)
 
 iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('iamb','fast.iamb','inter.iamb','iamb.fdr'),
-                 m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                 m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     test <- match.arg(test)
     version <- match.arg(version)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     algorithm <- switch(version,
         iamb = bnlearn::iamb,
@@ -701,17 +656,12 @@ iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, 
 #' g.rep <- obj$replicates
 
 boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('iamb','fast.iamb','inter.iamb','iamb.fdr'),
-                      R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                      R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     test <- match.arg(test)
     version <- match.arg(version)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     algorithm <- switch(version,
         iamb = bnlearn::iamb,
@@ -733,7 +683,7 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
         iamb(df, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha, B=B, max.sx=max.sx, version=version,
-             m=m, to='adjacency', cluster=1, seed=NULL)
+             m=m, to='adjacency', cluster=1, seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -769,17 +719,12 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
 #' g <- parents.children(df)
 
 parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('mmpc','si.hiton.pc','hpc'),
-                             m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                             m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     test <- match.arg(test)
     version <- match.arg(version)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     algorithm <- switch(version,
         mmpc = bnlearn::mmpc,
@@ -835,17 +780,12 @@ parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, 
 #' g.rep <- obj$replicates
 
 boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('mmpc','si.hiton.pc','hpc'),
-                                  R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                                  R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     test <- match.arg(test)
     version <- match.arg(version)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     algorithm <- switch(version,
         mmpc = bnlearn::mmpc,
@@ -866,7 +806,7 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
         parents.children(df, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha, B=B, max.sx=max.sx, version=version,
-                         m=m, to='adjacency', cluster=1, seed=NULL)
+                         m=m, to='adjacency', cluster=1, seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -895,15 +835,10 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
 #' @examples
 #' g <- chowliu(df)
 
-chowliu <- function(df, whitelist=NULL, blacklist=NULL, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+chowliu <- function(df, whitelist=NULL, blacklist=NULL, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -943,15 +878,10 @@ chowliu <- function(df, whitelist=NULL, blacklist=NULL, m=NULL, to=c('igraph', '
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -965,7 +895,7 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
 
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
-        chowliu(df, whitelist=whitelist, blacklist=blacklist, m=m, to='adjacency', seed=NULL)
+        chowliu(df, whitelist=whitelist, blacklist=blacklist, m=m, to='adjacency', seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -994,15 +924,10 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
 #' @examples
 #' g <- aracne(df)
 
-aracne <- function(df, whitelist=NULL, blacklist=NULL, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+aracne <- function(df, whitelist=NULL, blacklist=NULL, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -1042,15 +967,10 @@ aracne <- function(df, whitelist=NULL, blacklist=NULL, m=NULL, to=c('igraph', 'a
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'edges')
@@ -1064,7 +984,7 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
 
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
-        aracne(df, whitelist=whitelist, blacklist=blacklist, m=m, to='adjacency', seed=NULL)
+        aracne(df, whitelist=whitelist, blacklist=blacklist, m=m, to='adjacency', seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -1102,15 +1022,10 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
 #' g <- hc(df)
 
 hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, restart=0, perturb=1, max.iter=Inf, maxp=Inf,
-               m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+               m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(start)) {
         start <- convert.format(start, to='bnlearn')
@@ -1163,15 +1078,10 @@ hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, res
 #' g.rep <- obj$replicates
 
 boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, restart=0, perturb=1, max.iter=Inf, maxp=Inf,
-                    R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                    R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(start)) {
         start <- convert.format(start, to='bnlearn')
@@ -1191,7 +1101,7 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
         hc(df, start=start, whitelist=whitelist, blacklist=blacklist, score=score, restart=restart, perturb=perturb, max.iter=max.iter, maxp=maxp,
-           m=m, to='adjacency', seed=NULL)
+           m=m, to='adjacency', seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -1227,15 +1137,10 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
 #' g <- tabu(df)
 
 tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, tabu=10, max.tabu=NULL, max.iter=Inf, maxp=Inf,
-                 m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+                 m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(start)) {
          start <- convert.format(start, to='bnlearn')
@@ -1291,15 +1196,10 @@ tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, t
 #' g.rep <- obj$replicates
 
 boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, tabu=10, max.tabu=NULL, max.iter=Inf, maxp=Inf,
-                      R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                      R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(start)) {
          start <- convert.format(start, to='bnlearn')
@@ -1322,7 +1222,7 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
         tabu(df, start=start, whitelist=whitelist, blacklist=blacklist, score=score, tabu=tabu, max.tabu=max.tabu, max.iter=max.iter, maxp=maxp,
-             m=m, to='adjacency', seed=NULL)
+             m=m, to='adjacency', seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -1353,16 +1253,11 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
 #' g <- ges(df)
 
 ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
-                m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+                m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**10, 1)) {
     adaptive <- match.arg(adaptive)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(blacklist)) {
         blacklist <- convert.format(blacklist, 'adjacency')
@@ -1403,16 +1298,11 @@ ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), 
 #' g.rep <- obj$replicates
 
 boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
-                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     adaptive <- match.arg(adaptive)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(blacklist)) {
         blacklist <- convert.format(blacklist, 'adjacency')
@@ -1424,7 +1314,7 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
         ges(df, blacklist=blacklist, adaptive=adaptive, maxDegree=maxDegree,
-            m=m, to='adjacency', seed=NULL)
+            m=m, to='adjacency', seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -1458,16 +1348,11 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
 
 notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
                     max.iter=100, h.tol=1e-8, rho.max=1e+16, w.threshold=0.3, m=NULL,
-                    to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+                    to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**10, 1)) {
     loss.type <- match.arg(loss.type)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     splitted.df <- dataset.split(df, m=m)
     X <- df <- as.matrix(splitted.df$train)
@@ -1603,16 +1488,11 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
 
 boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
                          max.iter=100, h.tol=1e-8, rho.max=1e+16, w.threshold=0.3,
-                         R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                         R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     loss.type <- match.arg(loss.type)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
 
@@ -1659,18 +1539,13 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
 
 rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','gs','iamb','fast.iamb','inter.iamb','iamb.fdr','mmpc','si.hiton.pc','hpc'),
                    maximize=c('hc','tabu'), restrict.args=list(), maximize.args=list(), version=c('rsmax2','mmhc','h2pc'),
-                   m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                   m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     restrict <- match.arg(restrict)
     maximize <- match.arg(maximize)
     version <- match.arg(version)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     restrict <- switch(version,
         rsmax2 = restrict,
@@ -1735,18 +1610,13 @@ rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','g
 
 boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','gs','iamb','fast.iamb','inter.iamb','iamb.fdr','mmpc','si.hiton.pc','hpc'),
                         maximize=c('hc','tabu'), restrict.args=list(), maximize.args=list(), version=c('rsmax2','mmhc','h2pc'),
-                        R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                        R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     restrict <- match.arg(restrict)
     maximize <- match.arg(maximize)
     version <- match.arg(version)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     restrict <- switch(version,
         rsmax2 = restrict,
@@ -1774,7 +1644,7 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
     graphs <- foreach(rep=1:R) %dopar% {
         rsmax2(df, whitelist=whitelist, blacklist=blacklist, restrict=restrict,
                maximize=maximize, restrict.args=restrict.args, maximize.args=maximize.args, version=version,
-               m=m, to='adjacency', cluster=1, seed=NULL)
+               m=m, to='adjacency', cluster=1, seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -1810,16 +1680,11 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
 
 arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf,
                   adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
-                  m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+                  m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**10, 1)) {
     adaptive <- match.arg(adaptive)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'adjacency')
@@ -1875,17 +1740,12 @@ arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCIt
 
 boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf,
                        adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
-                       R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+                       R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
 
     adaptive <- match.arg(adaptive)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     if (!is.null(whitelist)) {
         whitelist <- convert.format(whitelist, 'adjacency')
@@ -1903,7 +1763,7 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
     graphs <- foreach(rep=1:R) %dopar% {
         arges(df, whitelist=whitelist, blacklist=blacklist, indep.test=indep.test, alpha=alpha, max.sx=max.sx,
               adaptive=adaptive, maxDegree=maxDegree,
-              m=m, to='adjacency', seed=NULL)
+              m=m, to='adjacency', seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -1933,15 +1793,10 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
 #' @examples
 #' g <- glasso(df, rho=0.1)
 
-glasso <- function(df, rho=0.1, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+glasso <- function(df, rho=0.1, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
 
@@ -1978,21 +1833,16 @@ glasso <- function(df, rho=0.1, m=NULL, to=c('igraph', 'adjacency', 'edges', 'gr
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
-        glasso(df, rho=rho, m=m, to='adjacency', seed=NULL)
+        glasso(df, rho=rho, m=m, to='adjacency', seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -2023,15 +1873,10 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph'
 #' @examples
 #' g <- lingam(df)
 
-lingam <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+lingam <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
 
@@ -2063,21 +1908,16 @@ lingam <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bn
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
 
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
-        lingam(df, m=m, to='adjacency', seed=NULL)
+        lingam(df, m=m, to='adjacency', seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -2113,16 +1953,11 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 
 genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, min.weight=0.1,
                    m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
-                   cluster=4, seed=NULL) {
+                   cluster=4, seed=sample(1:10**10, 1)) {
     tree.method <- match.arg(tree.method)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     tree.method <- toupper(tree.method)
 
@@ -2165,16 +2000,11 @@ genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, min.wei
 
 boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, min.weight=0.1,
                         R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
-                        cluster=4, seed=NULL) {
+                        cluster=4, seed=sample(1:10**10, 1)) {
     tree.method <- match.arg(tree.method)
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     tree.method <- toupper(tree.method)
 
@@ -2187,7 +2017,7 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, mi
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
         genie3(df, tree.method=tree.method, K=K, n.tress=n.tress, min.weight=min.weight,
-               m=m, to='adjacency', cluster=1, seed=NULL)
+               m=m, to='adjacency', cluster=1, seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -2216,15 +2046,10 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, mi
 #' @examples
 #' g <- gclm(df)
 
-gclm <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+gclm <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
@@ -2283,22 +2108,17 @@ gclm <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnle
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+boot.gclm <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
 
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
-        gclm(df, m=m, to='adjacency', seed=NULL)
+        gclm(df, m=m, to='adjacency', seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -2334,15 +2154,10 @@ mll <- function(P, S) {
 #' @examples
 #' g <- nodag(df)
 
-nodag <- function(df, lambda=0.5, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=NULL) {
+nodag <- function(df, lambda=0.5, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
@@ -2384,22 +2199,17 @@ nodag <- function(df, lambda=0.5, m=NULL, to=c('igraph', 'adjacency', 'edges', '
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.nodag <- function(df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL) {
+boot.nodag <- function(df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1)) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
 
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
-        nodag(df, lambda=lambda, m=m, to='adjacency', seed=NULL)
+        nodag(df, lambda=lambda, m=m, to='adjacency', seed=sample(1:10**10, 1))
     }
     stopImplicitCluster()
 
@@ -2437,15 +2247,10 @@ boot.nodag <- function(df, lambda=0.5, R=200, m=NULL, threshold=0.5, to=c('igrap
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, iter.R=4, iter.m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=NULL, ...) {
+huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, iter.R=4, iter.m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**10, 1), ...) {
     to <- match.arg(to)
 
-    if (is.null(seed)) {
-        seed <- sample(1:10**10, 1)
-        set.seed(seed)
-    } else {
-        set.seed(seed)
-    }
+    set.seed(seed)
 
     df <- drop.all.zeros(df)
     registerDoParallel(cluster)

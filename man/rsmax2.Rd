@@ -17,7 +17,7 @@ rsmax2(
   m = NULL,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
   cluster = 4,
-  seed = NULL
+  seed = sample(1:10^10, 1)
 )
 }
 \arguments{

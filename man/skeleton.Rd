@@ -21,7 +21,7 @@ skeleton(
   pcalg.solve.confl = FALSE,
   bnlearn.test = ci.tests,
   bnlearn.B = NULL,
-  seed = NULL
+  seed = sample(1:10^10, 1)
 )
 }
 \arguments{
