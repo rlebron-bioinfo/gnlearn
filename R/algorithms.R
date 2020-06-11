@@ -2064,8 +2064,6 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, mi
 
     set.seed(seed)
 
-    tree.method <- toupper(tree.method)
-
     if (class(K)[1]=='character' & K != 'sqrt' & K != 'all') {
         K <- 'sqrt'
     }
