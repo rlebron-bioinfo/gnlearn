@@ -9,9 +9,9 @@ boot.notears(
   lambda1 = 0.1,
   loss.type = c("l2", "logistic", "poisson"),
   max.iter = 100,
-  h.tol = 1e-08,
-  rho.max = 1e+16,
-  w.threshold = 0.3,
+  h.tol = 1e-06,
+  rho.max = 1e+06,
+  w.threshold = 0.1,
   R = 200,
   m = NULL,
   threshold = 0.5,
@@ -33,7 +33,7 @@ boot.notears(
 
 \item{rho.max}{Maximum value of rho. Default: 1e+16}
 
-\item{w.threshold}{Threshold of absolute value of weight. Default: 0.3}
+\item{w.threshold}{Threshold of absolute value of weight. Default: 0.1}
 
 \item{R}{Number of bootstrap replicates (optional). Default: 200}
 

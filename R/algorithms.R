@@ -1517,7 +1517,7 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
 #' @param max.iter Maximum number of dual ascent steps. Default: 100
 #' @param h.tol Minimum absolute value of h. Default: 1e-8
 #' @param rho.max Maximum value of rho. Default: 1e+16
-#' @param w.threshold Threshold of absolute value of weight. Default: 0.3
+#' @param w.threshold Threshold of absolute value of weight. Default: 0.1
 #' @param R Number of bootstrap replicates (optional). Default: 200
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
@@ -1532,7 +1532,7 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
 #' g.rep <- obj$replicates
 
 boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
-                         max.iter=100, h.tol=1e-8, rho.max=1e+16, w.threshold=0.3,
+                         max.iter=100, h.tol=1e-6, rho.max=1e+6, w.threshold=0.1,
                          R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
     loss.type <- match.arg(loss.type)
     to <- match.arg(to)
