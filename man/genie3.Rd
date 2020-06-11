@@ -31,7 +31,7 @@ genie3(
 
 \item{to}{Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).}
 
-\item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: 4}
+\item{cluster}{The number of cores to be used (optional). Default: 4}
 
 \item{seed}{Seed used for random selection. Default: NULL}
 }

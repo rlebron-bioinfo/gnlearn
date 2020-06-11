@@ -65,13 +65,22 @@ skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf,
         g <- as(g@graph, 'matrix')
         rownames(g) <- colnames(g) <- colnames(splitted.df$train)
     } else if (implementation=='bnlearn') {
-        cluster <- parallel::makeCluster(cluster)
-        parallel::clusterSetRNGStream(cluster, seed)
-        g <- bnlearn::pc.stable(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
-                                B=bnlearn.B, max.sx=max.sx, undirected=TRUE, cluster=cluster)
-        g <- convert.format(g, to='adjacency')
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        parallel::stopCluster(cluster)
+        if (class(cluster)[1] == 'numeric') {
+            cluster <- parallel::makeCluster(cluster)
+        }
+        if (!is.null(cluster)) {
+            parallel::clusterSetRNGStream(cluster, seed)
+            g <- bnlearn::pc.stable(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
+                                    B=bnlearn.B, max.sx=max.sx, undirected=TRUE, cluster=cluster)
+            g <- convert.format(g, to='adjacency')
+            rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+            parallel::stopCluster(cluster)
+        } else {
+            g <- bnlearn::pc.stable(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
+                                    B=bnlearn.B, max.sx=max.sx, undirected=TRUE)
+            g <- convert.format(g, to='adjacency')
+            rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        }
     }
 
     g <- convert.format(g, from='adjacency', to=to)
@@ -136,7 +145,7 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
         skeleton(df, whitelist=whitelist, blacklist=blacklist, alpha=alpha, max.sx=max.sx, m=m,
-                 to='adjacency', cluster=1, implementation=implementation,
+                 to='adjacency', cluster=NULL, implementation=implementation,
                  pcalg.indep.test=pcalg.indep.test, pcalg.u2pd=pcalg.u2pd,
                  pcalg.conservative=pcalg.conservative, pcalg.maj.rule=pcalg.maj.rule, pcalg.solve.confl=pcalg.solve.confl,
                  bnlearn.test=bnlearn.test, bnlearn.B=bnlearn.B, seed=sample(1:10**6, 1))
@@ -227,13 +236,22 @@ pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, m=NUL
         g <- as(g@graph, 'matrix')
         rownames(g) <- colnames(g) <- colnames(splitted.df$train)
     } else if (implementation=='bnlearn') {
-        cluster <- parallel::makeCluster(cluster)
-        parallel::clusterSetRNGStream(cluster, seed)
-        g <- bnlearn::pc.stable(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
-                                B=bnlearn.B, max.sx=max.sx, undirected=FALSE, cluster=cluster)
-        g <- convert.format(g, to='adjacency')
-        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-        parallel::stopCluster(cluster)
+        if (class(cluster)[1] == 'numeric') {
+            cluster <- parallel::makeCluster(cluster)
+        }
+        if (!is.null(cluster)) {
+            parallel::clusterSetRNGStream(cluster, seed)
+            g <- bnlearn::pc.stable(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
+                                    B=bnlearn.B, max.sx=max.sx, undirected=FALSE, cluster=cluster)
+            g <- convert.format(g, to='adjacency')
+            rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+            parallel::stopCluster(cluster)
+        } else {
+            g <- bnlearn::pc.stable(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=bnlearn.test, alpha=alpha,
+                                    B=bnlearn.B, max.sx=max.sx, undirected=FALSE)
+            g <- convert.format(g, to='adjacency')
+            rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        }
     }
 
     g <- convert.format(g, from='adjacency', to=to)
@@ -310,7 +328,7 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
         pc(df, whitelist=whitelist, blacklist=blacklist, alpha=alpha, max.sx=max.sx, m=m,
-           to='adjacency', cluster=1, implementation=implementation,
+           to='adjacency', cluster=NULL, implementation=implementation,
            pcalg.indep.test=pcalg.indep.test, pcalg.u2pd=pcalg.u2pd,
            pcalg.conservative=pcalg.conservative, pcalg.maj.rule=pcalg.maj.rule, pcalg.solve.confl=pcalg.solve.confl,
            bnlearn.test=bnlearn.test, bnlearn.B=bnlearn.B, seed=sample(1:10**6, 1))
@@ -503,13 +521,22 @@ gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=
     df <- drop.all.zeros(df)
 
     splitted.df <- dataset.split(df, m=m)
-    cluster <- parallel::makeCluster(cluster)
-    parallel::clusterSetRNGStream(cluster, seed)
-    g <- bnlearn::gs(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
-                     B=B, max.sx=max.sx, undirected=FALSE, cluster=cluster)
-    g <- convert.format(g, to='adjacency')
-    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-    parallel::stopCluster(cluster)
+    if (class(cluster)[1] == 'numeric') {
+        cluster <- parallel::makeCluster(cluster)
+    }
+    if (!is.null(cluster)) {
+        parallel::clusterSetRNGStream(cluster, seed)
+        g <- bnlearn::gs(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
+                         B=B, max.sx=max.sx, undirected=FALSE, cluster=cluster)
+        g <- convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        parallel::stopCluster(cluster)
+    } else {
+        g <- bnlearn::gs(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
+                         B=B, max.sx=max.sx, undirected=FALSE)
+        g <- convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+    }
 
     g <- convert.format(g, from='adjacency', to=to)
     return(g)
@@ -558,7 +585,7 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
         gs(df, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha, B=B, max.sx=max.sx,
-           m=m, to='adjacency', cluster=1, seed=sample(1:10**6, 1))
+           m=m, to='adjacency', cluster=NULL, seed=sample(1:10**6, 1))
     }
     stopImplicitCluster()
 
@@ -619,13 +646,22 @@ iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, 
     df <- drop.all.zeros(df)
 
     splitted.df <- dataset.split(df, m=m)
-    cluster <- parallel::makeCluster(cluster)
-    parallel::clusterSetRNGStream(cluster, seed)
-    g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
-                   B=B, max.sx=max.sx, undirected=FALSE, cluster=cluster)
-    g <- convert.format(g, to='adjacency')
-    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-    parallel::stopCluster(cluster)
+    if (class(cluster)[1] == 'numeric') {
+        cluster <- parallel::makeCluster(cluster)
+    }
+    if (!is.null(cluster)) {
+        parallel::clusterSetRNGStream(cluster, seed)
+        g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
+                       B=B, max.sx=max.sx, undirected=FALSE, cluster=cluster)
+        g <- convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        parallel::stopCluster(cluster)
+    } else {
+        g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
+                       B=B, max.sx=max.sx, undirected=FALSE)
+        g <- convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+    }
 
     g <- convert.format(g, from='adjacency', to=to)
     return(g)
@@ -683,7 +719,7 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
         iamb(df, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha, B=B, max.sx=max.sx, version=version,
-             m=m, to='adjacency', cluster=1, seed=sample(1:10**6, 1))
+             m=m, to='adjacency', cluster=NULL, seed=sample(1:10**6, 1))
     }
     stopImplicitCluster()
 
@@ -743,13 +779,22 @@ parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, 
     df <- drop.all.zeros(df)
 
     splitted.df <- dataset.split(df, m=m)
-    cluster <- parallel::makeCluster(cluster)
-    parallel::clusterSetRNGStream(cluster, seed)
-    g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
-                   B=B, max.sx=max.sx, undirected=FALSE, cluster=cluster)
-    g <- convert.format(g, to='adjacency')
-    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-    parallel::stopCluster(cluster)
+    if (class(cluster)[1] == 'numeric') {
+        cluster <- parallel::makeCluster(cluster)
+    }
+    if (!is.null(cluster)) {
+        parallel::clusterSetRNGStream(cluster, seed)
+        g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
+                       B=B, max.sx=max.sx, undirected=FALSE, cluster=cluster)
+        g <- convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        parallel::stopCluster(cluster)
+    } else {
+        g <- algorithm(splitted.df$train, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha,
+                       B=B, max.sx=max.sx, undirected=FALSE)
+        g <- convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+    }
 
     g <- convert.format(g, from='adjacency', to=to)
     return(g)
@@ -806,7 +851,7 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
         parents.children(df, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha, B=B, max.sx=max.sx, version=version,
-                         m=m, to='adjacency', cluster=1, seed=sample(1:10**6, 1))
+                         m=m, to='adjacency', cluster=NULL, seed=sample(1:10**6, 1))
     }
     stopImplicitCluster()
 
@@ -1571,14 +1616,23 @@ rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','g
 
     splitted.df <- dataset.split(df, m=m)
 
-    cluster <- parallel::makeCluster(cluster)
-    parallel::clusterSetRNGStream(cluster, seed)
-    restrict.args$cluster <- cluster
-    g <- bnlearn::rsmax2(splitted.df$train, whitelist=whitelist, blacklist=blacklist, restrict=restrict, maximize=maximize,
-                         restrict.args=restrict.args, maximize.args=maximize.args)
-    g <- convert.format(g, to='adjacency')
-    rownames(g) <- colnames(g) <- colnames(splitted.df$train)
-    parallel::stopCluster(cluster)
+    if (class(cluster)[1] == 'numeric') {
+        cluster <- parallel::makeCluster(cluster)
+    }
+    if (!is.null(cluster)) {
+        parallel::clusterSetRNGStream(cluster, seed)
+        restrict.args$cluster <- cluster
+        g <- bnlearn::rsmax2(splitted.df$train, whitelist=whitelist, blacklist=blacklist, restrict=restrict, maximize=maximize,
+                             restrict.args=restrict.args, maximize.args=maximize.args)
+        g <- convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+        parallel::stopCluster(cluster)
+    } else {
+        g <- bnlearn::rsmax2(splitted.df$train, whitelist=whitelist, blacklist=blacklist, restrict=restrict, maximize=maximize,
+                             restrict.args=restrict.args, maximize.args=maximize.args)
+        g <- convert.format(g, to='adjacency')
+        rownames(g) <- colnames(g) <- colnames(splitted.df$train)
+    }
 
     g <- convert.format(g, from='adjacency', to=to)
     return(g)
@@ -1644,7 +1698,7 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
     graphs <- foreach(rep=1:R) %dopar% {
         rsmax2(df, whitelist=whitelist, blacklist=blacklist, restrict=restrict,
                maximize=maximize, restrict.args=restrict.args, maximize.args=maximize.args, version=version,
-               m=m, to='adjacency', cluster=1, seed=sample(1:10**6, 1))
+               m=m, to='adjacency', cluster=NULL, seed=sample(1:10**6, 1))
     }
     stopImplicitCluster()
 
@@ -1944,7 +1998,7 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 #' @param min.weight Minimum absolute value considered in the adjacency matrix. Lower values will be replaced by zero. Default: 0.1
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster The number of cores to be used (optional). Default: 4
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -1969,7 +2023,11 @@ genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, min.wei
 
     splitted.df <- dataset.split(df, m=m)
     splitted.df$train <- t(splitted.df$train)
-    g <- GENIE3::GENIE3(splitted.df$train, treeMethod=tree.method, K=K, nTrees=n.trees, nCores=cluster)
+    if (!is.null(cluster)) {
+        g <- GENIE3::GENIE3(splitted.df$train, treeMethod=tree.method, K=K, nTrees=n.trees, nCores=cluster)
+    } else {
+        g <- GENIE3::GENIE3(splitted.df$train, treeMethod=tree.method, K=K, nTrees=n.trees)
+    }
     rownames(g) <- colnames(g) <- rownames(splitted.df$train)
     g[g < min.weight] <- 0
 
@@ -2016,8 +2074,8 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, mi
 
     registerDoParallel(cluster)
     graphs <- foreach(rep=1:R) %dopar% {
-        genie3(df, tree.method=tree.method, K=K, n.tress=n.tress, min.weight=min.weight,
-               m=m, to='adjacency', cluster=1, seed=sample(1:10**6, 1))
+        genie3(df, tree.method=tree.method, K=K, n.trees=n.trees, min.weight=min.weight,
+               m=m, to='adjacency', cluster=NULL, seed=sample(1:10**6, 1))
     }
     stopImplicitCluster()
 
@@ -2276,7 +2334,7 @@ huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, 
     graphs <- foreach(rep=1:R) %dopar% {
         sel.genes <- sample(colnames(df), n.genes, replace=FALSE)
         sel.df <- subset(df, select=sel.genes)
-        obj <- algorithm(df=sel.df, R=iter.R, m=iter.m, threshold=0, to='adjacency', cluster=1, seed=seed, ...)
+        obj <- algorithm(df=sel.df, R=iter.R, m=iter.m, threshold=0, to='adjacency', cluster=NULL, seed=seed, ...)
         obj$replicates
     }
 
