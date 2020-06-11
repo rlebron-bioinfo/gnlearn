@@ -21,7 +21,7 @@ pc(
   pcalg.solve.confl = FALSE,
   bnlearn.test = ci.tests,
   bnlearn.B = NULL,
-  seed = sample(1:10^10, 1)
+  seed = sample(1:10^6, 1)
 )
 }
 \arguments{

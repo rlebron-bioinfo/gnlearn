@@ -11,7 +11,7 @@ boot.gclm(
   threshold = 0.5,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
   cluster = 4,
-  seed = sample(1:10^10, 1)
+  seed = sample(1:10^6, 1)
 )
 }
 \arguments{

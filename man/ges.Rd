@@ -11,7 +11,7 @@ ges(
   maxDegree = integer(0),
   m = NULL,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
-  seed = sample(1:10^10, 1)
+  seed = sample(1:10^6, 1)
 )
 }
 \arguments{
