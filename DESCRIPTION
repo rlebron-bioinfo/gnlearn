@@ -18,9 +18,9 @@ Author:
 Maintainer: Ricardo Lebrón <rlebron@go.ugr.es>
 Description: Genetic Network Learning (gnlearn) is an R package for structural learning of huge gene regulatory networks from single-cell datasets, using random gene resampling, cell bootstrapping, and one of the available structural learning algorithms.
 Depends:
-    parallel,
     foreach,
-    doParallel
+    snow,
+    doSNOW,
 biocViews:
 Imports:
     graph,
@@ -38,14 +38,17 @@ Imports:
     ape,
     gplots,
     DescTools,
-    doRNG
+    doRNG,
+    parallel,
+    progress
 Suggests:
     Rgraphviz,
     gRain,
     glmnet,
     MASS,
     ggplot2,
-    network
+    network,
+    doParallel
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

@@ -142,15 +142,32 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         skeleton(df, whitelist=whitelist, blacklist=blacklist, alpha=alpha, max.sx=max.sx, m=m,
                  to='adjacency', cluster=NULL, implementation=implementation,
                  pcalg.indep.test=pcalg.indep.test, pcalg.u2pd=pcalg.u2pd,
                  pcalg.conservative=pcalg.conservative, pcalg.maj.rule=pcalg.maj.rule, pcalg.solve.confl=pcalg.solve.confl,
                  bnlearn.test=bnlearn.test, bnlearn.B=bnlearn.B, seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -325,15 +342,32 @@ boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, 
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         pc(df, whitelist=whitelist, blacklist=blacklist, alpha=alpha, max.sx=max.sx, m=m,
            to='adjacency', cluster=NULL, implementation=implementation,
            pcalg.indep.test=pcalg.indep.test, pcalg.u2pd=pcalg.u2pd,
            pcalg.conservative=pcalg.conservative, pcalg.maj.rule=pcalg.maj.rule, pcalg.solve.confl=pcalg.solve.confl,
            bnlearn.test=bnlearn.test, bnlearn.B=bnlearn.B, seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -464,14 +498,31 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         fci(df, whitelist=whitelist, blacklist=blacklist, indep.test=indep.test, alpha=alpha, max.sx=max.sx, pdsep.max=pdsep.max,
                         conservative=conservative, maj.rule=maj.rule, version=version, type=type,
                         rules=rules, doPdsep=doPdsep, biCC=biCC, m=m,
                         to='adjacency', seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -582,12 +633,29 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         gs(df, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha, B=B, max.sx=max.sx,
            m=m, to='adjacency', cluster=NULL, seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -716,12 +784,29 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         iamb(df, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha, B=B, max.sx=max.sx, version=version,
              m=m, to='adjacency', cluster=NULL, seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -848,12 +933,29 @@ boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.te
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         parents.children(df, whitelist=whitelist, blacklist=blacklist, test=test, alpha=alpha, B=B, max.sx=max.sx, version=version,
                          m=m, to='adjacency', cluster=NULL, seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -938,11 +1040,28 @@ boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thre
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         chowliu(df, whitelist=whitelist, blacklist=blacklist, m=m, to='adjacency', seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -1027,11 +1146,28 @@ boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, thres
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         aracne(df, whitelist=whitelist, blacklist=blacklist, m=m, to='adjacency', seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -1143,12 +1279,29 @@ boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         hc(df, start=start, whitelist=whitelist, blacklist=blacklist, score=score, restart=restart, perturb=perturb, max.iter=max.iter, maxp=maxp,
            m=m, to='adjacency', seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -1264,12 +1417,29 @@ boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scor
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         tabu(df, start=start, whitelist=whitelist, blacklist=blacklist, score=score, tabu=tabu, max.tabu=max.tabu, max.iter=max.iter, maxp=maxp,
              m=m, to='adjacency', seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -1356,12 +1526,29 @@ boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triple
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         ges(df, blacklist=blacklist, adaptive=adaptive, maxDegree=maxDegree,
             m=m, to='adjacency', seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -1541,13 +1728,30 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         notears(df, lambda1=lambda1, loss.type=loss.type,
                 max.iter=max.iter, h.tol=h.tol, rho.max=rho.max, w.threshold=w.threshold, m=m,
                 to='adjacency')
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -1694,13 +1898,30 @@ boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stabl
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         rsmax2(df, whitelist=whitelist, blacklist=blacklist, restrict=restrict,
                maximize=maximize, restrict.args=restrict.args, maximize.args=maximize.args, version=version,
                m=m, to='adjacency', cluster=NULL, seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -1813,13 +2034,30 @@ boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gau
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         arges(df, whitelist=whitelist, blacklist=blacklist, indep.test=indep.test, alpha=alpha, max.sx=max.sx,
               adaptive=adaptive, maxDegree=maxDegree,
               m=m, to='adjacency', seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -1894,11 +2132,28 @@ boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph'
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         glasso(df, rho=rho, m=m, to='adjacency', seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     A <- average.graph(graphs, threshold=threshold, to='adjacency')
 
@@ -1969,11 +2224,28 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         lingam(df, m=m, to='adjacency', seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -2070,12 +2342,29 @@ boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, mi
 
     df <- drop.all.zeros(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         genie3(df, tree.method=tree.method, K=K, n.trees=n.trees, min.weight=min.weight,
                m=m, to='adjacency', cluster=NULL, seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -2188,11 +2477,28 @@ boot.gclm <- function(df, lambda=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         gclm(df, lambda=lambda, m=m, to='adjacency', seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     A <- average.graph(graphs, threshold=threshold, to='adjacency')
     g <- convert.format(A, to=to)
@@ -2279,11 +2585,28 @@ boot.nodag <- function(df, lambda=0.1, R=200, m=NULL, threshold=0.5, to=c('igrap
     df <- drop.all.zeros(df)
     df <- as.matrix(df)
 
-    registerDoParallel(cluster)
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         nodag(df, lambda=lambda, m=m, to='adjacency', seed=sample(1:10**6, 1))
     }
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     g <- average.graph(graphs, threshold=threshold, to=to)
     for (i in 1:R) {
@@ -2325,16 +2648,32 @@ huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, 
     set.seed(seed)
 
     df <- drop.all.zeros(df)
-    registerDoParallel(cluster)
 
-    graphs <- foreach(rep=1:R) %dopar% {
+    pb <- progress::progress_bar$new(
+        format = ":current/:total (:percent) [:bar] :elapsedfull | eta: :eta",
+        total = R,
+        width = 70)
+
+    tick <- function(n){
+        pb$tick(tokens = list())
+    }
+
+    if (is.null(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (!'cluster' %in% class(cluster)) {
+        cluster <- makeCluster(parallel::detectCores())
+    } else if (class(cluster)[1]) {
+        cluster <- makeCluster(cluster)
+    }
+
+    registerDoSNOW(cluster)
+    graphs <- foreach(rep=1:R, .options.snow = list(progress = tick)) %dopar% {
         sel.genes <- sample(colnames(df), n.genes, replace=FALSE)
         sel.df <- subset(df, select=sel.genes)
         obj <- algorithm(df=sel.df, R=iter.R, m=iter.m, threshold=0, to='adjacency', cluster=NULL, seed=seed, ...)
         obj$replicates
     }
-
-    stopImplicitCluster()
+    stopCluster(cluster)
 
     R <- length(graphs)
     replicates <- list()
