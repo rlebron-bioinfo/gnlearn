@@ -1430,14 +1430,14 @@ ortholog.graph <- function(g, genes, column, to=c('igraph', 'adjacency', 'edges'
 #' @param df Dataset.
 #' @param to Output format (optional): 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'igraph'
 #' @param from Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @keywords graph fit coefficients
 #' @export
 #' @examples
 #' g <- fit.coefficients(g, df)
 
 fit.coefficients <- function(g, df, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
-                             from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn'), cluster=4) {
+                             from=c('auto', 'adjacency', 'edges', 'graph', 'igraph', 'bnlearn'), cluster=parallel::detectCores()) {
     to <- match.arg(to)
     from <- match.arg(from)
     if (from=='auto') {

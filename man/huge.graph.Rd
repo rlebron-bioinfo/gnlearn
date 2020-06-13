@@ -13,7 +13,7 @@ huge.graph(
   iter.R = 4,
   iter.m = NULL,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
-  cluster = 4,
+  cluster = parallel::detectCores(),
   seed = sample(1:10^6, 1),
   ...
 )
@@ -35,7 +35,7 @@ huge.graph(
 
 \item{to}{Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn').}
 
-\item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: 4}
+\item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()}
 
 \item{seed}{Seed used for random selection. Default: NULL}
 

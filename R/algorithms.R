@@ -15,7 +15,7 @@ scores <- c('pred-loglik-g', 'loglik-g', 'aic-g', 'bic-g', 'bge')
 #' @param max.sx Maximum allowed size of the conditioning sets.
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param implementation Peter & Clark algorithm implementation: 'pcalg' or 'bnlearn'. Default: 'pcalg'
 #' @param pcalg.indep.test Conditional independence test to be used (pcalg implementation). Default: pcalg::gaussCItest
 #' @param bnlearn.test Conditional independence test to be used (bnlearn implementation): 'cor', 'mc-cor', 'smc-cor', 'zf', 'mc-zf', 'smc-zf', 'mi-g', 'mc-mi-g', 'smc-mi-g', or 'mi-g-sh'. Default: 'cor'
@@ -29,7 +29,7 @@ scores <- c('pred-loglik-g', 'loglik-g', 'aic-g', 'bic-g', 'bge')
 
 skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, m=NULL,
                      to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
-                     cluster=4, implementation=c('pcalg','bnlearn'),
+                     cluster=parallel::detectCores(), implementation=c('pcalg','bnlearn'),
                      pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
                      pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
                      bnlearn.test=ci.tests, bnlearn.B=NULL, seed=sample(1:10**6, 1)) {
@@ -99,7 +99,7 @@ skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf,
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param implementation Peter & Clark algorithm implementation: 'pcalg' or 'bnlearn'. Default: 'pcalg'
 #' @param pcalg.indep.test Conditional independence test to be used (pcalg implementation). Default: pcalg::gaussCItest
 #' @param bnlearn.test Conditional independence test to be used (bnlearn implementation): 'cor', 'mc-cor', 'smc-cor', 'zf', 'mc-zf', 'smc-zf', 'mi-g', 'mc-mi-g', 'smc-mi-g', or 'mi-g-sh'. Default: 'cor'
@@ -115,7 +115,7 @@ skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf,
 
 boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, R=200, m=NULL, threshold=0.5,
                           to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
-                          cluster=4, implementation=c('pcalg','bnlearn'),
+                          cluster=parallel::detectCores(), implementation=c('pcalg','bnlearn'),
                           pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
                           pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
                           bnlearn.test=ci.tests, bnlearn.B=NULL, seed=sample(1:10**6, 1)) {
@@ -173,7 +173,7 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
 #' @param max.sx Maximum allowed size of the conditioning sets.
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param implementation Peter & Clark algorithm implementation: 'pcalg' or 'bnlearn'. Default: 'pcalg'
 #' @param pcalg.indep.test Conditional independence test to be used (pcalg implementation). Default: pcalg::gaussCItest
 #' @param pcalg.u2pd Method for dealing with conflicting information when trying to orient edges (pcalg implementation). Default: 'relaxed'
@@ -191,7 +191,7 @@ boot.skeleton <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx
 
 pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, m=NULL,
                to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
-               cluster=4, implementation=c('pcalg','bnlearn'),
+               cluster=parallel::detectCores(), implementation=c('pcalg','bnlearn'),
                pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
                pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
                bnlearn.test=ci.tests, bnlearn.B=NULL, seed=sample(1:10**6, 1)) {
@@ -270,7 +270,7 @@ pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, m=NUL
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param implementation Peter & Clark algorithm implementation: 'pcalg' or 'bnlearn'. Default: 'pcalg'
 #' @param pcalg.indep.test Conditional independence test to be used (pcalg implementation). Default: pcalg::gaussCItest
 #' @param pcalg.u2pd Method for dealing with conflicting information when trying to orient edges (pcalg implementation). Default: 'relaxed'
@@ -290,7 +290,7 @@ pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, m=NUL
 
 boot.pc <- function(df, whitelist=NULL, blacklist=NULL, alpha=0.01, max.sx=Inf, R=200, m=NULL, threshold=0.5,
                     to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
-                    cluster=4, implementation=c('pcalg','bnlearn'),
+                    cluster=parallel::detectCores(), implementation=c('pcalg','bnlearn'),
                     pcalg.indep.test=pcalg::gaussCItest, pcalg.u2pd=c('relaxed','rand','retry'),
                     pcalg.conservative=FALSE, pcalg.maj.rule=FALSE, pcalg.solve.confl=FALSE,
                     bnlearn.test=ci.tests, bnlearn.B=NULL, seed=sample(1:10**6, 1)) {
@@ -433,7 +433,7 @@ fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItes
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -445,7 +445,7 @@ fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItes
 boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf, pdsep.max=Inf,
                      conservative=FALSE, maj.rule=FALSE, version=c('fci','rfci','fci.plus'), type=c('normal','anytime','adaptive'),
                      rules=rep(TRUE,10), doPdsep=TRUE, biCC=FALSE,
-                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     version <- match.arg(version)
     type <- match.arg(type)
     to <- match.arg(to)
@@ -496,7 +496,7 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
 #' @param max.sx Maximum allowed size of the conditioning sets.
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -504,7 +504,7 @@ boot.fci <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gauss
 #' g <- gs(df)
 
 gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL,
-               m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+               m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     test <- match.arg(test)
     to <- match.arg(to)
 
@@ -556,7 +556,7 @@ gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -566,7 +566,7 @@ gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=
 #' g.rep <- obj$replicates
 
 boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL,
-                    R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+                    R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     test <- match.arg(test)
     to <- match.arg(to)
 
@@ -613,7 +613,7 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
 #' @param version Algorithm version: 'iamb', 'fast.iamb', 'inter.iamb', or 'iamb.fdr'. Default: 'iamb'
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -621,7 +621,7 @@ boot.gs <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.0
 #' g <- iamb(df)
 
 iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('iamb','fast.iamb','inter.iamb','iamb.fdr'),
-                 m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+                 m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     test <- match.arg(test)
     version <- match.arg(version)
     to <- match.arg(to)
@@ -682,7 +682,7 @@ iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, 
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -692,7 +692,7 @@ iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, 
 #' g.rep <- obj$replicates
 
 boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('iamb','fast.iamb','inter.iamb','iamb.fdr'),
-                      R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+                      R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     test <- match.arg(test)
     version <- match.arg(version)
     to <- match.arg(to)
@@ -747,7 +747,7 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
 #' @param version Algorithm version: 'mmpc', 'si.hiton.pc', or 'hpc'. Default: 'mmpc'
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -755,7 +755,7 @@ boot.iamb <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0
 #' g <- parents.children(df)
 
 parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('mmpc','si.hiton.pc','hpc'),
-                             m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+                             m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     test <- match.arg(test)
     version <- match.arg(version)
     to <- match.arg(to)
@@ -815,7 +815,7 @@ parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, 
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -825,7 +825,7 @@ parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, 
 #' g.rep <- obj$replicates
 
 boot.parents.children <- function(df, whitelist=NULL, blacklist=NULL, test=ci.tests, alpha=0.01, B=NULL, max.sx=NULL, version=c('mmpc','si.hiton.pc','hpc'),
-                                  R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+                                  R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     test <- match.arg(test)
     version <- match.arg(version)
     to <- match.arg(to)
@@ -914,7 +914,7 @@ chowliu <- function(df, whitelist=NULL, blacklist=NULL, m=NULL, to=c('igraph', '
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -923,7 +923,7 @@ chowliu <- function(df, whitelist=NULL, blacklist=NULL, m=NULL, to=c('igraph', '
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+boot.chowliu <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     to <- match.arg(to)
 
     set.seed(seed)
@@ -1003,7 +1003,7 @@ aracne <- function(df, whitelist=NULL, blacklist=NULL, m=NULL, to=c('igraph', 'a
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -1012,7 +1012,7 @@ aracne <- function(df, whitelist=NULL, blacklist=NULL, m=NULL, to=c('igraph', 'a
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+boot.aracne <- function(df, whitelist=NULL, blacklist=NULL, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     to <- match.arg(to)
 
     set.seed(seed)
@@ -1113,7 +1113,7 @@ hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, res
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -1123,7 +1123,7 @@ hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, res
 #' g.rep <- obj$replicates
 
 boot.hc <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, restart=0, perturb=1, max.iter=Inf, maxp=Inf,
-                    R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+                    R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     to <- match.arg(to)
 
     set.seed(seed)
@@ -1231,7 +1231,7 @@ tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, t
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -1241,7 +1241,7 @@ tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, t
 #' g.rep <- obj$replicates
 
 boot.tabu <- function(df, start=NULL, whitelist=NULL, blacklist=NULL, score=scores, tabu=10, max.tabu=NULL, max.iter=Inf, maxp=Inf,
-                      R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+                      R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     to <- match.arg(to)
 
     set.seed(seed)
@@ -1333,7 +1333,7 @@ ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), 
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -1343,7 +1343,7 @@ ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), 
 #' g.rep <- obj$replicates
 
 boot.ges <- function(df, blacklist=NULL, adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
-                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+                     R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     adaptive <- match.arg(adaptive)
     to <- match.arg(to)
 
@@ -1522,7 +1522,7 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -1533,7 +1533,7 @@ notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
 
 boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson'),
                          max.iter=100, h.tol=1e-6, rho.max=1e+6, w.threshold=0.1,
-                         R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+                         R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     loss.type <- match.arg(loss.type)
     to <- match.arg(to)
 
@@ -1575,7 +1575,7 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
 #' @param version Algorithm version: 'rsmax2','mmhc', or 'h2pc'. Default: 'rsmax2'
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -1584,7 +1584,7 @@ boot.notears <- function(df, lambda1=0.1, loss.type=c('l2','logistic','poisson')
 
 rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','gs','iamb','fast.iamb','inter.iamb','iamb.fdr','mmpc','si.hiton.pc','hpc'),
                    maximize=c('hc','tabu'), restrict.args=list(), maximize.args=list(), version=c('rsmax2','mmhc','h2pc'),
-                   m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+                   m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     restrict <- match.arg(restrict)
     maximize <- match.arg(maximize)
     version <- match.arg(version)
@@ -1653,7 +1653,7 @@ rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','g
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -1664,7 +1664,7 @@ rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','g
 
 boot.rsmax2 <- function(df, whitelist=NULL, blacklist=NULL, restrict=c('pc.stable','gs','iamb','fast.iamb','inter.iamb','iamb.fdr','mmpc','si.hiton.pc','hpc'),
                         maximize=c('hc','tabu'), restrict.args=list(), maximize.args=list(), version=c('rsmax2','mmhc','h2pc'),
-                        R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+                        R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     restrict <- match.arg(restrict)
     maximize <- match.arg(maximize)
     version <- match.arg(version)
@@ -1783,7 +1783,7 @@ arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCIt
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -1794,7 +1794,7 @@ arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCIt
 
 boot.arges <- function(df, whitelist=NULL, blacklist=NULL, indep.test=pcalg::gaussCItest, alpha=0.01, max.sx=Inf,
                        adaptive=c('none','vstructures','triples'), maxDegree=integer(0),
-                       R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+                       R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
 
     adaptive <- match.arg(adaptive)
     to <- match.arg(to)
@@ -1878,7 +1878,7 @@ glasso <- function(df, rho=0.1, m=NULL, to=c('igraph', 'adjacency', 'edges', 'gr
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -1887,7 +1887,7 @@ glasso <- function(df, rho=0.1, m=NULL, to=c('igraph', 'adjacency', 'edges', 'gr
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+boot.glasso <- function(df, rho=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     to <- match.arg(to)
 
     set.seed(seed)
@@ -1953,7 +1953,7 @@ lingam <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bn
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -1962,7 +1962,7 @@ lingam <- function(df, m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bn
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     to <- match.arg(to)
 
     set.seed(seed)
@@ -1998,7 +1998,7 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 #' @param min.weight Minimum absolute value considered in the adjacency matrix. Lower values will be replaced by zero. Default: 0.1
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster The number of cores to be used (optional). Default: 4
+#' @param cluster The number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -2007,7 +2007,7 @@ boot.lingam <- function(df, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjace
 
 genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, min.weight=0.1,
                    m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
-                   cluster=4, seed=sample(1:10**6, 1)) {
+                   cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     tree.method <- match.arg(tree.method)
     to <- match.arg(to)
 
@@ -2026,7 +2026,7 @@ genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, min.wei
     if (!is.null(cluster)) {
         g <- GENIE3::GENIE3(splitted.df$train, treeMethod=tree.method, K=K, nTrees=n.trees, nCores=cluster)
     } else {
-        g <- GENIE3::GENIE3(splitted.df$train, treeMethod=tree.method, K=K, nTrees=n.trees)
+        g <- GENIE3::GENIE3(splitted.df$train, treeMethod=tree.method, K=K, nTrees=n.trees, nCores=1)
     }
     rownames(g) <- colnames(g) <- rownames(splitted.df$train)
     g[g < min.weight] <- 0
@@ -2047,7 +2047,7 @@ genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, min.wei
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -2058,7 +2058,7 @@ genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, min.wei
 
 boot.genie3 <- function(df, tree.method=c('rf','et'), K='sqrt', n.trees=1000, min.weight=0.1,
                         R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'),
-                        cluster=4, seed=sample(1:10**6, 1)) {
+                        cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     tree.method <- match.arg(tree.method)
     to <- match.arg(to)
 
@@ -2171,7 +2171,7 @@ gclm <- function(df, lambda=0.1, m=NULL, to=c('igraph', 'adjacency', 'edges', 'g
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @export
@@ -2180,7 +2180,7 @@ gclm <- function(df, lambda=0.1, m=NULL, to=c('igraph', 'adjacency', 'edges', 'g
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.gclm <- function(df, lambda=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+boot.gclm <- function(df, lambda=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     to <- match.arg(to)
 
     set.seed(seed)
@@ -2261,7 +2261,7 @@ nodag <- function(df, lambda=0.1, m=NULL, to=c('igraph', 'adjacency', 'edges', '
 #' @param m Size of training set (optional). Default: nrow(df)/2
 #' @param threshold Minimum strength required for a coefficient to be included in the average adjacency matrix (optional). Default: 0.5
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @keywords learning graph
 #' @useDynLib gnlearn
@@ -2271,7 +2271,7 @@ nodag <- function(df, lambda=0.1, m=NULL, to=c('igraph', 'adjacency', 'edges', '
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-boot.nodag <- function(df, lambda=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1)) {
+boot.nodag <- function(df, lambda=0.1, R=200, m=NULL, threshold=0.5, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1)) {
     to <- match.arg(to)
 
     set.seed(seed)
@@ -2307,7 +2307,7 @@ boot.nodag <- function(df, lambda=0.1, R=200, m=NULL, threshold=0.5, to=c('igrap
 #' @param iter.R Number of bootstrap replicates. Default: 200
 #' @param iter.m Size of training set. Default: nrow(df)/2
 #' @param to Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn').
-#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: 4
+#' @param cluster A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()
 #' @param seed Seed used for random selection. Default: NULL
 #' @param ... Other arguments for the specified algorithm.
 #' @keywords learning huge graph
@@ -2319,7 +2319,7 @@ boot.nodag <- function(df, lambda=0.1, R=200, m=NULL, threshold=0.5, to=c('igrap
 #' avg.g <- obj$average
 #' g.rep <- obj$replicates
 
-huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, iter.R=4, iter.m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=4, seed=sample(1:10**6, 1), ...) {
+huge.graph <- function(df, algorithm=boot.pc, n.genes=15, R=200, threshold=0.5, iter.R=4, iter.m=NULL, to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn'), cluster=parallel::detectCores(), seed=sample(1:10**6, 1), ...) {
     to <- match.arg(to)
 
     set.seed(seed)

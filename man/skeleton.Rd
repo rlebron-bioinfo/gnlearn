@@ -12,7 +12,7 @@ skeleton(
   max.sx = Inf,
   m = NULL,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
-  cluster = 4,
+  cluster = parallel::detectCores(),
   implementation = c("pcalg", "bnlearn"),
   pcalg.indep.test = pcalg::gaussCItest,
   pcalg.u2pd = c("relaxed", "rand", "retry"),
@@ -39,7 +39,7 @@ skeleton(
 
 \item{to}{Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).}
 
-\item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: 4}
+\item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()}
 
 \item{implementation}{Peter & Clark algorithm implementation: 'pcalg' or 'bnlearn'. Default: 'pcalg'}
 

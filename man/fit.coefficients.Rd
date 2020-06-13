@@ -9,7 +9,7 @@ fit.coefficients(
   df,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
   from = c("auto", "adjacency", "edges", "graph", "igraph", "bnlearn"),
-  cluster = 4
+  cluster = parallel::detectCores()
 )
 }
 \arguments{
@@ -21,7 +21,7 @@ fit.coefficients(
 
 \item{from}{Input format (optional): 'auto', 'adjacency', 'edges', 'graph', 'igraph', or 'bnlearn'. Default: 'auto'}
 
-\item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: 4}
+\item{cluster}{A cluster object from package parallel or the number of cores to be used (optional). Default: parallel::detectCores()}
 }
 \description{
 This function allows you to estimate the coefficients of the adjacency matrix of a previously learned graph.

@@ -12,7 +12,7 @@ genie3(
   min.weight = 0.1,
   m = NULL,
   to = c("igraph", "adjacency", "edges", "graph", "bnlearn"),
-  cluster = 4,
+  cluster = parallel::detectCores(),
   seed = sample(1:10^6, 1)
 )
 }
@@ -31,7 +31,7 @@ genie3(
 
 \item{to}{Output format ('adjacency', 'edges', 'graph', 'igraph', or 'bnlearn') (optional).}
 
-\item{cluster}{The number of cores to be used (optional). Default: 4}
+\item{cluster}{The number of cores to be used (optional). Default: parallel::detectCores()}
 
 \item{seed}{Seed used for random selection. Default: NULL}
 }
