@@ -507,6 +507,8 @@ compare.graphs <- function(learned, true, learned.replicates=NULL, skeleton=FALS
     f1 <- f1.score(igraph::ecount(tp), igraph::ecount(fp), igraph::ecount(fn))
     miss <- miss.rate(igraph::ecount(fn), igraph::ecount(tp))
     fdr <- fd.rate(igraph::ecount(fp), igraph::ecount(tp))
+    jaccard <- igraph::ecount(tp)/igraph::ecount(u)
+    sorensen.dice <- 2*jaccard/(1+jaccard)
 
     if (plot) {
         learned.x <- igraph::difference(learned, tp)
@@ -650,7 +652,9 @@ compare.graphs <- function(learned, true, learned.replicates=NULL, skeleton=FALS
             Accuracy = acc,
             Balanced.Accuracy = b.acc,
             SHD = shd,
-            Hamming = hamming
+            Hamming = hamming,
+            Jaccard = jaccard,
+            Sorensen.Dice = sorensen.dice
         ))
     } else {
         return(list(
@@ -670,7 +674,9 @@ compare.graphs <- function(learned, true, learned.replicates=NULL, skeleton=FALS
             Accuracy = acc,
             Balanced.Accuracy = b.acc,
             SHD = shd,
-            Hamming = hamming
+            Hamming = hamming,
+            Jaccard = jaccard,
+            Sorensen.Dice = sorensen.dice
         ))
     }
 }
