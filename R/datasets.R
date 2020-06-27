@@ -312,6 +312,9 @@ import.graph <- function(path, sep='\t', header=TRUE, index=TRUE, from=c('adjace
     } else {
         file <- file(path, 'rt')
     }
+    if (from=='edges') {
+        index <- FALSE
+    }
     if (index) {
         df <- read.table(file, sep=sep, header=header, row.names=1, check.names=FALSE)
     } else {
