@@ -301,7 +301,7 @@ import.dataset <- function(path, log=FALSE, sep='\t', header=TRUE, index=FALSE, 
 import.graph <- function(path, sep='\t', header=TRUE, index=TRUE, from=c('adjacency','edges'),
                          to=c('igraph', 'adjacency', 'edges', 'graph', 'bnlearn')) {
     from <- match.arg(from)
-    to <- match.args(to)
+    to <- match.arg(to)
     ext <- tools::file_ext(path)
     if (ext == 'gz') {
         file <- gzfile(path, 'rt')
