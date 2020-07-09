@@ -1,7 +1,5 @@
 # gnlearn
-**G**enetic **N**etwork **Learn**ing (`gnlearn`) is an R package for structural learning of huge gene regulatory networks from single-cell datasets, using random gene resampling, cell bootstrapping, and one of the available algorithms (see below).
-
-The learned genetic networks can be obtained as graphs (in `graph` or `igraph` R packages formats), as adjacent matrices or as a lists of edges. `gnlearn` has a wide range of functions for working with both input datasets and learned networks (see *Package Overview* section).
+**G**enetic **N**etwork **Learn**ing (`gnlearn`) is an R package for structural learning of transcriptional regulatory networks from single-cell datasets. Learned transcriptional regulatory networks can be obtained as graphs (in `graph` or `igraph` R packages formats), adjacent matrices or lists of edges.
 
 ***
 
@@ -172,113 +170,115 @@ docker run -ti --rm -v "$PWD":/root/wd rlebronbioinfo/gnlearn Rscript /root/wd/m
 
 After running one of these commands, your working directory will be mounted in /root/wd inside the Docker container. This container will be automatically destroyed after closing the interpreter.
 
-## Quick Start
-
-
-## Documentation
-
-
-## Examples
-
-*Example #1: Breast Cancer*
-
-*Example #2: Hepatocellular Carcinoma*
-
-*Example #3: Erythropoiesis*
-
 ## Citation
 
-The gnlearn article is not yet available (Ricardo Lebrón & Gherardo Varando, in preparation).
+The gnlearn article is under preparation. Please also use the following references according to the algorithm used:
 
-Please also use the following references depending on the algorithm used:
 * PC or skeleton [[1]](#1)
 * FCI [[2]](#2)
 * RFCI [[3]](#3)
 * FCI+ [[4]](#4)
 * GS [[5]](#5)
 * IAMB [[6]](#6)
-* Fast IAMB [[6]](#6)
-* Interleaved IAMB [[7]](#7)
-* IAMB with FDR Correction [[8]](#8) [[9]](#9)
-* MMPC [[10]](#10)
-* SI-HITON-PC [[11]](#11)
-* HPC [[12]](#12)
-* Chow-Liu algorithm [[13]](#13)
-* ARACNE [[14]](#14)
-* HC [[15]](#15)
-* Tabu [[15]](#15)
-* GES [[16]](#16)
-* Linear NO-TEARS [[17]](#17)
-* RSMAX2 [[18]](#18)
-* MMHC [[19]](#19)
-* H2PC [[20]](#20)
-* ARGES [[21]](#21)
-* GLASSO [[22]](#22)
-* LINGAM [[23]](#23)
-* GENIE3 [[]](#)
-* GCLM [[24]](#24)
-* NODAG [[25]](#25)
+* Fast-IAMB [[7]](#7)
+* Interleaved-IAMB [[6]](#6)
+* IAMB with FDR Correction [[8]](#8)
+* MMPC [[6]](#6)
+* SI-HITON-PC [[9]](#9)
+* HPC [[10]](#10)
+* Chow-Liu algorithm [[11]](#11)
+* ARACNE [[12]](#12)
+* HC [[13]](#13)
+* Tabu [[13]](#13)
+* GES [[14]](#14)
+* Linear NO-TEARS [[15]](#15) [[16]](#16)
+* RSMAX2 [[17]](#17)
+* MMHC [[18]](#18)
+* H2PC [[10]](#10)
+* ARGES [[19]](#19)
+* GLASSO [[20]](#20)
+* LINGAM [[21]](#21)
+* GENIE3 [[22]](#22)
+* GCLM [[23]](#23)
+* NODAG [[24]](#24)
 
-If you use a pcalg-based or bnlearn-based implementation, please cite [[26]](#26) and [[27]](#27) respectively.
+If you use a pcalg-based or bnlearn-based implementation, please cite [[25]](#25) and [[26]](#26) respectively.
 
 ## References
 <a id="1">[1]</a>
-Colombo D, Maathuis MH (2014). "Order-Independent Constraint-Based Causal Structure Learning". Journal of Machine Learning Research, 15:3921–3962.
+Colombo, D. and Maathuis, M. H. (2014). Order-independent constraint-based causal structure learning. The Journal of Machine Learning Research, 15(1):3741–3782.
 
 <a id="2">[2]</a>
+Spirtes, P., Glymour, C. N., Scheines, R., and Heckerman, D. (2000). Causation, Prediction, and Search. MIT press.
 
 <a id="3">[3]</a>
+Colombo, D., Maathuis, M. H., Kalisch, M., and Richardson, T. S. (2012). Learning high-dimensional directed acyclic graphs with latent and selection variables. The Annals of Statistics, pages 294–321.
 
 <a id="4">[4]</a>
+Claassen, T., Mooij, J., and Heskes, T. (2013). Learning sparse causal models is not np-hard. preprint arXiv:1309.6824.
 
 <a id="5">[5]</a>
-Margaritis D (2003). Learning Bayesian Network Model Structure from Data. Ph.D. thesis, School of Computer Science, Carnegie-Mellon University, Pittsburgh, PA.
+Margaritis, D. (2003). Learning bayesian network model structure from data. Technical report, Carnegie-Mellon Univ Pittsburgh Pa School of Computer Science.
 
 <a id="6">[6]</a>
-Tsamardinos I, Aliferis CF, Statnikov A (2003). "Algorithms for Large Scale Markov Blanket Discovery". Proceedings of the Sixteenth International Florida Artificial Intelligence Research Society Conference, 376–381.
+Tsamardinos, I., Aliferis, C. F., Statnikov, A. R., and Statnikov, E. (2003). Algorithms for large scale markov blanket discovery. In FLAIRS conference, volume 2, pages 376–380.
 
 <a id="7">[7]</a>
-Yaramakala S, Margaritis D (2005). "Speculative Markov Blanket Discovery for Optimal Feature Selection". Proceedings of the Fifth IEEE International Conference on Data Mining, 809–812.
+Yaramakala, S. and Margaritis, D. (2005). Speculative markov blanket discovery for optimal feature selection. In Fifth IEEE International Conference on Data Mining, pages 1–4. IEEE.
 
 <a id="8">[8]</a>
-Pena JM (2008). "Learning Gaussian Graphical Models of Gene Networks with False Discovery Rate Control". Proceedings of the Sixth European Conference on Evolutionary Computation, Machine Learning and Data Mining in Bioinformatics, 165–176.
+Peña, J. M. (2008). Learning gaussian graphical models of gene networks with false discovery rate control. In European conference on evolutionary computation, machine learning and data mining in bioinformatics, pages 165–176. Springer.
 
 <a id="9">[9]</a>
-Gasse M, Aussem A, Elghazel H (2014). "A Hybrid Algorithm for Bayesian Network Structure Learning with Application to Multi-Label Learning". Expert Systems with Applications, 41(15):6755–6772.
+Aliferis, F. C., Statnikov, A., Tsamardinos, I., Subramani, M. and Koutsoukos, X. D. (2010). Local Causal and Markov Blanket Induction for Causal Discovery and Feature Selection for Classification Part I: Algorithms and Empirical Evaluation. Journal of Machine Learning Research, 11:171–234.
 
 <a id="10">[10]</a>
-
+Gasse, M., Aussem, A., and Elghazel, H. (2014). A hybrid algorithm for bayesian network structure learning with application to multi-label learning. Expert Systems with Applications, 41(15):6755–6772.
 
 <a id="11">[11]</a>
+Chow, C. and Liu, C. (1968). Approximating discrete probability distributions with dependence trees. IEEE Transactions on Information Theory, 14(3):462–467.
 
 <a id="12">[12]</a>
+Margolin, A. A., Nemenman, I., Basso, K., Wiggins, C., Stolovitzky, G., Favera, R. D., and Califano, A. (2006). ARACNE: An Algorithm for the Reconstruction of Gene Regulatory Networks in a Mammalian Cellular Context. BMC Bioinformatics, 7(S1):S7.
 
 <a id="13">[13]</a>
+Bouckaert, R. R. (1995). Bayesian belief networks: from construction to inference. PhD thesis.
 
 <a id="14">[14]</a>
+Chickering, D. M. (2002). Learning equivalence classes of bayesian-network structures. Journal of machine learning research, 2(Feb):445–498.
 
 <a id="15">[15]</a>
+Zheng, X., Aragam, B., Ravikumar, P. K., and Xing, E. P. (2018). Dags with no tears: Continuous optimization for structure learning. In Advances in Neural Information Processing Systems, pages 9472–9483.
 
 <a id="16">[16]</a>
+Zheng, X., Dan, C., Aragam, B., Ravikumar, P., and Xing, E. P. (2019). Learning sparse nonparametric dags. preprint arXiv:1909.13189.
 
 <a id="17">[17]</a>
+Friedman, N., Nachman, I., and Pe’er, D. (2013). Learning bayesian network structure from massive datasets: The sparse candidate algorithm. preprint arXiv:1301.6696.
 
 <a id="18">[18]</a>
+Tsamardinos, I., Brown, L. E., and Aliferis, C. F. (2006). The max-min hill-climbing bayesian network structure learning algorithm. Machine learning, 65(1):31–78.
 
 <a id="19">[19]</a>
+Nandy, P., Hauser, A., and Maathuis, M. H. (2018). High-dimensional consistency in score-based and hybrid structure learning. The Annals of Statistics, 46(6A):3151–3183.
 
 <a id="20">[20]</a>
+Zhao, T., Liu, H., Roeder, K., Lafferty, J., and Wasserman, L. (2012). The huge package for high-dimensional undirected graph estimation in R. The Journal of Machine Learning Research, 13(1), 1059-1062.
 
 <a id="21">[21]</a>
+Shimizu, S., Hoyer, P. O., Hyvärinen, A., and Kerminen, A. (2006). A linear non-gaussian acyclic model for causal discovery. Journal of Machine Learning Research, 7(Oct):2003–2030.
 
 <a id="22">[22]</a>
+Huynh-Thu, V. A., Irrthum, A., Wehenkel, L., and Geurts, P. (2010). Inferring Regulatory Networks from Expression Data Using Tree-Based Methods. PLoS ONE, 5(9):e12776.
 
 <a id="23">[23]</a>
+Varando, G. and Hansen, N. R. (2020). Graphical continuous lyapunov models. arXiv preprint arXiv:2005.10483.
 
 <a id="24">[24]</a>
+Varando, G. (2020). Learning dags without imposing acyclicity. arXiv preprint arXiv:2006.03005.
 
 <a id="25">[25]</a>
+Kalisch, M., Mächler, M., Colombo, D., Maathuis, M. H., and Bühlmann, P. (2012). Causal inference using graphical models with the r package pcalg. Journal of Statistical Software, 47(11):1–26.
 
 <a id="26">[26]</a>
-
-<a id="27">[27]</a>
+Scutari, M. (2010). Learning Bayesian Networks with the bnlearn R Package. Journal of Statistical Software, 35(3).
