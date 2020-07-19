@@ -170,6 +170,10 @@ docker run -ti --rm -v "$PWD":/root/wd rlebronbioinfo/gnlearn Rscript /root/wd/m
 
 After running one of these commands, your working directory will be mounted in /root/wd inside the Docker container. This container will be automatically destroyed after closing the interpreter.
 
+## Quick Start
+
+<a href="https://github.com/rlebron-bioinfo/gnlearn/blob/master/docs/quickstart.ipynb" target="_blank">Jupyter Notebook</a>
+
 ## Citation
 
 The gnlearn article is under preparation. Please also use the following references according to the algorithm used:
