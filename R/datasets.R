@@ -201,8 +201,12 @@ download.graph <- function(code, to=c('igraph', 'adjacency', 'edges', 'graph', '
     if (!is.null(url)) {
         tmp <- fs::file_temp(ext='.txt')
         utils::download.file(url, destfile=tmp, quiet=TRUE, mode='wt')
-        df <- read.table(tmp, sep='\t', header=TRUE, check.names=FALSE)
-        g <- convert.format(df, from='adjacency', to=to)
+        g <- readRDS(tmp)
+        g$average <- convert.format(g$average, from='adjacency', to=to)
+        R <- length(g$replicates)
+        for (i in 1:R) {
+            g$replicates[[i]] <- convert.format(g$replicates[[i]], from='adjacency', to=to)
+        }
         return(g)
     } else {
         return(NULL)
