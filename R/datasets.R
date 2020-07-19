@@ -199,8 +199,8 @@ download.graph <- function(code, to=c('igraph', 'adjacency', 'edges', 'graph', '
     df <- jsonlite::fromJSON(uri)
     url <- df$url
     if (!is.null(url)) {
-        tmp <- fs::file_temp(ext='.txt')
-        utils::download.file(url, destfile=tmp, quiet=TRUE, mode='wt')
+        tmp <- fs::file_temp(ext='.rds')
+        utils::download.file(url, destfile=tmp, quiet=TRUE, mode='wb')
         g <- readRDS(tmp)
         g$average <- convert.format(g$average, from='adjacency', to=to)
         R <- length(g$replicates)
